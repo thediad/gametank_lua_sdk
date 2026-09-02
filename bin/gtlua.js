@@ -238,6 +238,10 @@ if (cmd === "build") {
   const songsPaths = gIdx !== -1 ? rest[gIdx + 1].split(",").filter(Boolean) : [];
   const xIdx = rest.indexOf("--sheetext");
   const sheetExtPath = xIdx !== -1 ? rest[xIdx + 1] : undefined;
+  const ffIdx = rest.indexOf("--gff");
+  const gffPath = ffIdx !== -1 ? rest[ffIdx + 1] : undefined;
+  const mIdx = rest.indexOf("--map");
+  const mapPath = mIdx !== -1 ? rest[mIdx + 1] : undefined;
   const nIdx = rest.indexOf("--num8");
   const valueOf = (i) => (i === -1 ? -2 : i + 1);   // index of a flag's value arg
   const entry = rest.filter((a, i) =>
@@ -246,23 +250,29 @@ if (cmd === "build") {
     i !== fIdx && i !== valueOf(fIdx) &&
     i !== gIdx && i !== valueOf(gIdx) &&
     i !== xIdx && i !== valueOf(xIdx) &&
+    i !== ffIdx && i !== valueOf(ffIdx) &&
+    i !== mIdx && i !== valueOf(mIdx) &&
     i !== nIdx)[0];
-  if (!entry) fail("usage: gtlua build <main.lua> [--sheet foo.gtg] [--frames foo.gsi] [--songs a.gtm2,b.gtm2] [--sheetext ext.bin] [--num8] [-o game.gtr]");
-  await runBuild(entry, { outPath, sheetPath, num8: nIdx !== -1, framesPath, songsPaths, sheetExtPath });
+  if (!entry) fail("usage: gtlua build <main.lua> [--sheet foo.gtg] [--gff foo.gff] [--map foo.map] [--frames foo.gsi] [--songs a.gtm2,b.gtm2] [--sheetext ext.bin] [--num8] [-o game.gtr]");
+  await runBuild(entry, { outPath, sheetPath, gffPath, mapPath, num8: nIdx !== -1, framesPath, songsPaths, sheetExtPath });
   if (_closeWorker) _closeWorker();
 } else if (cmd === "run") {
   // build then play in a window (bundled core), no external emulator needed.
   const oIdx = rest.indexOf("-o");
   const sIdx = rest.indexOf("--sheet");
   const fIdx = rest.indexOf("--frames");
+  const ffIdx = rest.indexOf("--gff");
+  const mIdx = rest.indexOf("--map");
   const nIdx = rest.indexOf("--num8");
   const valueOf = (i) => (i === -1 ? -2 : i + 1);
   const entry = rest.filter((a, i) =>
     i !== oIdx && i !== valueOf(oIdx) &&
     i !== sIdx && i !== valueOf(sIdx) &&
     i !== fIdx && i !== valueOf(fIdx) &&
+    i !== ffIdx && i !== valueOf(ffIdx) &&
+    i !== mIdx && i !== valueOf(mIdx) &&
     i !== nIdx)[0];
-  if (!entry) fail("usage: gtlua run <main.lua> [--sheet foo.gtg] [--frames foo.gsi] [--num8]");
+  if (!entry) fail("usage: gtlua run <main.lua> [--sheet foo.gtg] [--gff foo.gff] [--map foo.map] [--frames foo.gsi] [--num8]");
   // if given a prebuilt .gtr, run it directly; else build to a temp .gtr first.
   let gtr;
   if (entry.endsWith(".gtr")) {
@@ -272,6 +282,8 @@ if (cmd === "build") {
     await runBuild(entry, {
       outPath: gtr,
       sheetPath: sIdx !== -1 ? rest[sIdx + 1] : undefined,
+      gffPath: ffIdx !== -1 ? rest[ffIdx + 1] : undefined,
+      mapPath: mIdx !== -1 ? rest[mIdx + 1] : undefined,
       num8: nIdx !== -1,
       framesPath: fIdx !== -1 ? rest[fIdx + 1] : undefined,
     });
@@ -304,8 +316,8 @@ if (cmd === "build") {
   const { gfxCli } = await import("./gtlua-gfx.mjs");
   gfxCli(rest);
 } else {
-  fail("usage: gtlua build <main.lua> [--sheet foo.gtg] [--frames foo.gsi] [--num8] [-o game.gtr]\n" +
-    "       gtlua run   <main.lua|game.gtr> [--sheet ...] [--num8]   build + play in a window\n" +
+  fail("usage: gtlua build <main.lua> [--sheet foo.gtg] [--gff foo.gff] [--map foo.map] [--frames foo.gsi] [--num8] [-o game.gtr]\n" +
+       "       gtlua run   <main.lua|game.gtr> [--sheet ...] [--gff ...] [--map ...] [--num8]   build + play in a window\n" +
     "       gtlua gfx import <in.png|in.p8|in.gtg> [-o out.gtg]\n" +
     "       gtlua gfx export <in.gtg> [-o out.png]\n" +
     "       gtlua c <main.lua>");

@@ -30,10 +30,19 @@ export const BUILTINS = {
   // PICO-8 tilemap: map(cx,cy, sx,sy, cw,ch) draws a cw x ch block of the cart's
   // __map__ (imported as a byte array) starting at cell (cx,cy) to screen pixel
   // (sx,sy), one 8x8 sheet sprite per non-zero tile. Software spr()-loop, the
-  // same as PICO-8 (neither machine has tilemap hardware). All six args are
-  // optional in PICO-8 (default 0,0,0,0,128,32-ish); we require none.
-  map:      { params: [["int", true], ["int", true], ["coord", true], ["coord", true], ["int", true], ["int", true]], ret: "void", special: "map" },
+  // same as PICO-8 (neither machine has tilemap hardware). The optional seventh
+  // argument is a sprite-flag mask: every requested bit must match.
+  map:      { params: [["int", true], ["int", true], ["coord", true], ["coord", true], ["int", true], ["int", true], ["int", true]], ret: "void", special: "map" },
   mget:     { params: [["int", false], ["int", false]], ret: "int", special: "mget" },
+  mset:     { params: [["int", false], ["int", false], ["int", false]], ret: "void", special: "mset" },
+
+  // PICO-8 sprite flags.
+  // fget(n)       -> all 8 flag bits
+  // fget(n, f)    -> 0/1 for flag f
+  // fset(n, v)    -> replace all 8 bits
+  // fset(n, f, v) -> set/clear flag f
+  fget:     { params: [["int", false], ["int", true]], ret: "int", special: "fget" },
+  fset:     { params: [["int", false], ["int", false], ["flip", true]], ret: "void", special: "fset" },
   // PICO-8 pget(x,y): read a framebuffer pixel (raw GameTank color byte).
   pget:     { params: [["coord", false], ["coord", false]], ret: "int", c: "lc_pget" },
   // run()/reset() restart the cart from power-on: a full crt0 reset that reruns

@@ -17,7 +17,7 @@
     "node": ">=24"
   },
   "dependencies": {
-    "luacretro": "^0.1.0",
+    "luacretro": "file:vendor/luacretro",
     "romdev-core-gametank": "0.3.0",
     "romdev-core-runner": "0.1.0",
     "romdev-toolchain-cc65": "0.1.3"

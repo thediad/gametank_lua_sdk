@@ -131,8 +131,9 @@ function calibrateSizes(sizes, placement, realPort) {
 }
 
 function compileLua(env, entry, opts = {}) {
-  const source = env.readText(entry);
-  const result = compile(source, env.basename(entry), opts);
+  const { sourcePrefix = "", ...compileOpts } = opts;
+  const source = sourcePrefix + env.readText(entry);
+  const result = compile(source, env.basename(entry), compileOpts);
   const warnings = result.diagnostics.filter((d) => d.severity === "warning");
   if (warnings.length) env.warn(formatDiagnostics(warnings));
   if (!result.ok) {
@@ -192,6 +193,8 @@ const GTG_BYTES = 16384;   // one native .gtg quadrant = 128x128 8bpp
 // quadrant (sprite cells 128-255 sit below and are never composed, only spr'd).
 // So a composing native game stores just this top slice raw for compose re-reads.
 const GTG_COMPOSE_BYTES = 8192;
+const GFF_BYTES = 256;
+const P8_MAP_BYTES = 8192;
 
 // A native .gtg sheet is 16384 bytes (one 128x128 8bpp quadrant). This is the
 // only sheet format; makeSheetC rejects any other size.
@@ -258,7 +261,14 @@ const GTG_BOTTOM_BANK = 1;   // composing games park the sheet's bottom half her
 // rows 64+ of the "sheet" resolve into this extension). Set per build.
 let SHEET_EXT = null;
 
-function makeGSheetC(env, sheetPath, banked, framesPath, composes, split) {
+function addFlagsAsset(env, gffPath, decls, calls) {
+  if (!gffPath) return;
+  const bytes = Array.from(env.readFile(gffPath));
+  decls.push(`static const unsigned char gt_gff[${GFF_BYTES}] = {${bytes.join(",")}};`);
+  calls.push("gt_flags_init(gt_gff);");
+}
+
+function makeGSheetC(env, sheetPath, banked, framesPath, composes, split, gffPath) {
   const quads = discoverQuadrants(env, sheetPath);
   // SHEET-segment (bank 2) declarations, and a separate B1RODATA (bank 1) chunk
   // for a composing game's sheet bottom-half (so a full native sheet doesn't have
@@ -321,6 +331,7 @@ function makeGSheetC(env, sheetPath, banked, framesPath, composes, split) {
     sheetDecls.push(ft.decl);
     calls.push(ft.reg);
   }
+  addFlagsAsset(env, gffPath, sheetDecls, calls);
 
   if (!banked) {
     return `#include "gt_api.h"\n${sheetDecls.join("\n")}\n${b1Decls.join("\n")}\n` +
@@ -362,9 +373,16 @@ function injectSongs(cSource, songs, banked) {
     `gt_music_init(); gt_song_bank(gt_songbank_tab, ${songs.length}U);`);
 }
 
-function makeSheetC(env, sheetPath, banked, framesPath, composes, split) {
-  if (!sheetPath) return `void gt_sheet_init(void) {}\n`;
-  if (isGtgSheet(env, sheetPath)) return makeGSheetC(env, sheetPath, banked, framesPath, composes, split);
+function makeSheetC(env, sheetPath, banked, framesPath, composes, split, gffPath) {
+  if (!sheetPath) {
+    if (!gffPath) return `void gt_sheet_init(void) {}\n`;
+    const decls = [], calls = [];
+    addFlagsAsset(env, gffPath, decls, calls);
+    if (!banked) return `#include "gt_api.h"\n${decls.join("\n")}\nvoid gt_sheet_init(void) { ${calls.join(" ")} }\n`;
+    return `#include "gt_api.h"\n#pragma rodata-name ("SHEET")\n${decls.join("\n")}\n` +
+      `#pragma rodata-name ("RODATA")\nvoid gt_sheet_init(void) { gt_bank(2); ${calls.join(" ")} }\n`;
+  }
+  if (isGtgSheet(env, sheetPath)) return makeGSheetC(env, sheetPath, banked, framesPath, composes, split, gffPath);
   const n = env.size(sheetPath);
   fail(`--sheet expects a native .gtg sprite sheet (16384 bytes/quadrant; got ${n}). ` +
     `Convert a PICO-8 cart or a PNG with: gtlua gfx import <in> -o sheet.gtg`);
@@ -686,15 +704,24 @@ function rebalance(env, placement, sizes, overflows, sheetBytes, callGraph, uses
 /**
  * Build a gtlua game to a .gtr cart.
  * @param {string} entry path to the game's main.lua
- * @param {{outPath?:string, sheetPath?:string, num8?:boolean, framesPath?:string}} opts
+ * @param {{outPath?:string, sheetPath?:string, gffPath?:string, mapPath?:string, num8?:boolean, framesPath?:string}} opts
  * @param {BuildEnv} env injected filesystem / toolchain / logging primitives
  */
 export async function build(entry, opts, env) {
   const { outPath, sheetPath, num8 = false, framesPath = undefined, songsPaths = [],
-          sheetExtPath = undefined } = opts;
+          sheetExtPath = undefined, gffPath = undefined, mapPath = undefined } = opts;
   SHEET_EXT = sheetExtPath ? env.readFile(sheetExtPath) : null;
   if (SHEET_EXT && SHEET_EXT.length % 1024 !== 0)
     fail(`--sheetext must be whole 128x8 cell rows (1024-byte multiples); got ${SHEET_EXT.length}`);
+  if (gffPath && env.size(gffPath) !== GFF_BYTES)
+    fail(`--gff expects exactly ${GFF_BYTES} sprite-flag bytes; got ${env.size(gffPath)}`);
+  if (mapPath && env.size(mapPath) !== P8_MAP_BYTES)
+    fail(`--map expects exactly ${P8_MAP_BYTES} bytes (128x64); got ${env.size(mapPath)}`);
+  if (mapPath && /\b(?:local\s+)?__p8map\s*=/.test(env.readText(entry)))
+    fail("--map supplies __p8map automatically; remove the manual __p8map declaration from the Lua source");
+  const mapPrefix = mapPath
+    ? `local __p8map=hexdata("${Array.from(env.readFile(mapPath), (b) => b.toString(16).padStart(2, "0")).join("")}")\n`
+    : "";
   const SDK = env.sdk;
   if (!env.exists(entry)) fail(`no such file: ${entry}`);
   const projDir = env.dirname(entry);
@@ -708,7 +735,7 @@ export async function build(entry, opts, env) {
   // --num8: fixed becomes 8.8-in-an-int everywhere - the game C and every
   // SDK unit must agree on the width, so the define rides the shared CFLAGS
   if (num8) CFLAGS.push("-DGT_NUM8");
-  const AFLAGS = ["--cpu", "W65C02", "-g"];   /* -g: symbols reach the ld65 dbgfile */
+  const AFLAGS = ["--cpu", "65C02", "-g"];   /* -g: symbols reach the ld65 dbgfile */
   if (env.asminc && env.exists(env.asminc)) AFLAGS.push("-I", env.asminc);
   // compile C then run the gtlua peephole pass over cc65's assembly output
   // (tail-call fusion + dead reload elimination - see compiler/peephole.js)
@@ -752,7 +779,7 @@ export async function build(entry, opts, env) {
   // Project songs: read once, then inject into every generated game C (flat
   // AND each banked placement attempt) so music(n) plays project song n.
   const songsBytes = songsPaths.map((p) => env.readFile(p));
-  let result = compileLua(env, entry, { num8 });
+  let result = compileLua(env, entry, { num8, sourcePrefix: mapPrefix });
   result.c = injectSongs(result.c, songsBytes, false);
   const usesAudio = result.c.includes("gt_audio_init(");
   const usesStarfield = result.c.includes("gt_parallax");
@@ -821,7 +848,7 @@ export async function build(entry, opts, env) {
   // sspr-only keeps the proven full packed GRAM load (+ a readable ROM copy).
   const gsheetSplit = gtgSheet && bgReadsSheet;
   env.writeFile(B(`${name}.c`), result.c);
-  env.writeFile(B("sheet.c"), makeSheetC(env, sheetPath, false, framesPath, gsheetCompose, gsheetSplit));
+  env.writeFile(B("sheet.c"), makeSheetC(env, sheetPath, false, framesPath, gsheetCompose, gsheetSplit, gffPath));
 
   // 2. compile + assemble everything.
   // main.c is always needed (its .s feeds the FLASH2M function-size model).
@@ -966,11 +993,12 @@ export async function build(entry, opts, env) {
     }
   };
   foldRodataSizes(result.c, sizes);
-  const sheetBytes = sheetPath ? gtgSheetRomBytes(env, sheetPath, gsheetSplit) : 0;
+  const sheetBytes = (sheetPath ? gtgSheetRomBytes(env, sheetPath, gsheetSplit) : 0) +
+    (gffPath ? GFF_BYTES : 0);
   const placement = initialPlacement(result.callGraph);
 
   as(env.sdkFile("gt_bank.s"), B("gt_bank.o"));
-  env.writeFile(B("sheet.c"), makeSheetC(env, sheetPath, true, framesPath, gsheetCompose, gsheetSplit));
+  env.writeFile(B("sheet.c"), makeSheetC(env, sheetPath, true, framesPath, gsheetCompose, gsheetSplit, gffPath));
   cc(B("sheet.c"), B("sheet.s"));
   as(B("sheet.s"), B("sheet.o"));
 
@@ -1182,7 +1210,7 @@ export async function build(entry, opts, env) {
       env.warn("bank placement tight: retrying with all inlining off");
     }
     const compileAndLink = (placementNow) => {
-      result = compileLua(env, entry, { banked: true, placement: placementNow, midInline, inliner: fnInline, num8, rndInt });
+      result = compileLua(env, entry, { banked: true, placement: placementNow, midInline, inliner: fnInline, num8, rndInt, sourcePrefix: mapPrefix });
       result.c = injectSongs(result.c, songsBytes, true);
       env.writeFile(B(`${name}.c`), result.c);
       // Memoize the game-unit .o by the GENERATED C bytes. The placement ladder

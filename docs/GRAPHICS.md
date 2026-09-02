@@ -79,7 +79,7 @@ gtlua ships a converter so you can author in ordinary tools and import:
 
 ```
 gtlua gfx import art.png            # PNG  -> art.gtg (+ art_1/_2/_3.gtg if >128px)
-gtlua gfx import cart.p8            # a PICO-8 cart's __gfx__ -> a .gtg
+gtlua gfx import cart.p8            # __gfx__ -> .gtg; __gff__ -> .gff; map -> .map
 gtlua gfx import art.png -o hero.gtg
 gtlua gfx export hero.gtg           # .gtg -> hero.png, to edit and re-import
 ```
@@ -89,6 +89,14 @@ gtlua gfx export hero.gtg           # .gtg -> hero.png, to edit and re-import
   GameTank's 256 colors; fully-transparent pixels become color 0.
 - **`export`** renders a `.gtg` back to a PNG so you can round-trip through an
   image editor. (The round-trip is visually lossless.)
+
+A `.p8` cart with a `__gff__` section also produces a sibling 256-byte `.gff`.
+Pass it to `gtlua build` with `--gff`; its values initialize `fget()`, and
+subsequent `fset()` calls mutate the RAM copy.
+
+A cart with `__map__` also produces an 8192-byte `.map`: its first 32 rows come
+from `__map__`, and rows 32..63 come from PICO-8's shared lower sprite-sheet
+memory. Pass it with `--map`; the build supplies `__p8map` automatically.
 
 The converter is zero-dependency (it uses Node's built-in zlib for PNG), so it
 works anywhere gtlua runs.

@@ -4,13 +4,20 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
 import {
-  encodePng, decodePng, rgbaToGtg, gtgToPng, p8GfxToGtg, gfxBinToGtg, toGtg, gtgNames,
+  encodePng, decodePng, rgbaToGtg, gtgToPng, p8GfxToGtg, p8Gff, p8Map, gfxBinToGtg, toGtg, gtgNames,
   parseGsi, encodeGsi, bakeFrameTable,
   QUADRANT, QUADRANT_BYTES, FRAME_BYTES,
 } from "../compiler/gfx.mjs";
 import { GT_CAPTURE_PALETTE, nearestColorByte } from "../compiler/gt_palette.js";
 import { P8_PALETTE } from "../compiler/builtins.js";
+
+const SDK = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
 // build an RGBA buffer from a (x,y)->[r,g,b,a] function
 function makeRgba(w, h, fn) {
@@ -114,6 +121,56 @@ test("PICO-8 __gfx__ imports to a single quadrant via P8_PALETTE", () => {
   const q = quadrants[0];
   assert.equal(q[0], 0, "index 0 -> transparent");
   assert.notEqual(q[1], 0, "index 8 -> a color");
+});
+
+test("PICO-8 __gff__ imports exactly 256 sprite-flag bytes", () => {
+  const flags = Array.from({ length: 256 }, (_, i) => i.toString(16).padStart(2, "0")).join("");
+  const p8 = `__gfx__\n0\n__gff__\n${flags.slice(0, 256)}\n${flags.slice(256)}\n__sfx__\n`;
+  assert.deepEqual([...p8Gff(p8)], Array.from({ length: 256 }, (_, i) => i));
+  assert.deepEqual([...p8GfxToGtg(p8).gff], Array.from({ length: 256 }, (_, i) => i));
+  assert.equal(p8Gff("__gfx__\n0\n"), null);
+  assert.throws(() => p8Gff("__gff__\n00\n"), /exactly 256 bytes/);
+});
+
+test("PICO-8 map import appends shared lower-gfx bytes as rows 32..63", () => {
+  const mapHex = "12" + "00".repeat(4095);
+  const gfxHex = "0".repeat(8192) + "ab" + "0".repeat(8190);
+  const map = p8Map(`__gfx__\n${gfxHex}\n__map__\n${mapHex}\n__gff__\n`);
+  assert.equal(map.length, 8192);
+  assert.equal(map[0], 0x12);
+  assert.equal(map[4096], 0xba, "low gfx nibble is the low map-byte nibble");
+  assert.equal(map[8191], 0);
+  assert.equal(p8Map("__gfx__\n0\n"), null);
+  assert.throws(() => p8Map("__map__\n00\n"), /exactly 4096 bytes/);
+});
+
+test("gfx CLI emits .gtg, .gff, and the complete 64-row .map from a .p8 cart", () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "gtlua-p8-import-"));
+  try {
+    const cart = path.join(dir, "fixture.p8");
+    const out = path.join(dir, "fixture.gtg");
+    const flagsHex = Array.from({ length: 256 }, (_, i) => i.toString(16).padStart(2, "0")).join("");
+    const mapHex = "12" + "00".repeat(4095);
+    const gfxHex = "0".repeat(8192) + "ab" + "0".repeat(8190);
+    writeFileSync(cart, `pico-8 cartridge // http://www.pico-8.com\nversion 42\n__gfx__\n${gfxHex}\n__map__\n${mapHex}\n__gff__\n${flagsHex}\n`);
+
+    const run = spawnSync(process.execPath,
+      [path.join(SDK, "bin", "gtlua.js"), "gfx", "import", cart, "-o", out],
+      { encoding: "utf8" });
+    assert.equal(run.status, 0, run.stderr || run.stdout);
+
+    const gtg = readFileSync(out);
+    const gff = readFileSync(path.join(dir, "fixture.gff"));
+    const map = readFileSync(path.join(dir, "fixture.map"));
+    assert.equal(gtg.length, 16384);
+    assert.equal(gff.length, 256);
+    assert.equal(gff[255], 255);
+    assert.equal(map.length, 8192);
+    assert.equal(map[0], 0x12);
+    assert.equal(map[4096], 0xba);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test("4bpp->gtg uses the SAME palette table as the C runtime (parity invariant)", () => {

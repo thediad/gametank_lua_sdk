@@ -32,6 +32,7 @@ import { parentPort } from "node:worker_threads";
 import { readFile, readdir, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 let toolchain, shareDir;
 const factoryCache = new Map();       // gluePath -> { factory, wasmBinary }
@@ -47,7 +48,7 @@ async function loadFactory(gluePath) {
   const hit = factoryCache.get(gluePath);
   if (hit) return hit;
   const wasmBinary = await readFile(gluePath.replace(/\.(m?js)$/, ".wasm"));
-  const factory = (await import(gluePath)).default;
+  const factory = (await import(pathToFileURL(gluePath).href)).default;
   const entry = { factory, wasmBinary };
   factoryCache.set(gluePath, entry);
   return entry;

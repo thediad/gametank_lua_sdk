@@ -774,24 +774,184 @@ void gt_spr(int n, int x, int y, int w, int h, int flip) {
     gt_spr_z();
 }
 
-/* PICO-8 map(cx,cy, sx,sy, cw,ch): draw a cw x ch block of the tilemap,
- * starting at map cell (cx,cy), to screen pixel (sx,sy). Each cell is one 8x8
- * sheet sprite whose index is the map byte; PICO-8 skips tile 0 (empty), so we
- * do too. This is exactly PICO-8's own software model - a spr() loop over an
- * index array - which is native to the GameTank blitter (no tilemap hardware
- * needed, and none exists on either machine). `map` is the flat index array
- * (row-major, MAP_W bytes per row); the caller passes MAP_W as the stride. */
-void gt_map(unsigned char *map, int mapw,
-               int cx, int cy, int sx, int sy, int cw, int ch) {
+/*
+ * PICO-8 mutable map overlay.
+ *
+ * Imported __map__ data lives in ROM, so mset() cannot modify it directly.
+ * Keep a small RAM table containing only cells changed at runtime.
+ *
+ * 32 entries cost 96 bytes plus one count byte.
+ */
+#define GT_MAP_PATCH_MAX 32
+
+static unsigned char gt_map_patch_x[GT_MAP_PATCH_MAX];
+static unsigned char gt_map_patch_y[GT_MAP_PATCH_MAX];
+static unsigned char gt_map_patch_tile[GT_MAP_PATCH_MAX];
+static unsigned char gt_map_patch_count;
+
+/* Read a map cell, checking runtime mset() overrides before ROM. */
+int gt_mget(const unsigned char *map, int x, int y) {
+    int i;
+
+    if (x < 0 || x >= 128 || y < 0 || y >= 64) {
+        return 0;
+    }
+
+    for (i = (int)gt_map_patch_count - 1; i >= 0; --i) {
+        if (gt_map_patch_x[i] == (unsigned char)x &&
+            gt_map_patch_y[i] == (unsigned char)y) {
+            return gt_map_patch_tile[i];
+        }
+    }
+
+    return map[(unsigned int)y * 128u + (unsigned int)x];
+}
+
+void gt_mset(const unsigned char *map, int x, int y, int tile) {
+    int i;
+    unsigned char ux;
+    unsigned char uy;
+    unsigned char ut;
+    unsigned char original;
+
+    if (x < 0 || x >= 128 || y < 0 || y >= 64) {
+        return;
+    }
+
+    ux = (unsigned char)x;
+    uy = (unsigned char)y;
+    ut = (unsigned char)tile;
+    original = map[(unsigned int)y * 128u + (unsigned int)x];
+
+    for (i = 0; i < (int)gt_map_patch_count; ++i) {
+        if (gt_map_patch_x[i] == ux &&
+            gt_map_patch_y[i] == uy) {
+
+            if (ut == original) {
+                --gt_map_patch_count;
+
+                gt_map_patch_x[i] =
+                    gt_map_patch_x[gt_map_patch_count];
+                gt_map_patch_y[i] =
+                    gt_map_patch_y[gt_map_patch_count];
+                gt_map_patch_tile[i] =
+                    gt_map_patch_tile[gt_map_patch_count];
+            } else {
+                gt_map_patch_tile[i] = ut;
+            }
+
+            return;
+        }
+    }
+
+    if (ut == original) return;
+
+    if (gt_map_patch_count >= GT_MAP_PATCH_MAX) return;
+
+    gt_map_patch_x[gt_map_patch_count] = ux;
+    gt_map_patch_y[gt_map_patch_count] = uy;
+    gt_map_patch_tile[gt_map_patch_count] = ut;
+    ++gt_map_patch_count;
+}
+
+
+/*
+ * PICO-8 sprite flags.
+ *
+ * One byte per sprite, giving 8 independently addressable flags.
+ * BSS starts zeroed when no flag asset is supplied. A build with --gff copies
+ * the imported ROM defaults here during gt_sheet_init(), before user _init().
+ */
+static unsigned char gt_sprite_flags[256];
+
+/* Copy imported PICO-8 __gff__ defaults from ROM into mutable RAM. */
+void gt_flags_init(const unsigned char *flags) {
+    unsigned int i;
+    for (i = 0; i < 256u; ++i) {
+        gt_sprite_flags[i] = flags[i];
+    }
+}
+
+/*
+ * flag == -1:
+ *     return all 8 bits
+ *
+ * flag 0..7:
+ *     return 0 or 1 for that bit
+ */
+int gt_fget(int sprite, int flag) {
+    unsigned char bits;
+
+    if (sprite < 0 || sprite >= 256) {
+        return 0;
+    }
+
+    bits = gt_sprite_flags[(unsigned int)sprite];
+
+    if (flag == -1) {
+        return bits;
+    }
+
+    if (flag < 0 || flag >= 8) {
+        return 0;
+    }
+
+    return (bits & (1u << flag)) ? 1 : 0;
+}
+
+/*
+ * flag == -1:
+ *     replace the complete 8-bit flag value
+ *
+ * flag 0..7:
+ *     set or clear that individual bit
+ */
+void gt_fset(int sprite, int flag, int value) {
+    unsigned char mask;
+
+    if (sprite < 0 || sprite >= 256) {
+        return;
+    }
+
+    if (flag == -1) {
+        gt_sprite_flags[(unsigned int)sprite] =
+            (unsigned char)value;
+        return;
+    }
+
+    if (flag < 0 || flag >= 8) {
+        return;
+    }
+
+    mask = (unsigned char)(1u << flag);
+
+    if (value) {
+        gt_sprite_flags[(unsigned int)sprite] |= mask;
+    } else {
+        gt_sprite_flags[(unsigned int)sprite] &=
+            (unsigned char)~mask;
+    }
+}
+
+void gt_map(const unsigned char *map, int mapw,
+               int cx, int cy, int sx, int sy, int cw, int ch, int layers) {
     int j, i;
+    (void)mapw; /* imported PICO-8 maps are currently fixed at 128 cells wide */
+
     for (j = 0; j < ch; j++) {
-        unsigned char *row = map + (unsigned int)((cy + j) * mapw + cx);
         int py = sy + j * 8;
+
         for (i = 0; i < cw; i++) {
-            unsigned char t = row[i];
+            unsigned char t =
+                (unsigned char)gt_mget(map, cx + i, cy + j);
+
             /* w/h are in CELLS (gt_spr scales <<3 to pixels): one 8x8 tile
              * = 1 cell, NOT 8. Passing 8 blits a 64x64 region per tile. */
-            if (t) gt_spr(t, sx + i * 8, py, 1, 1, 0);
+            if (t && (layers == -1 ||
+                      (gt_sprite_flags[t] & (unsigned char)layers) ==
+                          (unsigned char)layers)) {
+                gt_spr(t, sx + i * 8, py, 1, 1, 0);
+            }
         }
     }
 }

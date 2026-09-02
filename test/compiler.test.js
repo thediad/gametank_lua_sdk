@@ -176,8 +176,45 @@ test("sspr() emits gt_sspr with dw/dh defaulting to 0 (= source size)", () => {
 test("map() draws the imported tilemap; mget() reads a cell", () => {
   const c = cOf("local __p8map = hexdata(\"01020304\")\nfunction _update60()\nend\n" +
                 "function _draw()\n  cls()\n  map(0, 0, 0, 0, 16, 4)\n  local t = mget(2, 0)\nend\n");
-  assert.match(c, /gt_map\(lcl___p8map, 128, 0, 0, 0, 0, 16, 4\)/);
-  assert.match(c, /lcl___p8map\[.*128.*2/);   // mget(2,0) -> [0*128+2]
+  assert.match(c, /gt_map\(lcl___p8map, 128, 0, 0, 0, 0, 16, 4, -1\)/);
+  assert.match(c, /gt_mget\(lcl___p8map, 2, 0\)/);
+});
+
+test("map() defaults to the full imported 128x64 map", () => {
+  const c = cOf("local __p8map = hexdata(\"00\")\nfunction _update60() end\nfunction _draw() map() end\n");
+  assert.match(c, /gt_map\(lcl___p8map, 128, 0, 0, 0, 0, 128, 64, -1\)/);
+});
+
+test("map() passes its optional sprite-flag layer mask", () => {
+  const c = cOf("local __p8map = hexdata(\"01\")\nfunction _update60() end\n" +
+                "function _draw() map(1,2,3,4,5,6,0x5) end\n");
+  assert.match(c, /gt_map\(lcl___p8map, 128, 1, 2, 3, 4, 5, 6, 5\)/);
+});
+
+
+test("map/mget/mset and sprite flags lower to GameTank runtime calls", () => {
+  const c = cOf(
+    "local __p8map = hexdata(\"01020304\")\n" +
+    "local a=0\nlocal b=0\nlocal c2=0\n" +
+    "function _update60()\n" +
+    "  mset(2,0,7)\n" +
+    "  a=mget(2,0)\n" +
+    "  fset(10,2,true)\n" +
+    "  fset(11,9)\n" +
+    "  b=fget(10,2)\n" +
+    "  c2=fget(11)\n" +
+    "end\n" +
+    "function _draw()\nend\n"
+  );
+
+  assert.match(c, /gt_mset\(lcl___p8map, 2, 0, 7\)/);
+  assert.match(c, /gt_mget\(lcl___p8map, 2, 0\)/);
+
+  assert.match(c, /gt_fset\(10, 2,/);
+  assert.match(c, /gt_fset\(11, -1, 9\)/);
+
+  assert.match(c, /gt_fget\(10, 2\)/);
+  assert.match(c, /gt_fget\(11, -1\)/);
 });
 
 test("multiple assignment to struct fields (o.x, o.y = a, b)", () => {

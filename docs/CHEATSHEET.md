@@ -351,7 +351,7 @@ has tilemap hardware):
 
 | Call | Draws |
 |---|---|
-| `map(cx, cy, sx, sy, cw, ch)` | draw a `cw×ch` block of the map from cell `(cx,cy)` to screen `(sx,sy)`; one 8×8 sheet sprite per **non-zero** tile (**tile 0 is skipped**, PICO-8 semantics). All args optional |
+| `map(cx, cy, sx, sy, cw, ch, [layers])` | draw a `cw×ch` block of the map from cell `(cx,cy)` to screen `(sx,sy)`; one 8×8 sheet sprite per **non-zero** tile. When supplied, `layers` requires every selected sprite-flag bit. All args optional |
 | `mget(cx, cy)` | the tile index at map cell `(cx, cy)` |
 
 > For scrolling worlds, the `gt.bg_*` / `gt.chunks_draw` asm engines are the

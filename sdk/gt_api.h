@@ -211,7 +211,13 @@ void gt_music(int n, int loop);
 void gt_gtm2_play(const unsigned char *song, unsigned char loop);
 void gt_gtm2_stop(void);
 void gt_spr(int n, int x, int y, int w, int h, int flip);
-void gt_map(unsigned char *map, int mapw, int cx, int cy, int sx, int sy, int cw, int ch);
+void gt_map(const unsigned char *map, int mapw, int cx, int cy, int sx, int sy, int cw, int ch, int layers);
+int gt_mget(const unsigned char *map, int x, int y);
+void gt_mset(const unsigned char *map, int x, int y, int tile);
+
+int gt_fget(int sprite, int flag);
+void gt_fset(int sprite, int flag, int value);
+void gt_flags_init(const unsigned char *flags);
 void gt_sspr(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int flip);
 int gt_pget(int x, int y);
 void gt_run(void);

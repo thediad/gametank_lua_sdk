@@ -69,7 +69,9 @@ function collect() {
   return out;
 }
 
-const mode = process.argv[2];
+// Node's test runner executes every file under test/, so default to the safe,
+// read-only check mode when no CLI mode is supplied.
+const mode = process.argv[2] ?? "check";
 if (mode === "snapshot") {
   mkdirSync(GOLD, { recursive: true });
   const all = collect();

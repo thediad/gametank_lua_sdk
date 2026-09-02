@@ -232,10 +232,10 @@ fast path); no runtime string building yet.
 
 | Call | | Notes |
 |---|:--:|---|
-| `map(cx,cy,sx,sy,cw,ch)` | 🟡 | draws a `cw×ch` block of the imported `__map__` as `spr()` cells; **tile 0 skipped** (P8 semantics); args optional |
+| `map(cx,cy,sx,sy,cw,ch,[layers])` | ✅ | draws the imported 128×64 `.map` as `spr()` cells; **tile 0 skipped**; a layer mask requires every selected sprite-flag bit |
 | `mget(cx,cy)` | ✅ | tile index at map cell `(cx,cy)` |
-| `mset(x,y,[v])` | 🔵 | v0.4 (map is read-only ROM today) |
-| `fget / fset(n,[f],[v])` | 🔵 | tile flags - v0.4 |
+| `mset(x,y,v)` | ✅ | mutable 32-entry RAM overlay over the imported ROM map |
+| `fget(n,[f])` / `fset(n,[f],v)` | ✅ | mutable sprite flags; import `__gff__` as `.gff` and build with `--gff` |
 
 `map()` is a software `spr()` loop (neither machine has tilemap hardware), the
 same as PICO-8. **For fast scrolling worlds, gt also has it a different way:**

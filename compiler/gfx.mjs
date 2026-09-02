@@ -266,6 +266,43 @@ export function gtgToPng(gtg) {
 // bytes. It fits in exactly one quadrant. Color 0 stays transparent. This is
 // purely a migration on-ramp: import a PICO-8 cart's art into a real .gtg, then
 // author natively from there.
+export function p8Gff(p8text) {
+  const match = p8text.match(/(?:^|\n)__gff__\r?\n([\s\S]*?)(?=\r?\n__[a-z0-9_]+__\r?\n|$)/i);
+  if (!match) return null;
+  const hex = match[1].replace(/\s/g, "");
+  if (!/^[0-9a-f]{512}$/i.test(hex)) {
+    throw new Error(`__gff__ must contain exactly 256 bytes (got ${Math.floor(hex.length / 2)})`);
+  }
+  return Buffer.from(hex, "hex");
+}
+
+function p8SectionHex(p8text, section) {
+  const re = new RegExp(`(?:^|\\n)__${section}__\\r?\\n([\\s\\S]*?)(?=\\r?\\n__[a-z0-9_]+__\\r?\\n|$)`, "i");
+  const match = p8text.match(re);
+  return match ? match[1].replace(/\s/g, "") : null;
+}
+
+/* Materialize PICO-8's 128x64 map. Rows 0..31 come from __map__; rows 32..63
+ * are the packed bytes of the lower half of __gfx__ (the shared GFX2/MAP2
+ * region at 0x1000..0x1fff). */
+export function p8Map(p8text) {
+  const mapHex = p8SectionHex(p8text, "map");
+  if (mapHex === null) return null;
+  if (!/^[0-9a-f]{8192}$/i.test(mapHex)) {
+    throw new Error(`__map__ must contain exactly 4096 bytes (got ${Math.floor(mapHex.length / 2)})`);
+  }
+  const gfxHex = p8SectionHex(p8text, "gfx");
+  if (!gfxHex || !/^[0-9a-f]{16384}$/i.test(gfxHex)) {
+    throw new Error("a 128x64 map requires a complete 8192-byte __gfx__ section for shared rows 32..63");
+  }
+  const out = Buffer.alloc(8192);
+  Buffer.from(mapHex, "hex").copy(out, 0);
+  for (let pixel = 8192, dst = 4096; pixel < 16384; pixel += 2, dst++) {
+    out[dst] = parseInt(gfxHex[pixel], 16) | (parseInt(gfxHex[pixel + 1], 16) << 4);
+  }
+  return out;
+}
+
 export function p8GfxToGtg(p8text) {
   const seg = p8text.split("__gfx__")[1];
   if (!seg) throw new Error("no __gfx__ section in .p8 cart");
@@ -280,7 +317,8 @@ export function p8GfxToGtg(p8text) {
       q[y * QUADRANT + x] = P8_PALETTE[idx & 15];
     }
   }
-  return { quadrants: [q], width: QUADRANT, height: QUADRANT };
+  return { quadrants: [q], width: QUADRANT, height: QUADRANT,
+    gff: p8Gff(p8text), map: p8Map(p8text) };
 }
 
 // ---------------------------------------------------------------------------

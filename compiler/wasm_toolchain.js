@@ -23,6 +23,7 @@
 import { readFile, writeFile, readdir, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 // Lazily resolve romdev-toolchain-cc65's exported glue paths + share dir. Kept
 // lazy so a clone-without-npm-install can still fall back to native cc65 without
@@ -53,7 +54,7 @@ async function loadFactory(gluePath) {
   if (cached) return cached;
   const wasmPath = gluePath.replace(/\.(m?js)$/, ".wasm");
   const wasmBinary = await readFile(wasmPath);
-  const factory = (await import(gluePath)).default;
+  const factory = (await import(pathToFileURL(gluePath).href)).default;
   const entry = { factory, wasmBinary };
   factoryCache.set(gluePath, entry);
   return entry;

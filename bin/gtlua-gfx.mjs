@@ -45,12 +45,20 @@ export function gfxCli(rest) {
     const base = out || input.replace(/\.[^.]+$/, ".gtg");
     const names = gtgNames(base, res.quadrants.length);
     names.forEach((name, i) => writeFileSync(name, res.quadrants[i]));
+    const gffName = base.replace(/\.gtg$/i, "") + ".gff";
+    const mapName = base.replace(/\.gtg$/i, "") + ".map";
+    if (res.gff) writeFileSync(gffName, res.gff);
+    if (res.map) writeFileSync(mapName, res.map);
     const dims = `${res.width}x${res.height}`;
     if (names.length === 1) {
-      process.stdout.write(`${names[0]}  (${dims}, ${QUADRANT_BYTES} bytes)\n`);
+      process.stdout.write(`${names[0]}  (${dims}, ${QUADRANT_BYTES} bytes)\n` +
+        (res.gff ? `${gffName}  (256 sprite-flag bytes)\n` : ""));
+      if (res.map) process.stdout.write(`${mapName}  (8192 map bytes, 128x64)\n`);
     } else {
       process.stdout.write(
         `${dims} sheet -> ${names.length} quadrants:\n  ${names.join("\n  ")}\n`);
+      if (res.gff) process.stdout.write(`${gffName}  (256 sprite-flag bytes)\n`);
+      if (res.map) process.stdout.write(`${mapName}  (8192 map bytes, 128x64)\n`);
     }
     return;
   }

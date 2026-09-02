@@ -18,10 +18,12 @@ this - it badges every PICO-8 call as exact / partial / differs / n/a.
 ## The short version
 
 1. **Copy your cart's Lua** into `main.lua`.
-2. **Import the art**: `gtlua gfx import cart.p8 -o gfx.gtg`.
+2. **Import the art and flags**: `gtlua gfx import cart.p8 -o gfx.gtg` writes
+   `gfx.gtg`, plus `gfx.gff` and `gfx.map` when those cart sections are present.
 3. **Import the audio** (optional): `node bin/p8sfx.mjs cart.p8` → paste the
    `hexdata` into your source, register it with `sfx_bank()`.
-4. **Build**: `gtlua build main.lua --sheet gfx.gtg -o game.gtr`.
+4. **Build**: `gtlua build main.lua --sheet gfx.gtg --gff gfx.gff --map gfx.map -o game.gtr`
+   (omit optional assets that the cart does not contain).
 5. **Fix what the compiler flags.** It fails loudly, with a fix-it, on the Lua
    features that don't compile (see below) - work through those.
 
@@ -143,7 +145,7 @@ are dealbreakers, but plan for them:
 | `pal()` remap / palette-cycle / flash tints | no runtime palette; pre-author recolored sheet cells, or draw with `gt.rgb` bytes |
 | runtime-computed 0–15 colors | used as raw bytes (wrong color) - compute a GameTank byte instead |
 | Runtime string building (`..`, `sub`) | bake byte buffers today; string ops are on the roadmap |
-| `map`/`mget`/`mset` tilemap API | use `gt.bg_compose`/`gt.bg_draw` (shipped) or `gt.chunks_draw` |
+| `map`/`mget`/`mset` tilemap API | shipped for compatibility, including `map(...,[layers])`; use `gt.bg_compose`/`gt.bg_draw` or `gt.chunks_draw` when a native cached fast path is needed |
 | `cartdata`/`dget`/`dset` saves | the SAVE hardware exists; the API layer is planned |
 | Heavy unbounded-table allocation | capacity-bounded `pool`s (no GC) |
 
