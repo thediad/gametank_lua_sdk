@@ -799,6 +799,10 @@ export function check(chunk, file, opts = {}) {
       if (b) {
         if (b.audio) { usesAudio.flag = true; usesMusic.flag = true; }
         checkArgs(call, b.params, callee.name);
+        if (callee.name === "cartdata" && call.args[0]?.kind === "string" &&
+            (call.args[0].value.length > 64 || !/^[a-z0-9_]+$/.test(call.args[0].value))) {
+          err(call.args[0], 'cartdata() ID must be 1-64 characters: a-z, 0-9, or underscore');
+        }
         call.sig = b;
         // a "fn" (callback) arg is a bare function NAME, not a value - don't run
         // typeOf on it (that would trip the "functions are not values" error);

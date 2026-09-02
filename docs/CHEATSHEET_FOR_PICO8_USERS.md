@@ -247,10 +247,12 @@ same as PICO-8. **For fast scrolling worlds, gt also has it a different way:**
 
 | Call | | Notes |
 |---|:--:|---|
-| `cartdata("id")` | 🔵 | v0.4 |
-| `dget / dset(i,[v])` | 🔵 | 0..63 persistent slots - v0.4 |
+| `cartdata("id")` | ✅ | opens one persistent slot; ID is 1–64 lowercase letters, digits, or underscores |
+| `dget(i)` / `dset(i,v)` | ✅ | 64 persistent 16.16-number slots, indices 0..63 |
 
-The GameTank SAVE bank hardware exists for exactly this; the API layer is
+The GameTank SAVE bank hardware backs this directly. Using any save API
+automatically promotes the build to a 2 MiB FLASH2M+RAM cartridge. The emulator
+writes a sibling `.sav` file; real hardware requires a save-RAM cartridge.
 planned, not yet wired.
 
 ## Memory / low-level - n/a by design

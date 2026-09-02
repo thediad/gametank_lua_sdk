@@ -146,7 +146,7 @@ are dealbreakers, but plan for them:
 | runtime-computed 0–15 colors | used as raw bytes (wrong color) - compute a GameTank byte instead |
 | Runtime string building (`..`, `sub`) | bake byte buffers today; string ops are on the roadmap |
 | `map`/`mget`/`mset` tilemap API | shipped for compatibility, including `map(...,[layers])`; use `gt.bg_compose`/`gt.bg_draw` or `gt.chunks_draw` when a native cached fast path is needed |
-| `cartdata`/`dget`/`dset` saves | the SAVE hardware exists; the API layer is planned |
+| `cartdata`/`dget`/`dset` saves | shipped; automatically builds a 2 MiB FLASH2M+RAM cart and retains 64 fixed-point slots |
 | Heavy unbounded-table allocation | capacity-bounded `pool`s (no GC) |
 
 The compiler catches the code-level ones for you. The art and audio ones are

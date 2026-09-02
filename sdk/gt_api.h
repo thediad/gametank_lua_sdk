@@ -218,6 +218,15 @@ void gt_mset(const unsigned char *map, int x, int y, int tile);
 int gt_fget(int sprite, int flag);
 void gt_fset(int sprite, int flag, int value);
 void gt_flags_init(const unsigned char *flags);
+void gt_save_open(void);
+int gt_cartdata(unsigned long id);
+#ifdef GT_NUM8
+int gt_dget(int index);
+void gt_dset(int index, int value);
+#else
+long gt_dget(int index);
+void gt_dset(int index, long value);
+#endif
 void gt_sspr(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int flip);
 int gt_pget(int x, int y);
 void gt_run(void);

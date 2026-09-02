@@ -252,8 +252,9 @@ almost nothing when nothing is playing. For a single raw tone, the low-level
 
 Shipped since: native `.gtg` sprite sheets + `.gsi`/`sprf` frame tables, native
 `.gtm2` FM songs, a `gtlua gfx` converter, and a PICO-8 art/sound importer.
-Coming next (see [docs/PICO8.md](docs/PICO8.md) for the full roadmap): `map`/
-`mget`/`fget` tile APIs, `print`-time string building, and `cartdata` saves.
+The v0.4 compatibility layer includes `map`/`mget`/`mset`, sprite flags, and
+`cartdata`/`dget`/`dset` saves. Save-using games automatically build as 2 MiB
+FLASH2M+RAM cartridges; see [docs/PICO8.md](docs/PICO8.md) for the roadmap.
 
 ## Not-Lua walls (loud, never silent)
 

@@ -51,6 +51,9 @@ export const BUILTINS = {
   // the runtime stale. lc_run() jumps to the reset entry (never returns).
   run:      { params: [], ret: "void", c: "lc_run" },
   reset:    { params: [], ret: "void", c: "lc_run" },
+  cartdata: { params: [["str", false]], ret: "bool", special: "cartdata" },
+  dget:     { params: [["int", false]], ret: "fixed", c: "lc_dget" },
+  dset:     { params: [["int", false], ["num", false]], ret: "void", c: "lc_dset" },
   // PICO-8 sspr(sx,sy,sw,sh, dx,dy, [dw,dh], [flip_x,flip_y]): scaled sheet blit.
   // dw/dh default to sw/sh (unscaled). Software nearest-neighbor, rounded to an
   // integer scale and cached in GRAM (see lc_sspr). flips pack into one arg.

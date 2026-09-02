@@ -12,7 +12,7 @@
 ; cross-bank call stubs. Must live in the FIXED bank (it runs while the
 ; window is mid-switch).
 ; ---------------------------------------------------------------------------
-.export _gt_bank, gt_bank_raw, gt_cur_bank, _gt_cur_bank
+.export _gt_bank, _gt_save_open, gt_bank_raw, gt_cur_bank, _gt_cur_bank
 .PC02
 
 VIA_ORA  = $2801
@@ -46,7 +46,9 @@ _gt_bank := gt_bank_raw
 ; lined below at ~105 cycles (~2.2x). Same-bank requests return in 9.
 gt_bank_raw:
         cmp     gt_cur_bank
-        bne     @go
+        beq     @same
+        jmp     @go
+@same:
         rts
 @go:    inc     _gt_bank_busy
         sta     gt_cur_bank
@@ -59,15 +61,23 @@ gt_bank_raw:
         ldx     #$07            ; CLK/MOSI/CS as outputs
         stx     VIA_DDRA
         cmp     #0
-        beq     @b0
+        bne     :+
+        jmp     @b0
+:
         cmp     #1
-        beq     @b1
+        bne     :+
+        jmp     @b1
+:
         cmp     #2
-        beq     @b2
+        bne     :+
+        jmp     @b2
+:
         ; ---- general fallback (any bank number) ----
-        asl     a               ; discard bit 7: bits 6..0 now sit in 7..1
-        ldx     #7
-@bit:   asl     a               ; next data bit (bit 6 first) -> carry
+        ; SAVE-capable carts use bit7 as ROM(1)/SRAM(0). Normal bank calls
+        ; always select ROM and transmit the complete 8-bit latch value.
+        ora     #$80
+        ldx     #8
+@bit:   asl     a               ; next data bit (bit 7 first) -> carry
         pha
         lda     #0
         rol     a               ; A = carry (the data bit)
@@ -78,8 +88,11 @@ gt_bank_raw:
         dex
         bne     @bit
         jmp     @latch
-        ; ---- bank 0: seven 0-bits ----
-@b0:    stz     VIA_ORA
+        ; ---- bank 0: ROM-select 1, then seven 0-bits ----
+@b0:    lda     #$02
+        sta     VIA_ORA
+        inc     VIA_ORA
+        stz     VIA_ORA
         inc     VIA_ORA
         stz     VIA_ORA
         inc     VIA_ORA
@@ -94,8 +107,11 @@ gt_bank_raw:
         stz     VIA_ORA
         inc     VIA_ORA
         jmp     @latch
-        ; ---- bank 1: six 0-bits then a 1-bit ----
-@b1:    stz     VIA_ORA
+        ; ---- bank 1: ROM-select 1, six 0-bits, then a 1-bit ----
+@b1:    lda     #$02
+        sta     VIA_ORA
+        inc     VIA_ORA
+        stz     VIA_ORA
         inc     VIA_ORA
         stz     VIA_ORA
         inc     VIA_ORA
@@ -111,8 +127,11 @@ gt_bank_raw:
         sta     VIA_ORA
         inc     VIA_ORA
         jmp     @latch
-        ; ---- bank 2: five 0-bits, a 1-bit, a 0-bit ----
-@b2:    stz     VIA_ORA
+        ; ---- bank 2: ROM-select 1, five 0-bits, a 1-bit, a 0-bit ----
+@b2:    lda     #$02
+        sta     VIA_ORA
+        inc     VIA_ORA
+        stz     VIA_ORA
         inc     VIA_ORA
         stz     VIA_ORA
         inc     VIA_ORA
@@ -132,4 +151,23 @@ gt_bank_raw:
         sta     VIA_ORA         ; CS rise: latch the new bank
         stz     VIA_ORA
         stz     _gt_bank_busy
+        rts
+
+; void gt_save_open(void)
+; Map SRAM bank 0 into $8000-$BFFF and leave gt_bank_busy asserted so the
+; vblank music hook cannot disturb the window. The caller must finish by
+; calling gt_bank(saved_bank), which selects ROM and releases the lock.
+_gt_save_open:
+        inc     _gt_bank_busy
+        lda     #$FF
+        sta     gt_cur_bank      ; force the later restore to program the latch
+        ldx     #8
+@sbit: stz     VIA_ORA
+        inc     VIA_ORA
+        dex
+        bne     @sbit
+        stz     VIA_ORA
+        lda     #$04
+        sta     VIA_ORA
+        stz     VIA_ORA
         rts

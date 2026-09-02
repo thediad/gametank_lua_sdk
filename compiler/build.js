@@ -773,8 +773,6 @@ export async function build(entry, opts, env) {
   // link, all of which the banked path redoes) and go straight to banked. This
   // is the single biggest rebuild cost: without it every unit compiles TWICE.
   // The flat main.c compile is kept (section 4 reads its .s for function sizes).
-  const flash2mHint = env.exists(env.join(buildDir, ".placement.json"));
-
   // 1. lua -> C (flat 32 KB attempt first)
   // Project songs: read once, then inject into every generated game C (flat
   // AND each banked placement attempt) so music(n) plays project song n.
@@ -782,6 +780,8 @@ export async function build(entry, opts, env) {
   let result = compileLua(env, entry, { num8, sourcePrefix: mapPrefix });
   result.c = injectSongs(result.c, songsBytes, false);
   const usesAudio = result.c.includes("gt_audio_init(");
+  const usesSave = result.c.includes("gt_cartdata(") || result.c.includes("gt_dget(") || result.c.includes("gt_dset(");
+  const flash2mHint = usesSave || env.exists(env.join(buildDir, ".placement.json"));
   const usesStarfield = result.c.includes("gt_parallax");
   const usesAutocls = result.c.includes("gt_autocls_set(");
   // torus track cache (gt_track_grid/col/row2/view/props/compose): a racing-track
@@ -956,7 +956,9 @@ export async function build(entry, opts, env) {
 
   // 4. overflow -> FLASH2M banked build
   const over = link32.overflows.reduce((a, o) => a + o.bytes, 0);
-  env.warn(`32 KB cart overflows by ~${over} bytes - re-targeting the 2 MB FLASH2M cart`);
+  env.warn(usesSave
+    ? "persistent data requires FLASH2M+RAM - targeting a 2 MB save-capable cart"
+    : `32 KB cart overflows by ~${over} bytes - re-targeting the 2 MB FLASH2M cart`);
   let sizes = functionSizes(env, B(`${name}.s`));
   // fold each function's rodata (string literals + literal-run tables) into
   // its size: rodata rides the function's bank (the emitter pushes
@@ -1449,6 +1451,7 @@ export async function build(entry, opts, env) {
     img.set(pieces.subarray(bk * BANK_SIZE, (bk + 1) * BANK_SIZE), bk * BANK_SIZE);
   }
   img.set(pieces.subarray(nBanks * BANK_SIZE, (nBanks + 1) * BANK_SIZE), FLASH_SIZE - BANK_SIZE);
+  if (usesSave) img.set([0x53, 0x41, 0x56, 0x45], FLASH_SIZE - 16);
   env.writeFile(gtr, img);
 
   // save the placement the successful link ACTUALLY used - the ladder rungs
@@ -1458,6 +1461,6 @@ export async function build(entry, opts, env) {
   const counts = { fixed: 0, b0: 0, b1: 0, b2: 0, b4: 0, b5: 0, b6: 0, b7: 0, b8: 0, b9: 0, b10: 0, b11: 0, b12: 0, b13: 0 };
   for (const b of Object.values(workPlacement)) counts[b]++;
   const xl = counts.b4 || counts.b5 ? ` bank4:${counts.b4} bank5:${counts.b5}` : "";
-  env.log(`${gtr} (${env.size(gtr)} bytes, FLASH2M; ` +
+  env.log(`${gtr} (${env.size(gtr)} bytes, ${usesSave ? "FLASH2M+RAM" : "FLASH2M"}; ` +
     `functions fixed:${counts.fixed} bank0:${counts.b0} bank1:${counts.b1} bank2:${counts.b2}${xl})`);
 }

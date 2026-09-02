@@ -1277,6 +1277,14 @@ export function emit(chunk, symbols, file, opts = {}) {
         const layers = argAt(e, 6, "int", "-1");
         return `lc_map(lcl___p8map, 128, ${cx}, ${cy}, ${sx}, ${sy}, ${cw}, ${ch}, ${layers})`;
       }
+      case "cartdata": {
+        let h = 0x811c9dc5;
+        for (const ch of e.args[0].value) {
+          h ^= ch.charCodeAt(0) & 0xff;
+          h = Math.imul(h, 0x01000193) >>> 0;
+        }
+        return `lc_cartdata(0x${h.toString(16).padStart(8, "0")}UL)`;
+      }
       case "mget": {
         return `lc_mget(lcl___p8map, ${argAt(e, 0, "int", "0")}, ${argAt(e, 1, "int", "0")})`;
       }

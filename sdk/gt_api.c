@@ -933,6 +933,72 @@ void gt_fset(int sprite, int flag, int value) {
     }
 }
 
+/* PICO-8 cartdata: an ID header followed by 64 little-endian 16.16 slots. */
+#define GT_SAVE_BASE ((volatile unsigned char *)0x8000)
+#define GT_SAVE_DATA 8u
+static unsigned char gt_cartdata_ready;
+
+int gt_cartdata(unsigned long id) {
+    unsigned char saved_bank = gt_cur_bank;
+    volatile unsigned char *p;
+    unsigned int i;
+    int loaded;
+    gt_save_open();
+    p = GT_SAVE_BASE;
+    loaded = p[0] == 'G' && p[1] == 'T' && p[2] == 'L' && p[3] == 'D' &&
+        p[4] == (unsigned char)id && p[5] == (unsigned char)(id >> 8) &&
+        p[6] == (unsigned char)(id >> 16) && p[7] == (unsigned char)(id >> 24);
+    if (!loaded) {
+        p[0] = 'G'; p[1] = 'T'; p[2] = 'L'; p[3] = 'D';
+        p[4] = (unsigned char)id; p[5] = (unsigned char)(id >> 8);
+        p[6] = (unsigned char)(id >> 16); p[7] = (unsigned char)(id >> 24);
+        for (i = 0; i < 256u; ++i) p[GT_SAVE_DATA + i] = 0;
+    }
+    gt_bank(saved_bank);
+    gt_cartdata_ready = 1;
+    return loaded;
+}
+
+#ifdef GT_NUM8
+int gt_dget(int index) {
+#else
+long gt_dget(int index) {
+#endif
+    unsigned char saved_bank;
+    volatile unsigned char *p;
+    unsigned long raw;
+    if (!gt_cartdata_ready || index < 0 || index >= 64) return 0;
+    saved_bank = gt_cur_bank;
+    gt_save_open();
+    p = GT_SAVE_BASE + GT_SAVE_DATA + (unsigned int)index * 4u;
+    raw = (unsigned long)p[0] | ((unsigned long)p[1] << 8) |
+          ((unsigned long)p[2] << 16) | ((unsigned long)p[3] << 24);
+    gt_bank(saved_bank);
+#ifdef GT_NUM8
+    return (int)((long)raw >> 8);
+#else
+    return (long)raw;
+#endif
+}
+
+#ifdef GT_NUM8
+void gt_dset(int index, int value) {
+    unsigned long raw = (unsigned long)((long)value << 8);
+#else
+void gt_dset(int index, long value) {
+    unsigned long raw = (unsigned long)value;
+#endif
+    unsigned char saved_bank;
+    volatile unsigned char *p;
+    if (!gt_cartdata_ready || index < 0 || index >= 64) return;
+    saved_bank = gt_cur_bank;
+    gt_save_open();
+    p = GT_SAVE_BASE + GT_SAVE_DATA + (unsigned int)index * 4u;
+    p[0] = (unsigned char)raw; p[1] = (unsigned char)(raw >> 8);
+    p[2] = (unsigned char)(raw >> 16); p[3] = (unsigned char)(raw >> 24);
+    gt_bank(saved_bank);
+}
+
 void gt_map(const unsigned char *map, int mapw,
                int cx, int cy, int sx, int sy, int cw, int ch, int layers) {
     int j, i;

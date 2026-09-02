@@ -217,6 +217,20 @@ test("map/mget/mset and sprite flags lower to GameTank runtime calls", () => {
   assert.match(c, /gt_fget\(11, -1\)/);
 });
 
+test("cartdata/dget/dset lower with a stable ID hash and fixed values", () => {
+  const c = cOf('local loaded=0\nlocal score=0\nfunction _init()\n' +
+    ' if cartdata("thediad_save") then loaded=1 end\n score=dget(0)\n dset(1,score+0.5)\nend\n' +
+    'function _update60() end\nfunction _draw() end\n');
+  assert.match(c, /gt_cartdata\(0x[0-9a-f]{8}UL\)/);
+  assert.match(c, /gt_dget\(0\)/);
+  assert.match(c, /gt_dset\(1,/);
+});
+
+test("cartdata rejects IDs that cannot be portable PICO-8 save keys", () => {
+  const errors = errorsOf('function _init() cartdata("Bad-ID") end\nfunction _update60() end\nfunction _draw() end');
+  assert.ok(errors.some((e) => /ID must be 1-64/.test(e)));
+});
+
 test("multiple assignment to struct fields (o.x, o.y = a, b)", () => {
   const c = cOf("local objs = pool(8)\nfunction _init()\n  add(objs, {x=0, y=0})\nend\n" +
                 "function _update60()\n  for o in all(objs) do\n    o.x, o.y = o.x + 1, o.y + 2\n  end\nend\nfunction _draw()\nend\n");
