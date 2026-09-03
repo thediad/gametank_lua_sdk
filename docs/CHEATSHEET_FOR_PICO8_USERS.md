@@ -219,8 +219,8 @@ Zero-authoring built-ins: `sfx(0)`=jump, 1=pickup, 2=shoot, 3=explode, 4=blip,
 | Call | | Notes |
 |---|:--:|---|
 | `print(str,x,y,[c])` | ✅ | x,y **required** (4×6 font); returns right-edge x |
-| `print(str)` | 🔵 | cursor form (auto x,y advance) - v0.5, needs runtime cursor |
-| `?expr` | 🔵 | print shorthand - lands with the cursor form |
+| `print(str)` | 🟡 | cursor form with vertical auto-advance; wraps instead of scrolling at the bottom |
+| `?expr` | 🟡 | exact shorthand for the corresponding `print(expr,...)` form; cursor has the limit above |
 | `s = "hello"` | ✅ | string literals (short and `[[ long ]]`) |
 | `s .. s2` | 🔵 | runtime concat - v0.5 |
 | `sub tostr tonum chr ord split` | 🔵 | v0.5 |

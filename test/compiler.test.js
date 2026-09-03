@@ -78,6 +78,17 @@ test("print cursor form: print(v) and print(v, color) compile", () => {
   assert.match(c, /gt_print_cur_str\("hi", -1\)/);     // print("hi")
 });
 
+test("? shorthand lowers through the ordinary print forms", () => {
+  const c = cOf('local n = 5\nfunction _update60()\nend\nfunction _draw()\n  ?"hi"\n  ?n, 8\n  ?n, 4, 12, 7\nend\n');
+  assert.match(c, /gt_print_cur_str\("hi", -1\)/);
+  assert.match(c, /gt_print_cur_int\(lcl_n, /);
+  assert.match(c, /gt_print_int\(lcl_n, 4, 12, /);
+});
+
+test("? shorthand requires a same-line value", () => {
+  assert.ok(errorsOf('?\n' + LOOP).some((m) => /needs a value/.test(m)));
+});
+
 test("long string [[ ... ]] lexes as a string", () => {
   // spans newlines; used for level grids / credits
   const src = 'local g = ""\nfunction _update60()\nend\nfunction _draw()\n  g = [[\nab\ncd]]\n  print(g)\nend\n';

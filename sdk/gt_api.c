@@ -933,7 +933,10 @@ void gt_fset(int sprite, int flag, int value) {
     }
 }
 
-/* PICO-8 cartdata: an ID header followed by 64 little-endian 16.16 slots. */
+/* PICO-8 cartdata: an ID header followed by 64 little-endian 16.16 slots.
+ * Save calls force a banked build, so keep this hardware-only implementation
+ * out of ordinary flat carts (where gt_cur_bank/gt_save_open do not exist). */
+#ifdef GT_BANKED
 #define GT_SAVE_BASE ((volatile unsigned char *)0x8000)
 #define GT_SAVE_DATA 8u
 static unsigned char gt_cartdata_ready;
@@ -998,6 +1001,7 @@ void gt_dset(int index, long value) {
     p[2] = (unsigned char)(raw >> 16); p[3] = (unsigned char)(raw >> 24);
     gt_bank(saved_bank);
 }
+#endif
 
 void gt_map(const unsigned char *map, int mapw,
                int cx, int cy, int sx, int sy, int cw, int ch, int layers) {

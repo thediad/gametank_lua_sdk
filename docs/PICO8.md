@@ -72,7 +72,7 @@ optimization, never a semantic change.
 | multiple **return** values `x,y = f()`; multi-member assign `o.x,o.y = a,b` | ✅ v0.2.6 |
 | `rnd({a,b,c})` picks a random element (constant number list) | ✅ v0.2.6 |
 | string `\` escapes (`\"` `\\` `\n`) and `if cond do … end` (minifier form of `then`) | ✅ v0.2.6 |
-| `print(str)` cursor form / `?expr` shorthand | 🔵 v0.5 (needs a runtime text cursor) |
+| `print(str)` cursor form / `?expr` shorthand | ✅ v0.5 (cursor wraps instead of scrolling at the bottom) |
 
 ### Stays cut (compiled subset) - with the P8-dev-facing story
 
