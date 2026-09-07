@@ -10,7 +10,7 @@ function _init()
   -- These should be ignored safely.
   mset(-1, 0, 9)
   mset(128, 0, 9)
-  mset(0, 32, 9)
+  mset(0, 64, 9)
 end
 
 function _draw()
@@ -26,5 +26,5 @@ function _draw()
   -- Bounds behavior: all should return 0
   print(mget(-1, 0), 4, 48, 7)
   print(mget(128, 0), 4, 56, 7)
-  print(mget(0, 32), 4, 64, 7)
+  print(mget(0, 64), 4, 64, 7)
 end

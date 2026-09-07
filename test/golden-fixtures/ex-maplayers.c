@@ -24,7 +24,7 @@ static void lcl__draw(void)
     gt_map(lcl___p8map, 128, 0, 0, 40, 26, 3, 1, 1);
     gt_print("flag2", 2, 52, 7);
     gt_map(lcl___p8map, 128, 0, 0, 40, 50, 3, 1, 4);
-    gt_print("both", 2, 76, 7);
+    gt_print("flag0|2", 2, 76, 7);
     gt_map(lcl___p8map, 128, 0, 0, 40, 74, 3, 1, 5);
     gt_print_int(gt_fget(1, -1), 72, 4, 7);
     gt_print_int(gt_fget(2, -1), 88, 4, 7);

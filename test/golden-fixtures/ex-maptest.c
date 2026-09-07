@@ -16,7 +16,7 @@ static void lcl__init(void)
     gt_mset(lcl___p8map, 4, 0, 5);
     gt_mset(lcl___p8map, (-1), 0, 9);
     gt_mset(lcl___p8map, 128, 0, 9);
-    gt_mset(lcl___p8map, 0, 32, 9);
+    gt_mset(lcl___p8map, 0, 64, 9);
 }
 
 static void lcl__draw(void)
@@ -28,7 +28,7 @@ static void lcl__draw(void)
     gt_print_int(gt_mget(lcl___p8map, 6, 0), 4, 32, 7);
     gt_print_int(gt_mget(lcl___p8map, (-1), 0), 4, 48, 7);
     gt_print_int(gt_mget(lcl___p8map, 128, 0), 4, 56, 7);
-    gt_print_int(gt_mget(lcl___p8map, 0, 32), 4, 64, 7);
+    gt_print_int(gt_mget(lcl___p8map, 0, 64), 4, 64, 7);
 }
 
 void main(void)

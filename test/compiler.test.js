@@ -202,6 +202,12 @@ test("map() passes its optional sprite-flag layer mask", () => {
   assert.match(c, /gt_map\(lcl___p8map, 128, 1, 2, 3, 4, 5, 6, 5\)/);
 });
 
+test("map layer masks use any matching sprite flag", () => {
+  const runtime = readFileSync(path.join(REPO, "sdk/gt_api.c"), "utf8");
+  assert.match(runtime,
+    /\(gt_sprite_flags\[t\] & \(unsigned char\)layers\) != 0/);
+});
+
 
 test("map/mget/mset and sprite flags lower to GameTank runtime calls", () => {
   const c = cOf(

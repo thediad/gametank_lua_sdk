@@ -232,7 +232,7 @@ fast path); no runtime string building yet.
 
 | Call | | Notes |
 |---|:--:|---|
-| `map(cx,cy,sx,sy,cw,ch,[layers])` | ✅ | draws the imported 128×64 `.map` as `spr()` cells; **tile 0 skipped**; a layer mask requires every selected sprite-flag bit |
+| `map(cx,cy,sx,sy,cw,ch,[layers])` | ✅ | draws the imported 128×64 `.map` as `spr()` cells; **tile 0 skipped**; a layer mask draws tiles matching any selected sprite-flag bit |
 | `mget(cx,cy)` | ✅ | tile index at map cell `(cx,cy)` |
 | `mset(x,y,v)` | ✅ | mutable 32-entry RAM overlay over the imported ROM map |
 | `fget(n,[f])` / `fset(n,[f],v)` | ✅ | mutable sprite flags; import `__gff__` as `.gff` and build with `--gff` |

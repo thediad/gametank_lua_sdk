@@ -1018,8 +1018,7 @@ void gt_map(const unsigned char *map, int mapw,
             /* w/h are in CELLS (gt_spr scales <<3 to pixels): one 8x8 tile
              * = 1 cell, NOT 8. Passing 8 blits a 64x64 region per tile. */
             if (t && (layers == -1 ||
-                      (gt_sprite_flags[t] & (unsigned char)layers) ==
-                          (unsigned char)layers)) {
+                      (gt_sprite_flags[t] & (unsigned char)layers) != 0)) {
                 gt_spr(t, sx + i * 8, py, 1, 1, 0);
             }
         }

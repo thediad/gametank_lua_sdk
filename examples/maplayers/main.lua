@@ -20,7 +20,8 @@ function _draw()
   print("flag2",2,52,7)
   map(0,0,40,50,3,1,4)
 
-  print("both",2,76,7)
+  -- A combined mask is a union: draw tiles carrying flag 0 OR flag 2.
+  print("flag0|2",2,76,7)
   map(0,0,40,74,3,1,5)
 
   print(fget(1),72,4,7)
