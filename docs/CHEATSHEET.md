@@ -256,6 +256,7 @@ ps = pool(16)                        -- fixed-capacity entity pool
 add(ps, {x = 10, y = 20, kind = 1})  -- traps if full (in debug builds)
 del(ps, e)                           -- safe to delete while iterating
 for e in all(ps) do e.x += 1 end     -- iterate in insertion order
+count(ps)  #ps                       -- live element count (either spelling)
 
 grid  = array(64)                    -- 64 fixed-point cells
 bytes = array8(256)                  -- 256 byte-wide cells (0..255)

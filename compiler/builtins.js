@@ -122,6 +122,9 @@ export const BUILTINS = {
   // add(bullets, {x=1, y=2}), `for b in all(bullets)`, del(bullets, b).
   // Field set is frozen by the first add(); #pool = live count.
   pool: { params: [["int", false]], ret: "pool", special: "pool" },
+  // PICO-8 count(t): pools report their live element count; fixed arrays report
+  // their capacity (all slots are always present in gtlua's static model).
+  count: { params: [], ret: "int", special: "count" },
   print: { params: [], ret: "int", special: "print" },
   add:  { params: [], ret: "void", special: "add" },
   del:  { params: [], ret: "void", special: "del" },
