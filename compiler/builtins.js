@@ -16,6 +16,9 @@ export const BUILTINS = {
   camera:   { params: [["coord", true], ["coord", true]], ret: "void", c: "lc_camera" },
   clip:     { params: [["coord", true], ["coord", true], ["coord", true], ["coord", true], ["flip", true]], ret: "void", special: "clip" },
   color:    { params: [["color", false]], ret: "void", c: "lc_color" },
+  // GameTank hardware supports only its native color-0 colorkey. palt() resets
+  // it; palt(0,false) makes zero opaque. Other colors are rejected by emit.
+  palt:     { params: [["int", true], ["flip", true]], ret: "void", special: "palt" },
   pset:     { params: [["coord", false], ["coord", false], ["color", true]], ret: "void", c: "lc_pset" },
   rect:     { params: [["coord", false], ["coord", false], ["coord", false], ["coord", false], ["color", true]], ret: "void", c: "lc_rect" },
   rectfill: { params: [["coord", false], ["coord", false], ["coord", false], ["coord", false], ["color", true]], ret: "void", c: "lc_rectfill" },

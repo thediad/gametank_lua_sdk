@@ -32,6 +32,7 @@
 .import   _gt_rectfill_slow
 .import   _gt_spr_wide
 .import   _gt_spr_clipped
+.import   _gt_sprite_opaque
 .import   _gt_clip_enabled
 .export   _gt_rectfill_z
 .export   _gt_rng_next
@@ -421,6 +422,11 @@ _gt_spr_z:
         BCC @norm
 @wide:  JMP _gt_spr_wide
 @norm:
+        ; Opaque color zero is an uncommon palt(0,false) mode. Keep the normal
+        ; direct-to-ring path lean and let the C descriptor builder add the
+        ; DMA_OPAQUE flag only while that mode is active.
+        LDA _gt_sprite_opaque
+        BNE @clip
         ; Arbitrary clip is uncommon. Preserve the direct-to-ring hot path
         ; when disabled and use the C clipper only while a region is active.
         LDA _gt_clip_enabled

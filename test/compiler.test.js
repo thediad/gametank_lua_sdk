@@ -198,6 +198,20 @@ test("sspr() emits gt_sspr with dw/dh defaulting to 0 (= source size)", () => {
   assert.match(c, /gt_sspr\(0, 0, 8, 8, 100, 100, 0, 0,/);   // unscaled (dw/dh 0)
 });
 
+test("palt supports the GameTank color-0 transparency toggle", () => {
+  const c = cOf("function _update60()\nend\nfunction _draw()\n" +
+                "  palt()\n  palt(0)\n  palt(0,false)\nend\n");
+  assert.match(c, /gt_palt\(1\)/);
+  assert.match(c, /gt_palt\(\(\(0\) \? 1 : 0\)\)/);
+});
+
+test("palt rejects nonzero transparent colors", () => {
+  assert.throws(
+    () => cOf("function _update60() end\nfunction _draw() palt(2,true) end\n"),
+    /palt only supports color 0/,
+  );
+});
+
 test("map() draws the imported tilemap; mget() reads a cell", () => {
   const c = cOf("local __p8map = hexdata(\"01020304\")\nfunction _update60()\nend\n" +
                 "function _draw()\n  cls()\n  map(0, 0, 0, 0, 16, 4)\n  local t = mget(2, 0)\nend\n");

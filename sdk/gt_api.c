@@ -67,6 +67,7 @@ static char frame_dl_init;
 unsigned char draw_color;          /* resolved GameTank byte (asm fast paths read/write) */
 /* Clip state: 0=full-screen fast path, 1=active region, 2=empty region. */
 unsigned char gt_clip_enabled;
+unsigned char gt_sprite_opaque;    /* DMA_OPAQUE while palt(0,false) is active */
 int gt_clip_x0, gt_clip_y0, gt_clip_x1, gt_clip_y1;
 
 /* The 16 GameTank bytes the PICO-8 palette maps to. Colors are raw GT bytes
@@ -808,7 +809,7 @@ void GT_SPR_CLIPPED(void) {
     if (y + ph - 1 > by1) ph = by1 - y + 1;
     if (pw <= 0 || ph <= 0) return;
 
-    gt_ent[0] = QF_SPR;
+    gt_ent[0] = QF_SPR | gt_sprite_opaque;
     gt_ent[1] = (unsigned char)x;
     gt_ent[2] = (unsigned char)y;
     gt_ent[3] = (unsigned char)(((n & 15) << 3) + skipx);
@@ -1158,7 +1159,7 @@ static void sspr_scaled_clipped(int sx, int sy, int sw, int sh,
                                       (unsigned int)(sx + srcx)] != col) break;
                     ++run;
                 }
-                if (!col) { ix += run; continue; }
+                if (!col && !gt_sprite_opaque) { ix += run; continue; }
                 px0 = dx + ix * s; py0 = dy + iy * s;
                 px1 = px0 + run * s - 1; py1 = py0 + s - 1;
                 if (px1 < bx0 || py1 < by0 || px0 > bx1 || py0 > by1) {
@@ -1212,7 +1213,7 @@ void gt_sspr(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int
         if (dx + w - 1 > bx1) w = bx1 - dx + 1;
         if (dy + h - 1 > by1) h = by1 - dy + 1;
         if (w <= 0 || h <= 0) return;
-        gt_ent[0] = QF_SPR;
+        gt_ent[0] = QF_SPR | gt_sprite_opaque;
         gt_ent[1] = (unsigned char)dx;
         gt_ent[2] = (unsigned char)dy;
         gt_ent[3] = (unsigned char)(sx + skipx);
@@ -1237,7 +1238,7 @@ void gt_sspr(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int
     {
         unsigned char w = (unsigned char)(sw * s), h = (unsigned char)(sh * s);
         if (!gt_gsheet_ptr) return;                 /* no readable source */
-        if (gt_clip_enabled || flip || dx < 0 || dy < 0 ||
+        if (gt_sprite_opaque || gt_clip_enabled || flip || dx < 0 || dy < 0 ||
             dx + (int)w > 128 || dy + (int)h > 128) {
             sspr_scaled_clipped(sx, sy, sw, sh, dx, dy, s, flip);
             return;
@@ -1466,6 +1467,10 @@ void gt_cls(int c) {
 
 void gt_camera(int x, int y) { gt_cam_x = x; gt_cam_y = y; }
 void gt_clip_reset(void) { gt_clip_enabled = 0; }
+
+void __fastcall__ gt_palt(int transparent) {
+    gt_sprite_opaque = transparent ? 0 : DMA_OPAQUE;
+}
 
 void gt_clip(int x, int y, int w, int h, int previous) {
     int x1 = x + w - 1, y1 = y + h - 1;
@@ -2784,6 +2789,7 @@ void gt_init(void) {
     gt_pad0 = 0; gt_pad1 = 0; gt_rpt0 = 0; gt_rpt1 = 0;
     gt_draw_mode = MODE_NONE;
     draw_color = 0x06;                 /* default draw color = GT byte for p8 index 6 */
+    gt_sprite_opaque = 0;              /* PICO-8 default: sheet color 0 transparent */
     flags_mirror = DMA_NMI | DMA_ENABLE | DMA_IRQ;
     *dma_flags = flags_mirror;
     banks_mirror = bankflip;

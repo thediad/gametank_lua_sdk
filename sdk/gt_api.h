@@ -69,6 +69,7 @@ void gt_cls(int c);
 void gt_camera(int x, int y);
 void gt_clip(int x, int y, int w, int h, int previous);
 void gt_clip_reset(void);
+void __fastcall__ gt_palt(int transparent);
 void __fastcall__ gt_color(int c);
 
 /* zp-ABI entry points: args in gt_a0..gt_a5 (see the block above).

@@ -175,7 +175,7 @@ per-function compatibility map is
 | | |
 |---|---|
 | lifecycle | `_init` `_update` `_update60` `_draw` |
-| graphics | `cls` `camera` `color` `pset` `rect` `rectfill` `circ` `circfill` `line` `sset` `spr(n,x,y,[w,h],[flip_x,flip_y])` - flips are free (hardware blitter mirror) |
+| graphics | `cls` `camera` `color` `palt(0,[transparent])` `pset` `rect` `rectfill` `circ` `circfill` `line` `sset` `spr(n,x,y,[w,h],[flip_x,flip_y])` - flips are free (hardware blitter mirror) |
 | sprites | 8×8-grid `spr(n)` off a `.gtg` sheet (`--sheet`, [docs/GRAPHICS.md](docs/GRAPHICS.md)); `sprf(frame,x,y,[fx],[fy])` for arbitrary-size / animated frames off a `.gsi` table ([docs/SPRITES.md](docs/SPRITES.md)) |
 | input | `btn(i,[pl])` `btnp(i,[pl])` - indices 0-3 d-pad, 4=🅾️(GT A), 5=❎(GT B), **6=GT C**, 7=START; `btnp` has PICO-8 auto-repeat |
 | math | `flr` `ceil` `abs` `sgn` `sqrt` `min` `max` `mid` `sin` `cos` `atan2` `rnd` `srand` `t`/`time` |

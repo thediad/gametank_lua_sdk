@@ -1284,6 +1284,13 @@ export function emit(chunk, symbols, file, opts = {}) {
         const previous = argAt(e, 4, "flip", "0");
         return `lc_clip(${x}, ${y}, ${w}, ${h}, ${previous})`;
       }
+      case "palt": {
+        if (e.args.length === 0) return "lc_palt(1)";
+        if (e.args[0].kind !== "number" || e.args[0].value !== 0) {
+          throw new Error("palt only supports color 0 on GameTank; re-author nonzero transparent colors in the sprite sheet");
+        }
+        return `lc_palt(${argAt(e, 1, "flip", "1")})`;
+      }
       case "cartdata": {
         let h = 0x811c9dc5;
         for (const ch of e.args[0].value) {
