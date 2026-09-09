@@ -1286,6 +1286,8 @@ export function emit(chunk, symbols, file, opts = {}) {
         return expr({ kind: "binop", op: b.op, left: a0, right: e.args[1], tk }, tk);
       }
       case "chr": case "sub": return `"${cStringBytes(e.staticString ?? "")}"`;
+      case "tonum": return e.tk === "int" ? String(Math.trunc(e.tonumValue ?? 0))
+        : `${Math.round((e.tonumValue ?? 0) * FONE) | 0}${FL}`;
       case "map": {
         // map(cx,cy,sx,sy,cw,ch,layers) over the imported __map__ array (128 wide).
         // PICO-8 defaults: cel 0,0 -> screen 0,0, full 128x64 map.

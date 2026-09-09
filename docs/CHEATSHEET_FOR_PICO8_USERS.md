@@ -227,7 +227,8 @@ Zero-authoring built-ins: `sfx(0)`=jump, 1=pickup, 2=shoot, 3=explode, 4=blip,
 | `ord("literal",[constant_index])` | 🟡 | one byte result; literal string and in-range constant index only |
 | `chr(constant_bytes...)` | 🟡 | compile-time string, directly usable by `print` |
 | `sub("literal",pos0,[pos1])` | 🟡 | compile-time positive in-range positions |
-| `tostr tonum split` | 🔵 | v0.5 |
+| `tonum("decimal_literal")` | 🟡 | compile-time decimal conversion; no format flags |
+| `tostr split` | 🔵 | v0.5 |
 
 Bake dynamic text into byte buffers and draw with `gt.print_buf` for HUDs (the
 fast path); no runtime string building yet.

@@ -234,6 +234,14 @@ test("sub folds a literal string and positive constant range", () => {
     .some((m) => /static positions/.test(m)));
 });
 
+test("tonum folds decimal string literals", () => {
+  const c = cOf("local a=0\nlocal b=0.0\nfunction _update60() a=tonum(\"42\") b=tonum(\"-3.5\") end\nfunction _draw() end\n");
+  assert.match(c, /lcl_a = 42/);
+  assert.match(c, /lcl_b = -229376L/);
+  assert.ok(errorsOf("local a=0\nfunction _update60() a=tonum(\"0xff\") end\nfunction _draw() end\n")
+    .some((m) => /decimal literals only/.test(m)));
+});
+
 test("sspr() emits gt_sspr with dw/dh defaulting to 0 (= source size)", () => {
   const c = cOf("function _update60()\nend\nfunction _draw()\n  cls()\n" +
                 "  sspr(80,8,8,8,50,9,16,16)\n  sspr(0,0,8,8,100,100)\nend\n");
