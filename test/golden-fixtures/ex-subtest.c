@@ -14,6 +14,8 @@ static void lcl__draw(void)
     gt_print("tank", 52, 42, 7);
     gt_print("bcd", 56, 62, 254);
     gt_print("compat", 48, 82, 190);
+    gt_print("single", 16, 102, 7);
+    gt_print("i", 56, 102, 31);
 }
 
 void main(void)

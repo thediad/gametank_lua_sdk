@@ -227,9 +227,10 @@ test("chr folds constant bytes into a safely escaped print string", () => {
 });
 
 test("sub folds a literal string and positive constant range", () => {
-  const c = cOf("function _update60() end\nfunction _draw() print(sub(\"gametank\",5),4,4,7) print(sub(\"abcdef\",2,4),4,12,7) end\n");
+  const c = cOf("function _update60() end\nfunction _draw() print(sub(\"gametank\",5),4,4,7) print(sub(\"abcdef\",2,4),4,12,7) print(sub(\"quick\",3,true),4,20,7) end\n");
   assert.ok(c.includes('gt_print("tank", 4, 4, 7)'));
   assert.ok(c.includes('gt_print("bcd", 4, 12, 7)'));
+  assert.ok(c.includes('gt_print("i", 4, 20, 7)'));
   assert.ok(errorsOf("function _update60() end\nfunction _draw() print(sub(\"abc\",0),4,4,7) end\n")
     .some((m) => /static positions/.test(m)));
 });

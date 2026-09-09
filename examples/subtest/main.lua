@@ -6,4 +6,6 @@ function _draw()
   print(sub("gametank", 5), 52, 42, 7)
   print(sub("abcdef", 2, 4), 56, 62, 11)
   print(sub("compatibility", 1, 6), 48, 82, 12)
+  print("single", 16, 102, 7)
+  print(sub("quick", 3, true), 56, 102, 10)
 end
