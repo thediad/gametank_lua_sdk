@@ -25,10 +25,10 @@ static void lcl__draw(void)
     gt_print_int(lcl_code, 76, 38, 254);
     gt_print("sub concat", 12, 58, 7);
     gt_print("12.5", 76, 58, 254);
-    gt_print("tostr", 12, 78, 7);
-    gt_print("-3.5", 76, 78, 254);
-    gt_print("rounded", 12, 98, 7);
-    gt_print("1.2346", 76, 98, 254);
+    gt_print("tonum const", 12, 78, 7);
+    gt_print_num(819200L, 76, 78, 254);
+    gt_print("empty", 12, 98, 7);
+    gt_print("ab", 76, 98, 254);
 }
 
 void main(void)

@@ -230,8 +230,8 @@ Zero-authoring built-ins: `sfx(0)`=jump, 1=pickup, 2=shoot, 3=explode, 4=blip,
 | `ord("literal",[constant_index])` | 🟡 | one byte result; literal string and in-range constant index only |
 | `chr(constant_bytes...)` | 🟡 | compile-time string, directly usable by `print` |
 | `sub("literal",pos0,[pos1])` | 🟡 | compile-time positions; literal boolean `pos1` selects one character |
-| `tonum("decimal_literal")` | 🟡 | compile-time decimal conversion; no format flags |
-| `tostr(constant_number)` | 🟡 | compile-time string; static string calls compose |
+| `tonum(decimal_or_constant_number)` | 🟡 | compile-time conversion; no format flags |
+| `tostr([constant_number])` | 🟡 | compile-time string; omitted value produces `""` |
 | `split` | 🔵 | v0.5 |
 
 Static `..` expressions are folded at compile time and compose with the static

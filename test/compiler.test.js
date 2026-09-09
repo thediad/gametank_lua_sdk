@@ -235,19 +235,21 @@ test("sub folds a literal string and positive constant range", () => {
     .some((m) => /static positions/.test(m)));
 });
 
-test("tonum folds decimal string literals", () => {
-  const c = cOf("local a=0\nlocal b=0.0\nfunction _update60() a=tonum(\"42\") b=tonum(\"-3.5\") end\nfunction _draw() end\n");
+test("tonum folds decimal strings and constant numbers", () => {
+  const c = cOf("local a=0\nlocal b=0.0\nlocal c=0.0\nfunction _update60() a=tonum(\"42\") b=tonum(\"-3.5\") c=tonum(10+2.5) end\nfunction _draw() end\n");
   assert.match(c, /lcl_a = 42/);
   assert.match(c, /lcl_b = -229376L/);
+  assert.match(c, /lcl_c = 819200L/);
   assert.ok(errorsOf("local a=0\nfunction _update60() a=tonum(\"0xff\") end\nfunction _draw() end\n")
     .some((m) => /decimal literals only/.test(m)));
 });
 
 test("static string operations compose and tostr folds constants", () => {
-  const c = cOf("local n=0\nfunction _update60() n=ord(chr(65)) end\nfunction _draw() print(sub(chr(104,101,108,108,111),2,4),4,4,7) print(tostr(-3.5),4,12,7) end\n");
+  const c = cOf("local n=0\nfunction _update60() n=ord(chr(65)) end\nfunction _draw() print(sub(chr(104,101,108,108,111),2,4),4,4,7) print(tostr(-3.5),4,12,7) print(\"a\"..tostr()..\"b\",4,20,7) end\n");
   assert.match(c, /lcl_n = 65/);
   assert.ok(c.includes('gt_print("ell", 4, 4, 7)'));
   assert.ok(c.includes('gt_print("-3.5", 4, 12, 7)'));
+  assert.ok(c.includes('gt_print("ab", 4, 20, 7)'));
 });
 
 test("static string concatenation composes without a runtime allocator", () => {
