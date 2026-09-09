@@ -29,7 +29,7 @@ no-interpreter model allow, and fails loudly with a fix-it wherever they don't.
 
 | Feature | PICO-8 semantics we adopt |
 |---|---|
-| ⚠ `\` integer division | `a\b == flr(a/b)` (floored). **`//` becomes a comment** (PICO-8 treats it as one; P8 devs paste code full of `//` comments). v0.1's `//`-as-division is removed. `\` requires a constant power-of-two divisor until the general-divide routine lands with fixed-point. |
+| `\` integer division | `a\b == flr(a/b)` (floored). **`//` becomes a comment** (PICO-8 treats it as one; P8 devs paste code full of `//` comments). Constant powers of two become shifts; other divisors use the floored runtime helper. |
 | `!=` | exact alias of `~=` |
 | One-line `if`/`while` shorthand | `if (cond) stmt [else stmt]`, `while (cond) stmt` - parens required, newline ends the body, no `elseif`. The single most common P8 idiom (`if (btn(0)) x-=1`). Implement as grammar, not a text preprocessor - sane subset only. |
 | Compound assignment | full set as operators land: `+= -= *= \= %= ..=` (have `+= -= *=` ⚠ `//=`→`\=`). Evaluate the LHS **once** (documented improvement over P8's evaluate-twice text expansion). |

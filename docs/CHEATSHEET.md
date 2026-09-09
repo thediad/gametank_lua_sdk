@@ -237,7 +237,7 @@ for i = 10, 1, -1 do ... end
 if cond do ... end                   -- accepted as `if cond then` (minifier form)
 
 a != b        -- same as a ~= b
-a \ b         -- floored int divide flr(a/b) - use a power-of-two divisor
+a \ b         -- general floored divide flr(a/b); powers of two become shifts
 sfx"3"  print"hi"  add(p,{..})       -- paren-less string / table calls
 s = [[ long string ]]                -- long strings [[..]] / [=[..]=]
 "a \"quote\" and \n"                 -- backslash escapes lex correctly

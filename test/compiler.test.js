@@ -40,6 +40,19 @@ test("// is a comment, backslash is floor division", () => {
   assert.match(c, /lcl_x >> 1/);
 });
 
+test("general floor division uses the runtime for variable divisors", () => {
+  const c = cOf("local a=-9\nlocal b=2\nlocal q=0\nfunction _update60()\n" +
+                " q=a \\ b\nend\nfunction _draw() end\n");
+  assert.match(c, /gt_ifdiv\(lcl_a, lcl_b\)/);
+});
+
+test("fractional floor division divides fixed values before flooring", () => {
+  const c = cOf("local a=-9.5\nlocal b=2\nlocal q=0\nfunction _update60()\n" +
+                " q=a \\ b\nend\nfunction _draw() end\n");
+  assert.match(c, /gt_fdiv/);
+  assert.match(c, />> 16/);
+});
+
 test("!= is ~=", () => {
   const c = cOf("local x = 1\nfunction _update60()\n  if x != 2 then\n    x = 2\n  end\nend\nfunction _draw()\nend\n");
   assert.match(c, /lcl_x != 2/);

@@ -94,7 +94,7 @@ exactly like a PICO-8 game that can't hold its target rate.
 
 | Feature | | Notes |
 |---|:--:|---|
-| `a \ b` | 🟡 | floored int divide `flr(a/b)` - **power-of-two divisor** for now |
+| `a \ b` | ✅ | general floored divide `flr(a/b)`; constant powers of two become shifts |
 | `//` | ✅ | a line comment, like PICO-8 |
 | `a != b` | ✅ | alias of `~=` |
 | `if (c) stmt else stmt` | ✅ | one-line if / while, parens required |
