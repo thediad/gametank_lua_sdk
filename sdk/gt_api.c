@@ -1108,6 +1108,8 @@ extern unsigned char sp_sw, sp_sh, sp_s; /* zp bytes */
 #pragma zpsym ("sp_sh")
 #pragma zpsym ("sp_s")
 void gt_sspr_z(void);
+void box_raw(unsigned char x, unsigned char y,
+             unsigned char w, unsigned char h, unsigned char color);
 
 /* nearest integer scale of dst/src, clamped 1..4 (0 dst -> 1) */
 static unsigned char sspr_scale(unsigned char src, int dst) {
@@ -1123,8 +1125,16 @@ static unsigned char sspr_scale(unsigned char src, int dst) {
  * request a flip. The hot fully-visible, unflipped case stays in gt_sspr.s. */
 static void sspr_scaled_clipped(int sx, int sy, int sw, int sh,
                                 int dx, int dy, unsigned char s, int flip) {
-    int ix, iy, ox, oy;
+    int ix, iy;
+    int bx0 = 0, by0 = 0, bx1 = 127, by1 = 127;
     if (!gt_gsheet_ptr || sx < 0 || sy < 0 || sx + sw > 128 || sy + sh > 64) return;
+    if (gt_clip_enabled == 2) return;
+    if (gt_clip_enabled) {
+        bx0 = gt_clip_x0; by0 = gt_clip_y0;
+        bx1 = gt_clip_x1; by1 = gt_clip_y1;
+    }
+    /* Drain before temporarily mapping the readable sheet bank. Rect entries
+     * below are self-contained hardware fills and can then queue normally. */
     enter_cpu_mode();
 #ifdef GT_BANKED
     {
@@ -1133,29 +1143,44 @@ static void sspr_scaled_clipped(int sx, int sy, int sw, int sh,
 #endif
         for (iy = 0; iy < sh; ++iy) {
             int srcy = (flip & 2) ? sh - 1 - iy : iy;
-            for (ix = 0; ix < sw; ++ix) {
+            for (ix = 0; ix < sw;) {
                 int srcx = (flip & 1) ? sw - 1 - ix : ix;
                 unsigned char col = gt_gsheet_ptr[(unsigned int)(sy + srcy) * 128u +
                                                    (unsigned int)(sx + srcx)];
-                if (!col) continue;
-                for (oy = 0; oy < s; ++oy) {
-                    int py = dy + iy * s + oy;
-                    if (py < 0 || py > 127 || gt_clip_enabled == 2 ||
-                        (gt_clip_enabled && (py < gt_clip_y0 || py > gt_clip_y1))) continue;
-                    for (ox = 0; ox < s; ++ox) {
-                        int px = dx + ix * s + ox;
-                        if (px < 0 || px > 127 ||
-                            (gt_clip_enabled && (px < gt_clip_x0 || px > gt_clip_x1))) continue;
-                        vram_row[(unsigned char)py][(unsigned char)px] = col;
-                    }
+                int run = 1;
+                int px0, py0, px1, py1;
+                /* Collapse adjacent equal source pixels into one scaled fill.
+                 * Flat-color sprite regions now cost one queue entry per run,
+                 * rather than one entry per source pixel. */
+                while (ix + run < sw) {
+                    srcx = (flip & 1) ? sw - 1 - ix - run : ix + run;
+                    if (gt_gsheet_ptr[(unsigned int)(sy + srcy) * 128u +
+                                      (unsigned int)(sx + srcx)] != col) break;
+                    ++run;
                 }
+                if (!col) { ix += run; continue; }
+                px0 = dx + ix * s; py0 = dy + iy * s;
+                px1 = px0 + run * s - 1; py1 = py0 + s - 1;
+                if (px1 < bx0 || py1 < by0 || px0 > bx1 || py0 > by1) {
+                    ix += run;
+                    continue;
+                }
+                if (px0 < bx0) px0 = bx0;
+                if (py0 < by0) py0 = by0;
+                if (px1 > bx1) px1 = bx1;
+                if (py1 > by1) py1 = by1;
+                if (px0 >= 0 && py0 >= 0 && px1 <= 127 && py1 <= 127) {
+                    box_raw((unsigned char)px0, (unsigned char)py0,
+                            (unsigned char)(px1 - px0 + 1),
+                            (unsigned char)(py1 - py0 + 1), col);
+                }
+                ix += run;
             }
         }
 #ifdef GT_BANKED
         gt_bank(saved_bank);
     }
 #endif
-    bg_pipeline_restore();
 }
 
 void gt_sspr(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int flip) {
