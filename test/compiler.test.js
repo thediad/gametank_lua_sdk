@@ -269,6 +269,19 @@ test("type folds statically known supported values", () => {
   }
 });
 
+test("split folds a static numeric string into a fixed array", () => {
+  const c = cOf('local values=split("10,20.5,-3")\nlocal digits=split("123",1)\nlocal n=0.0\nfunction _update60() n=values[2]+digits[3] end\nfunction _draw() print(count(values),4,4,7) end\n');
+  assert.match(c, /long lcl_values\[3\] = \{\s*655360L, 1343488L, -196608L\s*\}/);
+  assert.match(c, /unsigned char lcl_digits\[3\] = \{\s*1, 2, 3\s*\}/);
+  assert.match(c, /lcl_n = \(lcl_values\[1\] \+ \(\(long\)lcl_digits\[2\] << 16\)\)/);
+  assert.ok(errorsOf('local words=split("a,b")\nfunction _update60() end\nfunction _draw() end\n')
+    .some((m) => /numeric results only/.test(m)));
+  assert.ok(errorsOf('local values=split("1,2",",",false)\nfunction _update60() end\nfunction _draw() end\n')
+    .some((m) => /convert_numbers=true/.test(m)));
+  assert.ok(errorsOf('local values=split("123",0)\nfunction _update60() end\nfunction _draw() end\n')
+    .some((m) => /positive integer separator/.test(m)));
+});
+
 test("sspr() emits gt_sspr with dw/dh defaulting to 0 (= source size)", () => {
   const c = cOf("function _update60()\nend\nfunction _draw()\n  cls()\n" +
                 "  sspr(80,8,8,8,50,9,16,16)\n  sspr(0,0,8,8,100,100)\nend\n");

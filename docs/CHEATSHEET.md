@@ -281,10 +281,11 @@ print(str, [x, y], [c])   -- 4×6 font; returns the right-edge x
 `ord("literal", [constant_index])` is available at compile time for one in-range
 byte result; `chr(constant_bytes...)` and static `sub("literal",...)`
 make static strings for `print`; `tonum("decimal")`, `tonum(constant)`, and
-`tostr([constant])` fold
-at compile time. Static string calls compose. Runtime string *building* (`..`,
-`split`) isn't wired
-yet. For live HUDs, bake digits into a byte buffer and blit it fast:
+`tostr([constant])` fold at compile time. `split("1,2,3")` can initialize a
+top-level fixed numeric array, with an optional literal string or positive
+integer separator. Static string calls compose. Runtime string building and
+string-valued `split` results aren't
+wired yet. For live HUDs, bake digits into a byte buffer and blit it fast:
 
 ```lua
 gt.print_buf(buf, off, x, y, c)      -- fast HUD text from a byte buffer

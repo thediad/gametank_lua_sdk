@@ -134,6 +134,7 @@ export const BUILTINS = {
   tonum: { params: [], ret: "same", special: "tonum" },
   tostr: { params: [], ret: "str", special: "tostr" },
   type: { params: [], ret: "str", special: "type" },
+  split: { params: [], ret: "array", special: "split" },
   print: { params: [], ret: "int", special: "print" },
   add:  { params: [], ret: "void", special: "add" },
   del:  { params: [], ret: "void", special: "del" },

@@ -233,7 +233,7 @@ Zero-authoring built-ins: `sfx(0)`=jump, 1=pickup, 2=shoot, 3=explode, 4=blip,
 | `tonum(decimal_or_constant_number)` | 🟡 | compile-time conversion; no format flags |
 | `tostr([constant_number])` | 🟡 | compile-time string; omitted value produces `""` |
 | `type(value)` | 🟡 | compile-time result for supported statically known values |
-| `split` | 🔵 | v0.5 |
+| `split("numeric,literal",[separator],[true])` | 🟡 | top-level static numeric array; literal string or positive integer separator |
 
 Static `..` expressions are folded at compile time and compose with the static
 `ord`, `chr`, `sub`, and `tostr` forms. Bake dynamic text into byte buffers and
