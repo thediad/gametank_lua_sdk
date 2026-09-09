@@ -130,6 +130,7 @@ export const BUILTINS = {
   ord: { params: [], ret: "int", special: "ord" },
   // Allocation-free static form: every byte must be a compile-time constant.
   chr: { params: [], ret: "str", special: "chr" },
+  sub: { params: [], ret: "str", special: "sub" },
   print: { params: [], ret: "int", special: "print" },
   add:  { params: [], ret: "void", special: "add" },
   del:  { params: [], ret: "void", special: "del" },

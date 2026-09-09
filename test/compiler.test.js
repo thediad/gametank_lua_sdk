@@ -226,6 +226,14 @@ test("chr folds constant bytes into a safely escaped print string", () => {
     .some((m) => /constant integer bytes/.test(m)));
 });
 
+test("sub folds a literal string and positive constant range", () => {
+  const c = cOf("function _update60() end\nfunction _draw() print(sub(\"gametank\",5),4,4,7) print(sub(\"abcdef\",2,4),4,12,7) end\n");
+  assert.ok(c.includes('gt_print("tank", 4, 4, 7)'));
+  assert.ok(c.includes('gt_print("bcd", 4, 12, 7)'));
+  assert.ok(errorsOf("function _update60() end\nfunction _draw() print(sub(\"abc\",0),4,4,7) end\n")
+    .some((m) => /static positions/.test(m)));
+});
+
 test("sspr() emits gt_sspr with dw/dh defaulting to 0 (= source size)", () => {
   const c = cOf("function _update60()\nend\nfunction _draw()\n  cls()\n" +
                 "  sspr(80,8,8,8,50,9,16,16)\n  sspr(0,0,8,8,100,100)\nend\n");
