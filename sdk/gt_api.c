@@ -437,7 +437,8 @@ int GT_PRINT_INT(int v, int x, int y, int c) {
     return GT_PRINT(p, x, y, c);
 }
 
-/* print a fixed number: integer part (P8 prints integers bare) */
+/* Print a fixed number with up to four fractional digits, trimming trailing
+ * zeroes. PICO-8 prints integers bare and rounds non-integers to 4 decimals. */
 #ifdef GT_BANKED
 #define GT_PRINT_NUM gt_print_num_impl
 #else
@@ -448,31 +449,61 @@ int GT_PRINT_INT(int v, int x, int y, int c) {
 static
 #endif
 int GT_PRINT_NUM(int v, int x, int y, int c) {
-    char buf[8];
-    char *p = buf + 7;
-    int iv = v >> 8;
+    unsigned long mag;
+    unsigned int whole;
+    unsigned int frac10;
+    char buf[16];
+    char rev[6];
+    char *p;
+    char *q;
+    unsigned char neg = v < 0;
+    unsigned char i;
+    mag = neg ? (unsigned long)(-(v + 1)) + 1UL : (unsigned long)v;
+    whole = (unsigned int)(mag >> 8);
+    frac10 = (unsigned int)((((mag & 0xffUL) * 10000UL) + 128UL) >> 8);
 #else
 #ifdef GT_BANKED
 static
 #endif
 int GT_PRINT_NUM(long v, int x, int y, int c) {
-    char buf[8];
-    char *p = buf + 7;
-    int iv = (int)(v >> 16);
+    unsigned long mag;
+    unsigned int whole;
+    unsigned int frac10;
+    char buf[16];
+    char rev[6];
+    char *p;
+    char *q;
+    unsigned char neg = v < 0;
+    unsigned char i;
+    mag = neg ? (unsigned long)(-(v + 1L)) + 1UL : (unsigned long)v;
+    whole = (unsigned int)(mag >> 16);
+    frac10 = (unsigned int)((((mag & 0xffffUL) * 10000UL) + 32768UL) >> 16);
 #endif
-    unsigned int uv;
-    unsigned char neg = 0;
-    *p = 0;
-    if (iv < 0) { neg = 1; uv = (unsigned int)(-iv); } else uv = (unsigned int)iv;
-    /* one udiv per digit: cc65 computes % and / as SEPARATE division
-     * calls (~450 cycles each); divide once, multiply back for the digit */
+    if (frac10 == 10000u) { ++whole; frac10 = 0; }
+
+    /* Build the whole part backwards, then copy it forward. */
+    q = rev + sizeof(rev);
     do {
-        unsigned int q = uv / 10;
-        *--p = (char)('0' + (unsigned char)(uv - ((q << 3) + (q << 1))));
-        uv = q;
-    } while (uv);
-    if (neg) *--p = '-';
-    return GT_PRINT(p, x, y, c);
+        unsigned int quotient = whole / 10u;
+        *--q = (char)('0' + (unsigned char)(whole - quotient * 10u));
+        whole = quotient;
+    } while (whole);
+    p = buf;
+    if (neg) *p++ = '-';
+    while (q < rev + sizeof(rev)) *p++ = *q++;
+
+    if (frac10) {
+        *p++ = '.';
+        q = p;
+        for (i = 0; i < 4; ++i) {
+            unsigned int divisor = i == 0 ? 1000u : (i == 1 ? 100u : (i == 2 ? 10u : 1u));
+            *p++ = (char)('0' + (unsigned char)(frac10 / divisor));
+            frac10 %= divisor;
+        }
+        while (p > q && p[-1] == '0') --p;
+    }
+    *p = 0;
+    return GT_PRINT(buf, x, y, c);
 }
 #ifdef GT_BANKED
 #pragma code-name ("CODE")
