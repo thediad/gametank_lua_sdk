@@ -262,6 +262,13 @@ test("static string concatenation composes without a runtime allocator", () => {
     .some((m) => /runtime string concatenation/.test(m)));
 });
 
+test("type folds statically known supported values", () => {
+  const c = cOf("local n=1\nlocal ps=pool(2)\nlocal a=array8(2)\nfunction _update60() end\nfunction _draw() print(type(n),4,4,7) print(type(true),4,12,7) print(type(\"x\"),4,20,7) print(type(nil),4,28,7) print(type(ps),4,36,7) print(type(_draw),4,44,7) end\n");
+  for (const value of ["number", "boolean", "string", "nil", "table", "function"]) {
+    assert.ok(c.includes(`gt_print("${value}"`));
+  }
+});
+
 test("sspr() emits gt_sspr with dw/dh defaulting to 0 (= source size)", () => {
   const c = cOf("function _update60()\nend\nfunction _draw()\n  cls()\n" +
                 "  sspr(80,8,8,8,50,9,16,16)\n  sspr(0,0,8,8,100,100)\nend\n");

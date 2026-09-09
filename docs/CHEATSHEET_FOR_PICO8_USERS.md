@@ -232,6 +232,7 @@ Zero-authoring built-ins: `sfx(0)`=jump, 1=pickup, 2=shoot, 3=explode, 4=blip,
 | `sub("literal",pos0,[pos1])` | 🟡 | compile-time positions; literal boolean `pos1` selects one character |
 | `tonum(decimal_or_constant_number)` | 🟡 | compile-time conversion; no format flags |
 | `tostr([constant_number])` | 🟡 | compile-time string; omitted value produces `""` |
+| `type(value)` | 🟡 | compile-time result for supported statically known values |
 | `split` | 🔵 | v0.5 |
 
 Static `..` expressions are folded at compile time and compose with the static

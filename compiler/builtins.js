@@ -133,6 +133,7 @@ export const BUILTINS = {
   sub: { params: [], ret: "str", special: "sub" },
   tonum: { params: [], ret: "same", special: "tonum" },
   tostr: { params: [], ret: "str", special: "tostr" },
+  type: { params: [], ret: "str", special: "type" },
   print: { params: [], ret: "int", special: "print" },
   add:  { params: [], ret: "void", special: "add" },
   del:  { params: [], ret: "void", special: "del" },
