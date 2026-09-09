@@ -242,6 +242,13 @@ test("tonum folds decimal string literals", () => {
     .some((m) => /decimal literals only/.test(m)));
 });
 
+test("static string operations compose and tostr folds constants", () => {
+  const c = cOf("local n=0\nfunction _update60() n=ord(chr(65)) end\nfunction _draw() print(sub(chr(104,101,108,108,111),2,4),4,4,7) print(tostr(-3.5),4,12,7) end\n");
+  assert.match(c, /lcl_n = 65/);
+  assert.ok(c.includes('gt_print("ell", 4, 4, 7)'));
+  assert.ok(c.includes('gt_print("-3.5", 4, 12, 7)'));
+});
+
 test("sspr() emits gt_sspr with dw/dh defaulting to 0 (= source size)", () => {
   const c = cOf("function _update60()\nend\nfunction _draw()\n  cls()\n" +
                 "  sspr(80,8,8,8,50,9,16,16)\n  sspr(0,0,8,8,100,100)\nend\n");

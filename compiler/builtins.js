@@ -132,6 +132,7 @@ export const BUILTINS = {
   chr: { params: [], ret: "str", special: "chr" },
   sub: { params: [], ret: "str", special: "sub" },
   tonum: { params: [], ret: "same", special: "tonum" },
+  tostr: { params: [], ret: "str", special: "tostr" },
   print: { params: [], ret: "int", special: "print" },
   add:  { params: [], ret: "void", special: "add" },
   del:  { params: [], ret: "void", special: "del" },

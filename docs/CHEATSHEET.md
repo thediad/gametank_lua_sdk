@@ -280,8 +280,9 @@ print(str, [x, y], [c])   -- 4×6 font; returns the right-edge x
 
 `ord("literal", [constant_index])` is available at compile time for one in-range
 byte result; `chr(constant_bytes...)` and positive-range `sub("literal",...)`
-make static strings for `print`; `tonum("decimal")` folds at compile time.
-Runtime string *building* (`..`, `tostr`, `split`) isn't wired
+make static strings for `print`; `tonum("decimal")` and `tostr(constant)` fold
+at compile time. Static string calls compose. Runtime string *building* (`..`,
+`split`) isn't wired
 yet. For live HUDs, bake digits into a byte buffer and blit it fast:
 
 ```lua
