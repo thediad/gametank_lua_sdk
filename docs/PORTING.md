@@ -49,8 +49,9 @@ miss any):
   OOP-heavy carts.)
 - **Tables are capacity-bounded.** `pool(n)` / `add` / `del` / `all` replace
   unbounded tables - no GC on a 3.5 MHz 6502. Pick a max count per entity type.
-- **No runtime string building yet.** `..`, `sub`, `tostr` are on the roadmap;
-  for HUDs, bake text into byte buffers and draw with `gt.print_buf`.
+- **No runtime string building yet.** Static `..`, `sub`, and `tostr` expressions
+  are folded at compile time; for dynamic HUDs, bake text into byte buffers and
+  draw with `gt.print_buf`.
 - **No `peek`/`poke`/memory map.** PICO-8's `0x6000` screen and draw-state pokes
   don't exist - there's no VM to poke. Real hardware is reached through `gt.*`
   helpers.

@@ -249,6 +249,15 @@ test("static string operations compose and tostr folds constants", () => {
   assert.ok(c.includes('gt_print("-3.5", 4, 12, 7)'));
 });
 
+test("static string concatenation composes without a runtime allocator", () => {
+  const c = cOf("local n=0\nfunction _update60() n=ord(\"a\"..chr(98)) end\nfunction _draw() print(\"game\"..\"tank\",4,4,7) print(sub(\"x\"..tostr(12.5),2),4,12,7) end\n");
+  assert.match(c, /lcl_n = 97/);
+  assert.ok(c.includes('gt_print("gametank", 4, 4, 7)'));
+  assert.ok(c.includes('gt_print("12.5", 4, 12, 7)'));
+  assert.ok(errorsOf("local s=0\nfunction _update60() s=s..\"x\" end\nfunction _draw() end\n")
+    .some((m) => /runtime string concatenation/.test(m)));
+});
+
 test("sspr() emits gt_sspr with dw/dh defaulting to 0 (= source size)", () => {
   const c = cOf("function _update60()\nend\nfunction _draw()\n  cls()\n" +
                 "  sspr(80,8,8,8,50,9,16,16)\n  sspr(0,0,8,8,100,100)\nend\n");
@@ -636,7 +645,7 @@ const CASES = [
   ["'or' value idiom", LOOP + "local a = 1\nlocal b = 2\nfunction f()\n  a = a or b\nend\n", /needs boolean operands/],
   ["goto", LOOP + "function f()\n  goto top\nend\n", /goto is not supported/],
   ["exponent (non-constant power)", LOOP + "local p = 2\nlocal n = 3\nfunction f()\n  p = p ^ n\nend\n", /exponent/],
-  ["string concat", LOOP + "local a = 1\nfunction f()\n  a = a .. 2\nend\n", /concatenation is not supported yet/],
+  ["runtime string concat", LOOP + "local a = 1\nfunction f()\n  a = a .. 2\nend\n", /runtime string concatenation/],
   ["non-constant top-level init", "local r = rnd(4)\n" + LOOP, /constant expression/],
   ["out-of-range literal", "local r = 99999\n" + LOOP, /outside the 16.16 range/],
 ];

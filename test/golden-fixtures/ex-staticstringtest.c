@@ -9,7 +9,7 @@ int lcl_code = 0;
 
 static void lcl__init(void)
 {
-    lcl_code = 65;
+    lcl_code = 97;
 }
 
 static void lcl__update60(void)
@@ -19,14 +19,16 @@ static void lcl__update60(void)
 static void lcl__draw(void)
 {
     gt_cls(0);
-    gt_print("ord chr", 20, 28, 7);
-    gt_print_int(lcl_code, 84, 28, 254);
-    gt_print("sub chr", 20, 48, 7);
-    gt_print("ell", 84, 48, 254);
-    gt_print("tostr", 20, 68, 7);
-    gt_print("-3.5", 84, 68, 254);
-    gt_print("rounded", 20, 88, 7);
-    gt_print("1.2346", 84, 88, 254);
+    gt_print("concat", 12, 18, 7);
+    gt_print("gametank", 76, 18, 254);
+    gt_print("ord concat", 12, 38, 7);
+    gt_print_int(lcl_code, 76, 38, 254);
+    gt_print("sub concat", 12, 58, 7);
+    gt_print("12.5", 76, 58, 254);
+    gt_print("tostr", 12, 78, 7);
+    gt_print("-3.5", 76, 78, 254);
+    gt_print("rounded", 12, 98, 7);
+    gt_print("1.2346", 76, 98, 254);
 }
 
 void main(void)
