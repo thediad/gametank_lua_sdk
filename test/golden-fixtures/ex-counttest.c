@@ -7,6 +7,7 @@ static void lcl__draw(void);
 
 unsigned char lcl_things_id[4];
 unsigned char lcl_things_used[4];
+unsigned char lcl_things_order[4];  /* live slots in insertion order */
 unsigned char lcl_things_free;   /* free-chain head, +1-encoded (0 = empty) */
 int lcl_things_n;
 unsigned char lcl_things_hi;
@@ -15,8 +16,8 @@ int lcl_phase = 0;
 
 static void lcl__init(void)
 {
-    { unsigned char L_s0; if (lcl_things_free) { L_s0 = (unsigned char)(lcl_things_free - 1); lcl_things_free = (unsigned char)lcl_things_id[L_s0]; } else L_s0 = lcl_things_hi; if (L_s0 < 4) { lcl_things_used[L_s0] = 1; ++lcl_things_n; if (L_s0 >= lcl_things_hi) lcl_things_hi = L_s0 + 1; lcl_things_id[L_s0] = 1; } }
-    { unsigned char L_s1; if (lcl_things_free) { L_s1 = (unsigned char)(lcl_things_free - 1); lcl_things_free = (unsigned char)lcl_things_id[L_s1]; } else L_s1 = lcl_things_hi; if (L_s1 < 4) { lcl_things_used[L_s1] = 1; ++lcl_things_n; if (L_s1 >= lcl_things_hi) lcl_things_hi = L_s1 + 1; lcl_things_id[L_s1] = 2; } }
+    { unsigned char L_s0; if (lcl_things_free) { L_s0 = (unsigned char)(lcl_things_free - 1); lcl_things_free = (unsigned char)lcl_things_id[L_s0]; } else L_s0 = lcl_things_hi; if (L_s0 < 4) { lcl_things_used[L_s0] = 1; lcl_things_order[lcl_things_n++] = L_s0; if (L_s0 >= lcl_things_hi) lcl_things_hi = L_s0 + 1; lcl_things_id[L_s0] = 1; } }
+    { unsigned char L_s1; if (lcl_things_free) { L_s1 = (unsigned char)(lcl_things_free - 1); lcl_things_free = (unsigned char)lcl_things_id[L_s1]; } else L_s1 = lcl_things_hi; if (L_s1 < 4) { lcl_things_used[L_s1] = 1; lcl_things_order[lcl_things_n++] = L_s1; if (L_s1 >= lcl_things_hi) lcl_things_hi = L_s1 + 1; lcl_things_id[L_s1] = 2; } }
 }
 
 static void lcl__update60(void)
@@ -24,17 +25,17 @@ static void lcl__update60(void)
     if (((gt_rpt0 & 16u) != 0)) {
         lcl_phase = gt_ifmod((lcl_phase + 1), 3);
         if ((lcl_phase == 1)) {
-            { unsigned char L_s2; if (lcl_things_free) { L_s2 = (unsigned char)(lcl_things_free - 1); lcl_things_free = (unsigned char)lcl_things_id[L_s2]; } else L_s2 = lcl_things_hi; if (L_s2 < 4) { lcl_things_used[L_s2] = 1; ++lcl_things_n; if (L_s2 >= lcl_things_hi) lcl_things_hi = L_s2 + 1; lcl_things_id[L_s2] = 3; } }
+            { unsigned char L_s2; if (lcl_things_free) { L_s2 = (unsigned char)(lcl_things_free - 1); lcl_things_free = (unsigned char)lcl_things_id[L_s2]; } else L_s2 = lcl_things_hi; if (L_s2 < 4) { lcl_things_used[L_s2] = 1; lcl_things_order[lcl_things_n++] = L_s2; if (L_s2 >= lcl_things_hi) lcl_things_hi = L_s2 + 1; lcl_things_id[L_s2] = 3; } }
         } else if ((lcl_phase == 2)) {
-            { unsigned char L_p3;
-                for (L_p3 = 0; L_p3 < lcl_things_hi; ++L_p3) {
-                    if (!lcl_things_used[L_p3]) continue;
-                    (lcl_things_used[L_p3] = 0, lcl_things_id[L_p3] = lcl_things_free, lcl_things_free = (unsigned char)(L_p3 + 1), (--lcl_things_n == 0 ? (lcl_things_hi = 0, lcl_things_free = 0) : 0), (void)0);
+            { unsigned char L_o3, L_p4;
+                for (L_o3 = 0; L_o3 < lcl_things_n; ++L_o3) {
+                    L_p4 = lcl_things_order[L_o3];
+                    { unsigned char L_o5; lcl_things_used[L_p4] = 0; lcl_things_id[L_p4] = lcl_things_free; lcl_things_free = (unsigned char)(L_p4 + 1); --lcl_things_n; for (L_o5 = L_o3; L_o5 < lcl_things_n; ++L_o5) lcl_things_order[L_o5] = lcl_things_order[L_o5 + 1]; --L_o3; if (!lcl_things_n) { lcl_things_hi = 0; lcl_things_free = 0; } }
                 }
             }
         } else if ((lcl_phase == 0)) {
-            { unsigned char L_s4; if (lcl_things_free) { L_s4 = (unsigned char)(lcl_things_free - 1); lcl_things_free = (unsigned char)lcl_things_id[L_s4]; } else L_s4 = lcl_things_hi; if (L_s4 < 4) { lcl_things_used[L_s4] = 1; ++lcl_things_n; if (L_s4 >= lcl_things_hi) lcl_things_hi = L_s4 + 1; lcl_things_id[L_s4] = 1; } }
-            { unsigned char L_s5; if (lcl_things_free) { L_s5 = (unsigned char)(lcl_things_free - 1); lcl_things_free = (unsigned char)lcl_things_id[L_s5]; } else L_s5 = lcl_things_hi; if (L_s5 < 4) { lcl_things_used[L_s5] = 1; ++lcl_things_n; if (L_s5 >= lcl_things_hi) lcl_things_hi = L_s5 + 1; lcl_things_id[L_s5] = 2; } }
+            { unsigned char L_s6; if (lcl_things_free) { L_s6 = (unsigned char)(lcl_things_free - 1); lcl_things_free = (unsigned char)lcl_things_id[L_s6]; } else L_s6 = lcl_things_hi; if (L_s6 < 4) { lcl_things_used[L_s6] = 1; lcl_things_order[lcl_things_n++] = L_s6; if (L_s6 >= lcl_things_hi) lcl_things_hi = L_s6 + 1; lcl_things_id[L_s6] = 1; } }
+            { unsigned char L_s7; if (lcl_things_free) { L_s7 = (unsigned char)(lcl_things_free - 1); lcl_things_free = (unsigned char)lcl_things_id[L_s7]; } else L_s7 = lcl_things_hi; if (L_s7 < 4) { lcl_things_used[L_s7] = 1; lcl_things_order[lcl_things_n++] = L_s7; if (L_s7 >= lcl_things_hi) lcl_things_hi = L_s7 + 1; lcl_things_id[L_s7] = 2; } }
         }
     }
 }

@@ -510,11 +510,11 @@ test("pool declares a high-water mark alongside used/n", () => {
   assert.match(c, /unsigned char lcl_ps_hi;/);
 });
 
-test("pool iteration scans [0.._hi), not the full capacity", () => {
+test("pool iteration follows the compact insertion-order list", () => {
   const c = cOf(POOL);
-  // the forall loop bounds on _hi (the watermark), never the literal size 8
-  assert.match(c, /for \(L_p\d+ = 0; L_p\d+ < lcl_ps_hi; \+\+L_p\d+\)/);
-  assert.doesNotMatch(c, /for \(L_p\d+ = 0; L_p\d+ < 8;/);
+  assert.match(c, /unsigned char lcl_ps_order\[8\]/);
+  assert.match(c, /for \(L_o\d+ = 0; L_o\d+ < lcl_ps_n; \+\+L_o\d+\)/);
+  assert.match(c, /L_p\d+ = lcl_ps_order\[L_o\d+\]/);
 });
 
 test("add() allocates O(1): free-chain pop, else the watermark slot", () => {
@@ -526,14 +526,31 @@ test("add() allocates O(1): free-chain pop, else the watermark slot", () => {
   assert.match(c, /if \(L_s\d+ >= lcl_ps_hi\) lcl_ps_hi = L_s\d+ \+ 1;/);
   // capacity is still the hard ceiling on placement
   assert.match(c, /if \(L_s\d+ < 8\)/);
+  assert.match(c, /lcl_ps_order\[lcl_ps_n\+\+\] = L_s\d+/);
 });
 
-test("del() pushes the free chain and snaps hi + chain on empty", () => {
+test("del() pushes the free chain, removes the order entry, and snaps empty state", () => {
   const c = cOf(POOL);
   // freed slot joins the chain through its first field's storage
   assert.match(c, /lcl_ps_free = \(unsigned char\)\(\w+ \+ 1\)/);
+  assert.match(c, /lcl_ps_order\[L_o\d+\] = lcl_ps_order\[L_o\d+ \+ 1\]/);
   // pool emptying resets both the watermark and the chain
-  assert.match(c, /--lcl_ps_n == 0 \? \(lcl_ps_hi = 0, lcl_ps_free = 0\) : 0/);
+  assert.match(c, /if \(!lcl_ps_n\) \{ lcl_ps_hi = 0; lcl_ps_free = 0; \}/);
+});
+
+test("deli() removes a one-based insertion-order entry without returning a struct", () => {
+  const c = cOf(
+    "local ps = pool(4)\n" +
+    "function _init()\n add(ps,{x=10})\n add(ps,{x=20})\n deli(ps,1)\nend\n" +
+    "function _update60()\nend\nfunction _draw()\nend\n",
+  );
+  assert.match(c, /int L_i\d+ = 1 - 1/);
+  assert.match(c, /unsigned char L_s\d+ = lcl_ps_order\[L_i\d+\]/);
+  assert.match(c, /lcl_ps_order\[L_o\d+\] = lcl_ps_order\[L_o\d+ \+ 1\]/);
+  assert.throws(
+    () => cOf("local ps=pool(2)\nlocal x=0\nfunction _init()\n add(ps,{v=1})\n x=deli(ps,1)\nend\nfunction _update60()\nend\nfunction _draw()\nend\n"),
+    /deli\(\) is a statement in gtlua/,
+  );
 });
 
 // ---- gt.* extras -------------------------------------------------------------------

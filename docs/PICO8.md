@@ -105,7 +105,8 @@ gtlua compiles this as a fixed-capacity array of structs + a live count:
 `enemies = {} --[[cap 16]]` (or `enemies: {enemy[16]}` annotation). `add`
 past capacity is a loud runtime trap in debug builds. `all()` iterates in
 insertion order and tolerates `del` of the current element (P8-documented
-behavior). `add/del/count/#` are supported (`deli` remains planned). This one feature carries
+behavior). `add/del/deli/count/#` are supported; `deli` is statement-only because
+the compiled pool struct cannot be returned as a Lua value. This one feature carries
 most of "it feels like Lua."
 
 ---

@@ -136,6 +136,7 @@ export const BUILTINS = {
   print: { params: [], ret: "int", special: "print" },
   add:  { params: [], ret: "void", special: "add" },
   del:  { params: [], ret: "void", special: "del" },
+  deli: { params: [], ret: "void", special: "deli" },
 };
 
 // gt.* extras (GameTank-specific)

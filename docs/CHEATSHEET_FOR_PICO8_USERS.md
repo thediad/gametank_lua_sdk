@@ -191,6 +191,9 @@ redraw-tinted path.
 | `{x=1, y=2}` (struct) | ✅ | tables are structs: fixed **named** fields |
 | `{1,2,3}` / `{[k]=v}` | ❌ | array / map tables - one clear error, no cascade |
 
+`deli(ps,i)` removes the 1-based insertion-order entry. In gtlua it is a
+statement only, because a compiled pool struct cannot be returned as a value.
+
 **Tables are structs, not arrays or maps.** A table is a fixed set of named
 byte/word fields (`{x=1, y=2}`); there is no array-style `{1,2,3}`, no
 computed-key `{[k]=v}`, and no table-of-tables `{{..},{..}}` - those are a
