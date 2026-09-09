@@ -17,6 +17,7 @@
 .export _cc_x, _cc_y, _cc_r, _cc_c
 .exportzp _gt_draw_scratch      ; base of the shared draw-op scratch (see below)
 .import _gt_q, _gt_qhead, _gt_qtail, _gt_q_pump, _gt_draw_mode
+.import _gt_clip_enabled, _gt_clip_x0, _gt_clip_y0, _gt_clip_x1, _gt_clip_y1
 .PC02
 
 QF_RECT = $CD                  ; NMI|ENABLE|IRQ|COLORFILL|OPAQUE
@@ -57,13 +58,29 @@ span:   ; x0 = cc_x - A ; x1 = cc_x + A -> clip to 0..127, skip when outside
         sta     cc_t
         lda     _cc_x+1
         adc     #0
-        bmi     @skip           ; x1 < 0: fully left
+        bmi     @reject         ; x1 < 0: fully left
         bne     @xr             ; x1 > 255: clamp right edge
         lda     cc_t
         bpl     @x1ok
 @xr:    lda     #127
 @x1ok:  sta     cc_t+1          ; cc_t+1 = clipped x1 (0..127)
+        lda     _gt_clip_enabled
+        beq     @x0
+        cmp     #2
+        beq     @reject
+        lda     cc_t+1
+        cmp     _gt_clip_x0
+        bcc     @reject         ; x1 is left of the clip region
+        cmp     _gt_clip_x1
+        bcc     @x0
+        beq     @x0
+        lda     _gt_clip_x1
+        sta     cc_t+1
+        bra     @x0
+@reject:
+        jmp     @skip
         ; x0 = cc_x - hw
+@x0:
         sec
         lda     _cc_x
         sbc     cc_w
@@ -77,7 +94,18 @@ span:   ; x0 = cc_x - A ; x1 = cc_x + A -> clip to 0..127, skip when outside
         bra     @x0ok
 @xl:    lda     #0
 @x0ok:  sta     cc_x0
+        lda     _gt_clip_enabled
+        beq     @width
+        lda     cc_x0
+        cmp     _gt_clip_x1
+        beq     @width
+        bcs     @skip           ; x0 is right of the clip region
+        cmp     _gt_clip_x0
+        bcs     @width
+        lda     _gt_clip_x0
+        sta     cc_x0
         ; width = x1 - x0 + 1
+@width:
         sec
         lda     cc_t+1
         sbc     cc_x0
@@ -122,6 +150,17 @@ rowok:  ; cc_t = row (s16) -> cc_row when 0..127
         lda     cc_t
         bmi     @no
         sta     cc_row
+        lda     _gt_clip_enabled
+        beq     @yes
+        cmp     #2
+        beq     @no
+        lda     cc_row
+        cmp     _gt_clip_y0
+        bcc     @no
+        cmp     _gt_clip_y1
+        beq     @yes
+        bcs     @no
+@yes:
         sec
         rts
 @no:    clc
@@ -356,6 +395,16 @@ dots:   sta     cc_t
 
 ; stage a 1x1 at column A on cc_row
 dot:    sta     cc_x0
+        lda     _gt_clip_enabled
+        beq     @slot
+        cmp     #2
+        beq     @done
+        lda     cc_x0
+        cmp     _gt_clip_x0
+        bcc     @done
+        cmp     _gt_clip_x1
+        beq     @slot
+        bcs     @done
 @slot:  lda     _gt_qhead
         clc
         adc     #8
@@ -382,4 +431,5 @@ dot:    sta     cc_x0
         adc     #8
         sta     _gt_qhead
         jmp     _gt_q_pump
+@done:  rts
 .endproc

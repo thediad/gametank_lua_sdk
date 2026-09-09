@@ -140,6 +140,20 @@ test("spr with flip_x/flip_y packs into gt_a5", () => {
   assert.match(c, /gt_a5 = \(\(1\) \? 1 : 0\) \| \(\(\(0\) \? 1 : 0\) << 1\)/);
 });
 
+test("clip reset, rectangle, and previous-intersection forms lower correctly", () => {
+  const c = cOf("function _draw()\n  clip()\n  clip(8, 9, 40, 30)\n  clip(10, 11, 12, 13, true)\nend\n");
+  assert.match(c, /gt_clip_reset\(\)/);
+  assert.match(c, /gt_clip\(8, 9, 40, 30, 0\)/);
+  assert.match(c, /gt_clip\(10, 11, 12, 13, \(\(1\) \? 1 : 0\)\)/);
+});
+
+test("clip rejects partial argument lists", () => {
+  for (const args of ["1", "1,2", "1,2,3"]) {
+    assert.ok(errorsOf(`function _draw()\n  clip(${args})\nend\n`)
+      .some((m) => /clip\(\) takes 0, 4, or 5 arguments/.test(m)));
+  }
+});
+
 test("print bakes its color index to the GameTank byte (like every draw call)", () => {
   // regression: print used to pass the raw 0-15 index, so resolve_color (which
   // expects an already-baked byte) rendered every non-white print color wrong.

@@ -65,6 +65,9 @@ static char frame_dl_init;
 
 /* draw state (PICO-8 sticky globals; camera lives in zp - gt_blitq.s) */
 unsigned char draw_color;          /* resolved GameTank byte (asm fast paths read/write) */
+/* Clip state: 0=full-screen fast path, 1=active region, 2=empty region. */
+unsigned char gt_clip_enabled;
+int gt_clip_x0, gt_clip_y0, gt_clip_x1, gt_clip_y1;
 
 /* The 16 GameTank bytes the PICO-8 palette maps to. Colors are raw GT bytes
  * everywhere now (the compiler bakes 0-15 draw-color literals to these bytes at
@@ -774,6 +777,65 @@ void gt_spr(int n, int x, int y, int w, int h, int flip) {
     gt_spr_z();
 }
 
+/* Arbitrary-clip sprite fallback. Screen-edge clipping normally lives in the
+ * assembly hot path; this equivalent descriptor builder runs only after
+ * clip(x,y,w,h) activates a smaller region. */
+#ifdef GT_BANKED
+#pragma code-name ("B0CODE")
+#define GT_SPR_CLIPPED gt_spr_clipped_impl
+static void gt_spr_clipped_impl(void);
+#else
+#define GT_SPR_CLIPPED gt_spr_clipped
+#endif
+#ifdef GT_BANKED
+static
+#endif
+void GT_SPR_CLIPPED(void) {
+    int n = gt_a0, x = gt_a1 - gt_cam_x, y = gt_a2 - gt_cam_y;
+    int w = gt_a3 ? gt_a3 : 1, h = gt_a4 ? gt_a4 : 1, f = gt_a5;
+    int pw = w * 8, ph = h * 8, skipx = 0, skipy = 0;
+    int bx0 = 0, by0 = 0, bx1 = 127, by1 = 127;
+
+    if (gt_clip_enabled == 2) return;
+    if (gt_clip_enabled) {
+        bx0 = gt_clip_x0; by0 = gt_clip_y0;
+        bx1 = gt_clip_x1; by1 = gt_clip_y1;
+    }
+    if (x > bx1 || y > by1 || x + pw - 1 < bx0 || y + ph - 1 < by0) return;
+    if (x < bx0) { skipx = bx0 - x; pw -= skipx; x = bx0; }
+    if (y < by0) { skipy = by0 - y; ph -= skipy; y = by0; }
+    if (x + pw - 1 > bx1) pw = bx1 - x + 1;
+    if (y + ph - 1 > by1) ph = by1 - y + 1;
+    if (pw <= 0 || ph <= 0) return;
+
+    gt_ent[0] = QF_SPR;
+    gt_ent[1] = (unsigned char)x;
+    gt_ent[2] = (unsigned char)y;
+    gt_ent[3] = (unsigned char)(((n & 15) << 3) + skipx);
+    gt_ent[4] = (unsigned char)(((n & 0xf0) >> 1) + skipy);
+    gt_ent[5] = (unsigned char)pw;
+    gt_ent[6] = (unsigned char)ph;
+    gt_ent[7] = gt_qbank;
+    if (f & 1) {
+        gt_ent[3] = (unsigned char)(0 - gt_ent[3] - gt_ent[5]);
+        gt_ent[5] |= 0x80;
+    }
+    if (f & 2) {
+        gt_ent[4] = (unsigned char)(0 - gt_ent[4] - gt_ent[6]);
+        gt_ent[6] |= 0x80;
+    }
+    Q_COMMIT();
+}
+#ifdef GT_BANKED
+#pragma code-name ("CODE")
+void gt_spr_clipped(void) {
+    unsigned char saved_bank = gt_cur_bank;
+    gt_bank(0);
+    gt_spr_clipped_impl();
+    gt_bank(saved_bank);
+}
+#endif
+
 /*
  * PICO-8 mutable map overlay.
  *
@@ -1148,6 +1210,12 @@ void box_raw(unsigned char x, unsigned char y,
  * negative x0/large x1 clamps correctly before narrowing to the 7-bit blit. */
 void hspan_raw(int x0, int x1, int y) {
     if (y < 0 || y > 127 || x1 < 0 || x0 > 127) return;
+    if (gt_clip_enabled == 2) return;
+    if (gt_clip_enabled) {
+        if (y < gt_clip_y0 || y > gt_clip_y1 || x1 < gt_clip_x0 || x0 > gt_clip_x1) return;
+        if (x0 < gt_clip_x0) x0 = gt_clip_x0;
+        if (x1 > gt_clip_x1) x1 = gt_clip_x1;
+    }
     if (x0 < 0) x0 = 0;
     if (x1 > 127) x1 = 127;
     gt_ent[0] = QF_RECT;
@@ -1186,7 +1254,8 @@ void fill_clipped_z(void) {
      * and <=127 tests into one branch. A full-128 span (width/height == 128,
      * which the 7-bit counter can't encode) fails `gt_a2 - gt_a0 < 127` and
      * falls through to the slow path that splits it. */
-    if ((unsigned)gt_a0 <= 127 && (unsigned)gt_a1 <= 127 &&
+    if (!gt_clip_enabled &&
+        (unsigned)gt_a0 <= 127 && (unsigned)gt_a1 <= 127 &&
         (unsigned)gt_a2 <= 127 && (unsigned)gt_a3 <= 127 &&
         gt_a0 <= gt_a2 && gt_a1 <= gt_a3 &&
         gt_a2 - gt_a0 < 127 && gt_a3 - gt_a1 < 127) {
@@ -1203,11 +1272,20 @@ void fill_clipped_z(void) {
     }
     if (gt_a0 > gt_a2) { t = gt_a0; gt_a0 = gt_a2; gt_a2 = t; }
     if (gt_a1 > gt_a3) { t = gt_a1; gt_a1 = gt_a3; gt_a3 = t; }
+    if (gt_clip_enabled == 2) return;
     if (gt_a2 < 0 || gt_a3 < 0 || gt_a0 > 127 || gt_a1 > 127) return;
     if (gt_a0 < 0) gt_a0 = 0;
     if (gt_a1 < 0) gt_a1 = 0;
     if (gt_a2 > 127) gt_a2 = 127;
     if (gt_a3 > 127) gt_a3 = 127;
+    if (gt_clip_enabled) {
+        if (gt_a2 < gt_clip_x0 || gt_a3 < gt_clip_y0 ||
+            gt_a0 > gt_clip_x1 || gt_a1 > gt_clip_y1) return;
+        if (gt_a0 < gt_clip_x0) gt_a0 = gt_clip_x0;
+        if (gt_a1 < gt_clip_y0) gt_a1 = gt_clip_y0;
+        if (gt_a2 > gt_clip_x1) gt_a2 = gt_clip_x1;
+        if (gt_a3 > gt_clip_y1) gt_a3 = gt_clip_y1;
+    }
     /* full 128-wide/high spans need splitting (7-bit blit counters).
      * Both axes full (the 0,0,127,127 fill) = the 4-blit cls pattern. */
     if (gt_a2 - gt_a0 == 127 && gt_a3 - gt_a1 == 127) {
@@ -1283,6 +1361,7 @@ void GT_CLS(int c) {
      * while the big DMA is still in flight, so a cls() at the top of
      * _update() overlaps the whole frame's game logic. */
     unsigned char col = (c < 0) ? 0x00 : resolve_color(c);   /* cls() default = black */
+    gt_clip_enabled = 0;             /* PICO-8 cls() resets clipping */
     box_raw(127, 0, 1, 127, col);
     box_raw(0, 127, 127, 1, col);
     box_raw(127, 127, 1, 1, col);
@@ -1299,6 +1378,31 @@ void gt_cls(int c) {
 #endif
 
 void gt_camera(int x, int y) { gt_cam_x = x; gt_cam_y = y; }
+void gt_clip_reset(void) { gt_clip_enabled = 0; }
+
+void gt_clip(int x, int y, int w, int h, int previous) {
+    int x1 = x + w - 1, y1 = y + h - 1;
+    int nx0 = x, ny0 = y, nx1 = x1, ny1 = y1;
+    if (w <= 0 || h <= 0) { gt_clip_enabled = 2; return; }
+    if (nx0 < 0) nx0 = 0;
+    if (ny0 < 0) ny0 = 0;
+    if (nx1 > 127) nx1 = 127;
+    if (ny1 > 127) ny1 = 127;
+    if (previous && gt_clip_enabled) {
+        if (gt_clip_enabled == 2) return;
+        if (nx0 < gt_clip_x0) nx0 = gt_clip_x0;
+        if (ny0 < gt_clip_y0) ny0 = gt_clip_y0;
+        if (nx1 > gt_clip_x1) nx1 = gt_clip_x1;
+        if (ny1 > gt_clip_y1) ny1 = gt_clip_y1;
+    }
+    if (nx0 > nx1 || ny0 > ny1 || nx1 < 0 || ny1 < 0 || nx0 > 127 || ny0 > 127) {
+        gt_clip_enabled = 2;
+        return;
+    }
+    gt_clip_x0 = nx0; gt_clip_y0 = ny0;
+    gt_clip_x1 = nx1; gt_clip_y1 = ny1;
+    gt_clip_enabled = 1;
+}
 /* color() sets the current draw color. Inlined (not resolve_color(c)) so the hot
  * path is a couple of zp stores instead of a cdecl call: c<0 keeps the current
  * color, else the value IS the GameTank byte. */
@@ -1388,6 +1492,9 @@ void gt_rect(int x0, int y0, int x1, int y1, int c) {
 
 void pset_raw(int x, int y, unsigned char col) {
     if (x < 0 || x > 127 || y < 0 || y > 127) return;
+    if (gt_clip_enabled == 2) return;
+    if (gt_clip_enabled &&
+        (x < gt_clip_x0 || x > gt_clip_x1 || y < gt_clip_y0 || y > gt_clip_y1)) return;
     enter_cpu_mode();
     vram_row[(unsigned char)y][(unsigned char)x] = col;
 }

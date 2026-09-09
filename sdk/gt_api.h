@@ -67,6 +67,8 @@ unsigned char gt_btnp(int i, int pl);
 /* --- drawing (PICO-8 semantics; camera offset applies to all) --- */
 void gt_cls(int c);
 void gt_camera(int x, int y);
+void gt_clip(int x, int y, int w, int h, int previous);
+void gt_clip_reset(void);
 void __fastcall__ gt_color(int c);
 
 /* zp-ABI entry points: args in gt_a0..gt_a5 (see the block above).
@@ -80,6 +82,7 @@ void gt_circ_z(void);       /* a0=cx a1=cy a2=r a3=c */
 void gt_circfill_z(void);   /* a0=cx a1=cy a2=r a3=c */
 void gt_line_z(void);       /* a0=x0 a1=y0 a2=x1 a3=y1 a4=c */
 void gt_spr_z(void);
+void gt_spr_clipped(void); /* C fallback when arbitrary clip is active */
 void gt_spr_wide(void);  /* 128px-span splitter (asm punts here) */        /* a0=n a1=x a2=y a3=w a4=h */
 void gt_sset_z(void);       /* a0=x a1=y a2=c */
 void gt_parallax_init(int n, int cfar, int cmid, int cnear); /* seed n stars; colors -1 = classic tiers */

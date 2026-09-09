@@ -31,6 +31,8 @@
 .import   _draw_color
 .import   _gt_rectfill_slow
 .import   _gt_spr_wide
+.import   _gt_spr_clipped
+.import   _gt_clip_enabled
 .export   _gt_rectfill_z
 .export   _gt_rng_next
 .export   _gt_rng_state
@@ -290,6 +292,10 @@ _gt_rng_next:
 QF_RECT = $CD                   ; NMI|ENABLE|IRQ|COLORFILL|OPAQUE
 
 _gt_rectfill_z:
+        LDA _gt_clip_enabled
+        BEQ :+
+        JMP _gt_rectfill_slow
+:
         ; ---- color: negative keeps draw_color; else the low byte IS the color ----
         LDA _gt_a4+1
         BMI @ckeep
@@ -415,6 +421,10 @@ _gt_spr_z:
         BCC @norm
 @wide:  JMP _gt_spr_wide
 @norm:
+        ; Arbitrary clip is uncommon. Preserve the direct-to-ring hot path
+        ; when disabled and use the C clipper only while a region is active.
+        LDA _gt_clip_enabled
+        BNE @clip
         ; ---- claim a ring slot NOW and stage into it directly: push's
         ; 8-byte gt_ent->ring copy (+ its checks) disappears per sprite.
         ; X = slot base for the whole staging path (clip scratch moved to
@@ -426,6 +436,7 @@ _gt_spr_z:
         BNE @free
         JSR _gt_q_pump          ; ring full (measured ~never): drain, retry
         BRA @slot
+@clip:  JMP _gt_spr_clipped
 @free:  LDX _gt_qhead
         ; ---- pw = max(w,1) << 3 (16-bit result: A=lo, q_pwh=hi) ----
         LDA _gt_a3

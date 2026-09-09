@@ -145,8 +145,9 @@ capacity documented) · `mid/min/max/sgn/abs/sqrt/sin/cos/atan2` · `time()/t()`
 
 `sspr` unscaled works day one (arbitrary-rect blit); **scaled `sspr` is a
 compile error at first** (the blitter can't stretch; software scaling later).
-`clip()` - hardware X/Y clip exists at screen edges but not arbitrary rects;
-software-clip rectfill/spr later. `fillp`, `tline`, control codes, custom
+`clip(x,y,w,h,[previous])` / `clip()` - arbitrary screen-space clipping for
+the core shape and sprite/map paths; `previous=true` intersects regions and
+`cls()` resets clipping. `fillp`, `tline`, control codes, custom
 fonts: deferred indefinitely (fake-08 shipped without them and ran "many
 carts").
 

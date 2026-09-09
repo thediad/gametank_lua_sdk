@@ -1277,6 +1277,13 @@ export function emit(chunk, symbols, file, opts = {}) {
         const layers = argAt(e, 6, "int", "-1");
         return `lc_map(lcl___p8map, 128, ${cx}, ${cy}, ${sx}, ${sy}, ${cw}, ${ch}, ${layers})`;
       }
+      case "clip": {
+        if (e.args.length === 0) return "lc_clip_reset()";
+        const x = argAt(e, 0, "int", "0"), y = argAt(e, 1, "int", "0");
+        const w = argAt(e, 2, "int", "0"), h = argAt(e, 3, "int", "0");
+        const previous = argAt(e, 4, "flip", "0");
+        return `lc_clip(${x}, ${y}, ${w}, ${h}, ${previous})`;
+      }
       case "cartdata": {
         let h = 0x811c9dc5;
         for (const ch of e.args[0].value) {

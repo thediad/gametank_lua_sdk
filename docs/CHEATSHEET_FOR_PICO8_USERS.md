@@ -140,7 +140,7 @@ free (Lexaloffle designed it for exactly this class of machine).
 | `camera([x,y])` | ✅ | sticky draw offset |
 | `color(c)` | ✅ | |
 | `sspr(sx,sy,sw,sh,dx,dy,[dw,dh],[fx,fy])` | 🟡 | unscaled = 1:1 rect blit; scaled = **software integer nearest-neighbor** (rounds to one factor 1..4), not arbitrary scale |
-| `clip(x,y,w,h)` | 🔵 | screen-edge only today; software-clip v0.3+ |
+| `clip(x,y,w,h,[previous])`, `clip()` | ✅ | arbitrary screen-space clip; `previous=true` intersects; `cls()` resets |
 | `fillp`, `tline` | ❌ | deferred indefinitely |
 
 ## Palette & transparency - the largest real gap

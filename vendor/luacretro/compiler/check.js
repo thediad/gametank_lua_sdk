@@ -799,6 +799,9 @@ export function check(chunk, file, opts = {}) {
       if (b) {
         if (b.audio) { usesAudio.flag = true; usesMusic.flag = true; }
         checkArgs(call, b.params, callee.name);
+        if (callee.name === "clip" && call.args.length > 0 && call.args.length < 4) {
+          err(call, "clip() takes 0, 4, or 5 arguments");
+        }
         if (callee.name === "cartdata" && call.args[0]?.kind === "string" &&
             (call.args[0].value.length > 64 || !/^[a-z0-9_]+$/.test(call.args[0].value))) {
           err(call.args[0], 'cartdata() ID must be 1-64 characters: a-z, 0-9, or underscore');

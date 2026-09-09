@@ -14,6 +14,7 @@ export const BUILTINS = {
   // ---- graphics -------------------------------------------------------------
   cls:      { params: [["color", true]], ret: "void", c: "lc_cls" },
   camera:   { params: [["coord", true], ["coord", true]], ret: "void", c: "lc_camera" },
+  clip:     { params: [["coord", true], ["coord", true], ["coord", true], ["coord", true], ["flip", true]], ret: "void", special: "clip" },
   color:    { params: [["color", false]], ret: "void", c: "lc_color" },
   pset:     { params: [["coord", false], ["coord", false], ["color", true]], ret: "void", c: "lc_pset" },
   rect:     { params: [["coord", false], ["coord", false], ["coord", false], ["coord", false], ["color", true]], ret: "void", c: "lc_rect" },
@@ -31,7 +32,7 @@ export const BUILTINS = {
   // __map__ (imported as a byte array) starting at cell (cx,cy) to screen pixel
   // (sx,sy), one 8x8 sheet sprite per non-zero tile. Software spr()-loop, the
   // same as PICO-8 (neither machine has tilemap hardware). The optional seventh
-  // argument is a sprite-flag mask: every requested bit must match.
+  // argument is a sprite-flag mask: any requested bit may match.
   map:      { params: [["int", true], ["int", true], ["coord", true], ["coord", true], ["int", true], ["int", true], ["int", true]], ret: "void", special: "map" },
   mget:     { params: [["int", false], ["int", false]], ret: "int", special: "mget" },
   mset:     { params: [["int", false], ["int", false], ["int", false]], ret: "void", special: "mset" },

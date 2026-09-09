@@ -30,6 +30,7 @@
 .export _gt_line_poke
 .export _ln_x, _ln_y, _ln_dx, _ln_dy, _ln_sx, _ln_sy, _ln_err, _ln_col, _ln_n
 .importzp _gt_draw_scratch    ; shared draw-op zp scratch (defined in gt_circ.s)
+.import _gt_clip_enabled, _gt_clip_x0, _gt_clip_y0, _gt_clip_x1, _gt_clip_y1
 .PC02
 
 ; The whole Bresenham state lives in ZERO PAGE (fast) but OVERLAID on gt_circ's
@@ -58,6 +59,25 @@ ln_ptr:  .res 2          ; VRAM write pointer (MUST be zp - indirect plot)
 
 .proc _gt_line_poke
 plot:
+        ; The Bresenham walk must continue outside the active region, but only
+        ; write pixels inside it. The disabled case stays one cheap branch.
+        lda     _gt_clip_enabled
+        beq     draw
+        cmp     #2
+        beq     advance
+        lda     _ln_x
+        cmp     _gt_clip_x0
+        bcc     advance
+        cmp     _gt_clip_x1
+        beq     :+
+        bcs     advance
+:       lda     _ln_y
+        cmp     _gt_clip_y0
+        bcc     advance
+        cmp     _gt_clip_y1
+        beq     draw
+        bcs     advance
+draw:
         ; --- VRAM pointer for (ln_x, ln_y): $4000 + (y<<7) + x ---
         ; ptr_lo = ((y & 1) << 7) | x ;  ptr_hi = $40 + (y >> 1)
         ldx     #$00
@@ -77,6 +97,7 @@ plot:
         sta     (ln_ptr)        ; plot
 
         ; --- drew ln_n+1 pixels? ---
+advance:
         lda     _ln_n
         beq     endp
         dec     _ln_n
