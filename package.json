@@ -23,7 +23,7 @@
     "romdev-toolchain-cc65": "0.1.3"
   },
   "scripts": {
-    "test": "node --test 'test/**/*.test.js'",
+    "test": "node --test test/api_units.test.js test/compiler.test.js test/fixed_asm.test.js test/gfx.test.js test/gtm2.test.js test/toolchain_parity.test.js",
     "bench": "node bench/run.mjs"
   },
   "description": "Write GameTank games in a PICO-8-flavored Lua that ahead-of-time compiles to native 65C02. Bundled cc65 WASM toolchain + emulator, .gtr cartridges, no native tools.",
