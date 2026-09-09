@@ -139,7 +139,7 @@ free (Lexaloffle designed it for exactly this class of machine).
 | `sset(x,y,c)` | ✅ | write a sheet pixel (bake sprites) |
 | `camera([x,y])` | ✅ | sticky draw offset |
 | `color(c)` | ✅ | |
-| `sspr(sx,sy,sw,sh,dx,dy,[dw,dh],[fx,fy])` | 🟡 | unscaled = 1:1 rect blit; scaled = **software integer nearest-neighbor** (rounds to one factor 1..4), not arbitrary scale |
+| `sspr(sx,sy,sw,sh,dx,dy,[dw,dh],[fx,fy])` | 🟡 | unscaled = 1:1 rect blit; scaled = **software integer nearest-neighbor** (rounds to one factor 1..4), not arbitrary scale; clipped/flipped scaling uses a slower correctness path |
 | `clip(x,y,w,h,[previous])`, `clip()` | ✅ | arbitrary screen-space clip; `previous=true` intersects; `cls()` resets |
 | `fillp`, `tline` | ❌ | deferred indefinitely |
 

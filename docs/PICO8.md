@@ -143,8 +143,10 @@ capacity documented) · `mid/min/max/sgn/abs/sqrt/sin/cos/atan2` · `time()/t()`
 
 ### Tier 2+ (later/maybe)
 
-`sspr` unscaled works day one (arbitrary-rect blit); **scaled `sspr` is a
-compile error at first** (the blitter can't stretch; software scaling later).
+`sspr` supports 1:1 arbitrary-rect blits and software integer scaling (the
+requested dimensions round to one uniform factor 1..4, not arbitrary scaling).
+Fully visible unflipped scaling uses the assembly expander; clipped or flipped
+scaling uses a slower per-pixel correctness fallback.
 `clip(x,y,w,h,[previous])` / `clip()` - arbitrary screen-space clipping for
 the core shape and sprite/map paths; `previous=true` intersects regions and
 `cls()` resets clipping. `fillp`, `tline`, control codes, custom

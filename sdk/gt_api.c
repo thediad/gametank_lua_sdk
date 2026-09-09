@@ -1119,10 +1119,50 @@ static unsigned char sspr_scale(unsigned char src, int dst) {
     return (unsigned char)s;
 }
 
+/* Correctness fallback for scaled draws that cross an edge, use clip(), or
+ * request a flip. The hot fully-visible, unflipped case stays in gt_sspr.s. */
+static void sspr_scaled_clipped(int sx, int sy, int sw, int sh,
+                                int dx, int dy, unsigned char s, int flip) {
+    int ix, iy, ox, oy;
+    if (!gt_gsheet_ptr || sx < 0 || sy < 0 || sx + sw > 128 || sy + sh > 64) return;
+    enter_cpu_mode();
+#ifdef GT_BANKED
+    {
+        unsigned char saved_bank = gt_cur_bank;
+        gt_bank(2);
+#endif
+        for (iy = 0; iy < sh; ++iy) {
+            int srcy = (flip & 2) ? sh - 1 - iy : iy;
+            for (ix = 0; ix < sw; ++ix) {
+                int srcx = (flip & 1) ? sw - 1 - ix : ix;
+                unsigned char col = gt_gsheet_ptr[(unsigned int)(sy + srcy) * 128u +
+                                                   (unsigned int)(sx + srcx)];
+                if (!col) continue;
+                for (oy = 0; oy < s; ++oy) {
+                    int py = dy + iy * s + oy;
+                    if (py < 0 || py > 127 || gt_clip_enabled == 2 ||
+                        (gt_clip_enabled && (py < gt_clip_y0 || py > gt_clip_y1))) continue;
+                    for (ox = 0; ox < s; ++ox) {
+                        int px = dx + ix * s + ox;
+                        if (px < 0 || px > 127 ||
+                            (gt_clip_enabled && (px < gt_clip_x0 || px > gt_clip_x1))) continue;
+                        vram_row[(unsigned char)py][(unsigned char)px] = col;
+                    }
+                }
+            }
+        }
+#ifdef GT_BANKED
+        gt_bank(saved_bank);
+    }
+#endif
+    bg_pipeline_restore();
+}
+
 void gt_sspr(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int flip) {
     unsigned char s;
-    (void)flip;   /* flip on scaled sspr is a later add; source is read forward */
     if (sw <= 0 || sh <= 0) return;
+    dx -= gt_cam_x;
+    dy -= gt_cam_y;
     if (dw <= 0) dw = sw;
     if (dh <= 0) dh = sh;
     /* one integer scale for both axes (nearest of the two - degraded, keeps the
@@ -1134,27 +1174,49 @@ void gt_sspr(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int
     if (s == 1) {
         /* unscaled: an arbitrary-rect blit straight from the sheet at pixel
          * (sx,sy). GX/GY are pixel coords in the current sheet quadrant. */
-        unsigned char w = (unsigned char)sw, h = (unsigned char)sh;
-        if (dx <= -(int)w || dx > 127 || dy <= -(int)h || dy > 127) return;
+        int w = sw, h = sh, skipx = 0, skipy = 0;
+        int bx0 = 0, by0 = 0, bx1 = 127, by1 = 127;
+        if (gt_clip_enabled == 2) return;
+        if (gt_clip_enabled) {
+            bx0 = gt_clip_x0; by0 = gt_clip_y0;
+            bx1 = gt_clip_x1; by1 = gt_clip_y1;
+        }
+        if (dx > bx1 || dy > by1 || dx + w - 1 < bx0 || dy + h - 1 < by0) return;
+        if (dx < bx0) { skipx = bx0 - dx; w -= skipx; dx = bx0; }
+        if (dy < by0) { skipy = by0 - dy; h -= skipy; dy = by0; }
+        if (dx + w - 1 > bx1) w = bx1 - dx + 1;
+        if (dy + h - 1 > by1) h = by1 - dy + 1;
+        if (w <= 0 || h <= 0) return;
         gt_ent[0] = QF_SPR;
         gt_ent[1] = (unsigned char)dx;
         gt_ent[2] = (unsigned char)dy;
-        gt_ent[3] = (unsigned char)sx;
-        gt_ent[4] = (unsigned char)sy;
-        gt_ent[5] = (unsigned char)(w | ((flip & 1) ? 0x80 : 0));
-        gt_ent[6] = (unsigned char)(h | ((flip & 2) ? 0x80 : 0));
+        gt_ent[3] = (unsigned char)(sx + skipx);
+        gt_ent[4] = (unsigned char)(sy + skipy);
+        gt_ent[5] = (unsigned char)w;
+        gt_ent[6] = (unsigned char)h;
+        if (flip & 1) {
+            gt_ent[3] = (unsigned char)(0 - gt_ent[3] - gt_ent[5]);
+            gt_ent[5] |= 0x80;
+        }
+        if (flip & 2) {
+            gt_ent[4] = (unsigned char)(0 - gt_ent[4] - gt_ent[6]);
+            gt_ent[6] |= 0x80;
+        }
         gt_ent[7] = gt_qbank;
         gt_draw_mode = MODE_NONE;
         gt_q_push();
         return;
     }
 
-    /* scaled: clamp fully on-screen (the kernel does no edge clipping), then
-     * expand SxS straight into the framebuffer via the asm kernel. */
+    /* scaled: use the asm kernel only for its exact fast contract. */
     {
         unsigned char w = (unsigned char)(sw * s), h = (unsigned char)(sh * s);
         if (!gt_gsheet_ptr) return;                 /* no readable source */
-        if (dx < 0 || dy < 0 || dx + (int)w > 128 || dy + (int)h > 128) return;
+        if (gt_clip_enabled || flip || dx < 0 || dy < 0 ||
+            dx + (int)w > 128 || dy + (int)h > 128) {
+            sspr_scaled_clipped(sx, sy, sw, sh, dx, dy, s, flip);
+            return;
+        }
         sp_src = (unsigned char *)(gt_gsheet_ptr + (unsigned int)(sy * 128 + sx));
         sp_dst = (unsigned char *)(0x4000 + (unsigned int)((dy << 7) + dx));
         sp_sw = (unsigned char)sw;
