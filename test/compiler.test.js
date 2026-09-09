@@ -250,10 +250,11 @@ test("static string operations compose and tostr folds constants", () => {
 });
 
 test("static string concatenation composes without a runtime allocator", () => {
-  const c = cOf("local n=0\nfunction _update60() n=ord(\"a\"..chr(98)) end\nfunction _draw() print(\"game\"..\"tank\",4,4,7) print(sub(\"x\"..tostr(12.5),2),4,12,7) end\n");
+  const c = cOf("local n=0\nfunction _update60() n=ord(\"a\"..chr(98)) end\nfunction _draw() print(\"game\"..\"tank\",4,4,7) print(sub(\"x\"..tostr(12.5),2),4,12,7) print(\"score \"..(10+2.5),4,20,7) end\n");
   assert.match(c, /lcl_n = 97/);
   assert.ok(c.includes('gt_print("gametank", 4, 4, 7)'));
   assert.ok(c.includes('gt_print("12.5", 4, 12, 7)'));
+  assert.ok(c.includes('gt_print("score 12.5", 4, 20, 7)'));
   assert.ok(errorsOf("local s=0\nfunction _update60() s=s..\"x\" end\nfunction _draw() end\n")
     .some((m) => /runtime string concatenation/.test(m)));
 });

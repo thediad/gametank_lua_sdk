@@ -20,7 +20,7 @@ static void lcl__draw(void)
 {
     gt_cls(0);
     gt_print("concat", 12, 18, 7);
-    gt_print("gametank", 76, 18, 254);
+    gt_print("score 12.5", 76, 18, 254);
     gt_print("ord concat", 12, 38, 7);
     gt_print_int(lcl_code, 76, 38, 254);
     gt_print("sub concat", 12, 58, 7);

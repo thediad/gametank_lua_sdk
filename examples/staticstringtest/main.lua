@@ -10,7 +10,7 @@ end
 function _draw()
   cls(0)
   print("concat", 12, 18, 7)
-  print("game".."tank", 76, 18, 11)
+  print("score "..12.5, 76, 18, 11)
   print("ord concat", 12, 38, 7)
   print(code, 76, 38, 11)
   print("sub concat", 12, 58, 7)
