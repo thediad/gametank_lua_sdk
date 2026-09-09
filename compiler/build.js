@@ -958,7 +958,9 @@ export async function build(entry, opts, env) {
   const over = link32.overflows.reduce((a, o) => a + o.bytes, 0);
   env.warn(usesSave
     ? "persistent data requires FLASH2M+RAM - targeting a 2 MB save-capable cart"
-    : `32 KB cart overflows by ~${over} bytes - re-targeting the 2 MB FLASH2M cart`);
+    : flash2mHint
+      ? "cached FLASH2M placement found - reusing the 2 MB cart layout"
+      : `32 KB cart overflows by ~${over} bytes - re-targeting the 2 MB FLASH2M cart`);
   let sizes = functionSizes(env, B(`${name}.s`));
   // fold each function's rodata (string literals + literal-run tables) into
   // its size: rodata rides the function's bank (the emitter pushes
