@@ -224,7 +224,8 @@ Zero-authoring built-ins: `sfx(0)`=jump, 1=pickup, 2=shoot, 3=explode, 4=blip,
 | `?expr` | 🟡 | exact shorthand for the corresponding `print(expr,...)` form; cursor has the limit above |
 | `s = "hello"` | ✅ | string literals (short and `[[ long ]]`) |
 | `s .. s2` | 🔵 | runtime concat - v0.5 |
-| `sub tostr tonum chr ord split` | 🔵 | v0.5 |
+| `ord("literal",[constant_index])` | 🟡 | one byte result; literal string and in-range constant index only |
+| `sub tostr tonum chr split` | 🔵 | v0.5 |
 
 Bake dynamic text into byte buffers and draw with `gt.print_buf` for HUDs (the
 fast path); no runtime string building yet.

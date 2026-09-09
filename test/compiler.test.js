@@ -211,6 +211,14 @@ test("count reports live pool elements and fixed array capacity", () => {
     .some((m) => /top-level array or pool/.test(m)));
 });
 
+test("ord folds a literal string and constant index", () => {
+  const c = cOf("local a=0\nlocal b=0\nfunction _update60()\n a=ord(\"@\")\n b=ord(\"123\",2)\nend\nfunction _draw() end\n");
+  assert.match(c, /lcl_a = 64/);
+  assert.match(c, /lcl_b = 50/);
+  assert.ok(errorsOf("local i=1\nlocal a=0\nfunction _update60() a=ord(\"abc\",i) end\nfunction _draw() end\n")
+    .some((m) => /constant integer/.test(m)));
+});
+
 test("sspr() emits gt_sspr with dw/dh defaulting to 0 (= source size)", () => {
   const c = cOf("function _update60()\nend\nfunction _draw()\n  cls()\n" +
                 "  sspr(80,8,8,8,50,9,16,16)\n  sspr(0,0,8,8,100,100)\nend\n");

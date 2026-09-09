@@ -125,6 +125,9 @@ export const BUILTINS = {
   // PICO-8 count(t): pools report their live element count; fixed arrays report
   // their capacity (all slots are always present in gtlua's static model).
   count: { params: [], ret: "int", special: "count" },
+  // Static-string subset: literal input and optional literal 1-based index.
+  // Dynamic strings / multi-result ord remain part of the later string runtime.
+  ord: { params: [], ret: "int", special: "ord" },
   print: { params: [], ret: "int", special: "print" },
   add:  { params: [], ret: "void", special: "add" },
   del:  { params: [], ret: "void", special: "del" },
