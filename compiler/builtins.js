@@ -128,6 +128,8 @@ export const BUILTINS = {
   // Static-string subset: literal input and optional literal 1-based index.
   // Dynamic strings / multi-result ord remain part of the later string runtime.
   ord: { params: [], ret: "int", special: "ord" },
+  // Allocation-free static form: every byte must be a compile-time constant.
+  chr: { params: [], ret: "str", special: "chr" },
   print: { params: [], ret: "int", special: "print" },
   add:  { params: [], ret: "void", special: "add" },
   del:  { params: [], ret: "void", special: "del" },

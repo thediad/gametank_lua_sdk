@@ -279,7 +279,8 @@ print(str, [x, y], [c])   -- 4×6 font; returns the right-edge x
 ```
 
 `ord("literal", [constant_index])` is available at compile time for one in-range
-byte result. Runtime string *building* (`..`, `sub`, `tostr`, `tonum`, `split`) isn't wired
+byte result; `chr(constant_bytes...)` makes a static string for `print`. Runtime
+string *building* (`..`, `sub`, `tostr`, `tonum`, `split`) isn't wired
 yet. For live HUDs, bake digits into a byte buffer and blit it fast:
 
 ```lua

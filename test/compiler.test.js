@@ -219,6 +219,13 @@ test("ord folds a literal string and constant index", () => {
     .some((m) => /constant integer/.test(m)));
 });
 
+test("chr folds constant bytes into a safely escaped print string", () => {
+  const c = cOf("function _update60() end\nfunction _draw() print(chr(104,101,108,108,111,10),4,4,7) end\n");
+  assert.ok(c.includes('gt_print("hello\\012", 4, 4, 7)'));
+  assert.ok(errorsOf("local n=65\nfunction _update60() end\nfunction _draw() print(chr(n),4,4,7) end\n")
+    .some((m) => /constant integer bytes/.test(m)));
+});
+
 test("sspr() emits gt_sspr with dw/dh defaulting to 0 (= source size)", () => {
   const c = cOf("function _update60()\nend\nfunction _draw()\n  cls()\n" +
                 "  sspr(80,8,8,8,50,9,16,16)\n  sspr(0,0,8,8,100,100)\nend\n");
