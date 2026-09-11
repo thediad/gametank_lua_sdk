@@ -287,6 +287,10 @@ integer separator. Static string calls compose. Runtime string building and
 string-valued `split` results aren't
 wired yet. For live HUDs, bake digits into a byte buffer and blit it fast:
 
+The `#` operator reports the compile-time byte length of a static string
+expression, as well as the capacity/live count behavior documented for arrays
+and pools.
+
 ```lua
 gt.print_buf(buf, off, x, y, c)      -- fast HUD text from a byte buffer
 ```

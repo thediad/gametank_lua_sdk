@@ -226,6 +226,7 @@ Zero-authoring built-ins: `sfx(0)`=jump, 1=pickup, 2=shoot, 3=explode, 4=blip,
 | `print(str)` | 🟡 | cursor form with vertical auto-advance; wraps instead of scrolling at the bottom |
 | `?expr` | 🟡 | exact shorthand for the corresponding `print(expr,...)` form; cursor has the limit above |
 | `s = "hello"` | ✅ | string literals (short and `[[ long ]]`) |
+| `#s` | 🟡 | compile-time length of a static string expression |
 | `s .. s2` | 🟡 | static strings and constant numbers only; runtime concat remains unsupported |
 | `ord("literal",[constant_index])` | 🟡 | one byte result; literal string and in-range constant index only |
 | `chr(constant_bytes...)` | 🟡 | compile-time string, directly usable by `print` |

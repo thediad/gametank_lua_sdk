@@ -282,6 +282,15 @@ test("split folds a static numeric string into a fixed array", () => {
     .some((m) => /positive integer separator/.test(m)));
 });
 
+test("length folds static string expressions", () => {
+  const fixed = cOf('local n=0.5\nfunction _update60() n=#"abc" end\nfunction _draw() print(n,4,4,7) end\n');
+  assert.match(fixed, /lcl_n = .*3.*<< 16/);
+  const c = cOf('local n=0\nfunction _update60() n=#"gametank" + #("a"..chr(98)) end\nfunction _draw() print(n,4,4,7) end\n');
+  assert.match(c, /lcl_n = \(8 \+ 2\)/);
+  assert.ok(errorsOf('local n=1\nfunction _update60() n=#n end\nfunction _draw() end\n')
+    .some((m) => /static string expressions/.test(m)));
+});
+
 test("sspr() emits gt_sspr with dw/dh defaulting to 0 (= source size)", () => {
   const c = cOf("function _update60()\nend\nfunction _draw()\n  cls()\n" +
                 "  sspr(80,8,8,8,50,9,16,16)\n  sspr(0,0,8,8,100,100)\nend\n");
