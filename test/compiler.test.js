@@ -317,6 +317,15 @@ test("length folds static string expressions", () => {
     .some((m) => /static string expressions/.test(m)));
 });
 
+test("literal string lengths initialize globals and array capacities", () => {
+  const c = cOf('local width=#"gametank"\nlocal fraction=#"abc"+0.5\nlocal bytes=array8(#"abcd")\nfunction _draw() print(width,4,4,7) print(fraction,4,12,7) print(#bytes,4,20,7) end\n');
+  assert.match(c, /int lcl_width = 8;/);
+  assert.match(c, /long lcl_fraction = 229376L/);
+  assert.match(c, /unsigned char lcl_bytes\[4\];/);
+  assert.ok(errorsOf('local bytes=array8(#"")\nfunction _draw() end\n')
+    .some((m) => /constant capacity between 1/.test(m)));
+});
+
 test("array length converts to fixed point in fractional arithmetic", () => {
   const c = cOf('local a=array(3)\nlocal n=0.5\nfunction _update60() n=#a+0.5 end\nfunction _draw() print(n,4,4,7) end\n');
   assert.match(c, /lcl_n = .*3.*<< 16.*32768L/);
