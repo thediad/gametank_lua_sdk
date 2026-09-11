@@ -269,6 +269,12 @@ test("type folds statically known supported values", () => {
   }
 });
 
+test("type respects variables shadowing function names", () => {
+  const c = cOf('function helper() return 1 end\nfunction _update60() end\nfunction _draw() local helper=2 local rnd=3 print(type(helper),4,4,7) print(type(rnd),4,12,7) end\n');
+  assert.equal((c.match(/gt_print\("number"/g) || []).length, 2);
+  assert.ok(!c.includes('gt_print("function"'));
+});
+
 test("split folds a static numeric string into a fixed array", () => {
   const c = cOf('local values=split("10,20.5,-3")\nlocal digits=split("123",1)\nlocal n=0.0\nfunction _update60() n=values[2]+digits[3] end\nfunction _draw() print(count(values),4,4,7) end\n');
   assert.match(c, /long lcl_values\[3\] = \{\s*655360L, 1343488L, -196608L\s*\}/);
