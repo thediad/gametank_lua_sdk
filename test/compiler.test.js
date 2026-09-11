@@ -296,6 +296,11 @@ test("array length converts to fixed point in fractional arithmetic", () => {
   assert.match(c, /lcl_n = .*3.*<< 16.*32768L/);
 });
 
+test("length respects a local variable shadowing a global array", () => {
+  const errors = errorsOf('local values=array(3)\nfunction _update60() local values=2 local n=#values end\nfunction _draw() end\n');
+  assert.ok(errors.some((m) => /static string expressions/.test(m)));
+});
+
 test("sspr() emits gt_sspr with dw/dh defaulting to 0 (= source size)", () => {
   const c = cOf("function _update60()\nend\nfunction _draw()\n  cls()\n" +
                 "  sspr(80,8,8,8,50,9,16,16)\n  sspr(0,0,8,8,100,100)\nend\n");
