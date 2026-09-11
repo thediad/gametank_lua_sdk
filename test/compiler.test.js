@@ -275,6 +275,15 @@ test("type respects variables shadowing function names", () => {
   assert.ok(!c.includes('gt_print("function"'));
 });
 
+test("type rejects runtime calls instead of discarding their evaluation", () => {
+  for (const value of ['bump()', '1+bump()', 'rnd(4)', 'ord(chr(65))+bump()']) {
+    const errors = errorsOf(`local n=0\nfunction bump() n+=1 return n end\nfunction _draw() print(type(${value}),4,4,7) end\n`);
+    assert.ok(errors.some((m) => /evaluate.*variable first/.test(m)), value);
+  }
+  const c = cOf('function _draw() print(type(ord(chr(65))),4,4,7) end\n');
+  assert.ok(c.includes('gt_print("number"'));
+});
+
 test("split folds a static numeric string into a fixed array", () => {
   const c = cOf('local values=split("10,20.5,-3")\nlocal digits=split("123",1)\nlocal n=0.0\nfunction _update60() n=values[2]+digits[3] end\nfunction _draw() print(count(values),4,4,7) end\n');
   assert.match(c, /long lcl_values\[3\] = \{\s*655360L, 1343488L, -196608L\s*\}/);
