@@ -244,6 +244,17 @@ test("tonum folds decimal strings and constant numbers", () => {
     .some((m) => /decimal literals only/.test(m)));
 });
 
+test("tonum accepts composed static decimal strings", () => {
+  const c = cOf('local a=0.5\nlocal b=0.5\nlocal c=0\nfunction _init() a=tonum("12"..".5") b=tonum(sub("x-3.5",2)) c=tonum(chr(52,50)) end\nfunction _draw() end\n');
+  assert.match(c, /lcl_a = 819200L/);
+  assert.match(c, /lcl_b = -229376L/);
+  assert.match(c, /lcl_c = 42/);
+  for (const value of ['"0x".."ff"', 'tostr()', '"bad".."value"']) {
+    assert.ok(errorsOf(`local n=0\nfunction _draw() n=tonum(${value}) end\n`)
+      .some((m) => /decimal literals only/.test(m)));
+  }
+});
+
 test("static string operations compose and tostr folds constants", () => {
   const c = cOf("local n=0\nfunction _update60() n=ord(chr(65)) end\nfunction _draw() print(sub(chr(104,101,108,108,111),2,4),4,4,7) print(tostr(-3.5),4,12,7) print(\"a\"..tostr()..\"b\",4,20,7) end\n");
   assert.match(c, /lcl_n = 65/);
