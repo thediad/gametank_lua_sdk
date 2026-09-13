@@ -308,6 +308,15 @@ test("split folds a static numeric string into a fixed array", () => {
     .some((m) => /positive integer separator/.test(m)));
 });
 
+test("split accepts composed static sources and separators", () => {
+  const c = cOf('local values=split("10,"..tostr(20.5)..","..sub("x-3",2))\nlocal piped=split("4|5",chr(124))\nlocal digits=split(chr(49,50,51,52),2)\nfunction _draw() end\n');
+  assert.match(c, /long lcl_values\[3\] = \{\s*655360L, 1343488L, -196608L\s*\}/);
+  assert.match(c, /unsigned char lcl_piped\[2\] = \{\s*4, 5\s*\}/);
+  assert.match(c, /unsigned char lcl_digits\[2\] = \{\s*12, 34\s*\}/);
+  assert.ok(errorsOf('local x=1\nlocal values=split("1,"..x)\nfunction _draw() end\n')
+    .some((m) => /static string/.test(m)));
+});
+
 test("length folds static string expressions", () => {
   const fixed = cOf('local n=0.5\nfunction _update60() n=#"abc" end\nfunction _draw() print(n,4,4,7) end\n');
   assert.match(fixed, /lcl_n = .*3.*<< 16/);
