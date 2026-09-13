@@ -182,6 +182,9 @@ Pure constant forms of `flr`, `ceil`, `sgn`, `min`, `max`, and `mid` can also
 initialize top-level locals and array capacities. Runtime-dependent arguments
 still belong in `_init()`.
 
+`abs()` preserves PICO-8's minimum-value edge: `abs(-32768)` saturates to
+`0x7fff.ffff` instead of overflowing back to a negative number.
+
 ## Tables & entities
 
 | Call | | Notes |

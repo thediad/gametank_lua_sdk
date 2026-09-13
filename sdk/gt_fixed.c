@@ -206,12 +206,18 @@ int gt_ifmod(int a, int b) {
     return r;
 }
 
-int  gt_absi(int x)  { return x < 0 ? -x : x; }
+int gt_absi(int x) {
+    if ((unsigned int)x == 0x8000U) return 0x7FFF;
+    return x < 0 ? -x : x;
+}
 int  gt_sgni(int x)  { return x < 0 ? -1 : 1; }
 int  gt_mini(int a, int b)  { return a < b ? a : b; }
 int  gt_maxi(int a, int b)  { return a > b ? a : b; }
 #ifndef GT_NUM8
-long gt_absf(long x) { return x < 0 ? -x : x; }
+long gt_absf(long x) {
+    if (x == (-2147483647L - 1L)) return 0x7FFFFFFFL;
+    return x < 0 ? -x : x;
+}
 int  gt_sgnf(long x) { return x < 0 ? -1 : 1; }
 long gt_minf(long a, long b) { return a < b ? a : b; }
 long gt_maxf(long a, long b) { return a > b ? a : b; }

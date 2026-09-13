@@ -86,7 +86,9 @@ export const BUILTINS = {
   // ---- math ------------------------------------------------------------------
   flr:   { params: [["num", false]], ret: "int", c: null, special: "flr" },
   ceil:  { params: [["num", false]], ret: "int", c: null, special: "ceil" },
-  abs:   { params: [["num", false]], ret: "same", c: null, special: "abs" },
+  // Always fixed: abs(the minimum integer) saturates to the largest fractional
+  // value, which cannot be represented by the narrow integer optimization.
+  abs:   { params: [["num", false]], ret: "fixed", c: null, special: "abs" },
   sgn:   { params: [["num", false]], ret: "int", c: null, special: "sgn" },
   min:   { params: [["num", false], ["num", true]], ret: "same", c: null, special: "min" },
   max:   { params: [["num", false], ["num", true]], ret: "same", c: null, special: "max" },

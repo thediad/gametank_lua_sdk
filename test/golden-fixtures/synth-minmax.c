@@ -9,7 +9,7 @@ static void lcl__update(void)
     { int lcl_a = (((unsigned char)1 < (unsigned char)2) ? (1) : (2));
         { int lcl_b = (((unsigned char)3 > (unsigned char)4) ? (3) : (4));
             { int lcl_c = (((unsigned char)1 < (unsigned char)2) ? (((unsigned char)2 < (unsigned char)3) ? (2) : (((unsigned char)1 < (unsigned char)3) ? (3) : (1))) : (((unsigned char)1 < (unsigned char)3) ? (1) : (((unsigned char)2 < (unsigned char)3) ? (3) : (2))));
-                { int lcl_d = gt_absi((-5));
+                { long lcl_d = gt_absf(((long)(-5) << 16));
                 }
             }
         }

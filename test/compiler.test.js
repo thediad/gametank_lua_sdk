@@ -16,8 +16,8 @@ function errorsOf(src) {
     .map((d) => d.message);
 }
 
-function cOf(src) {
-  const r = compile(src, "t.lua");
+function cOf(src, opts = {}) {
+  const r = compile(src, "t.lua", opts);
   assert.equal(r.ok, true, JSON.stringify(r.diagnostics, null, 2));
   return r.c;
 }
@@ -377,6 +377,19 @@ test("pure math builtins work in constant initializers", () => {
   }
 });
 
+test("abs saturates the minimum fixed value", () => {
+  const c = cOf('local edge=abs(-32768)\nlocal ordinary=abs(-2.5)\nlocal runtime=-32768\nfunction _init() runtime=abs(runtime) end\nfunction _draw() end\n');
+  assert.match(c, /long lcl_edge = 2147483647L/);
+  assert.match(c, /long lcl_ordinary = 163840L/);
+  assert.match(c, /long lcl_runtime = -2147483648L/);
+  assert.match(c, /lcl_runtime = gt_absf\(lcl_runtime\)/);
+  assert.doesNotMatch(c, /gt_absi/);
+
+  const n8 = cOf('local edge=abs(-128)\nlocal runtime=-128\nfunction _init() runtime=abs(runtime) end\nfunction _draw() end\n', { num8: true });
+  assert.match(n8, /int lcl_edge = 32767/);
+  assert.match(n8, /lcl_runtime = gt_absi\(lcl_runtime\)/);
+});
+
 test("array length converts to fixed point in fractional arithmetic", () => {
   const c = cOf('local a=array(3)\nlocal n=0.5\nfunction _update60() n=#a+0.5 end\nfunction _draw() print(n,4,4,7) end\n');
   assert.match(c, /lcl_n = .*3.*<< 16.*32768L/);
@@ -552,6 +565,13 @@ test("fractional literals make a variable fixed (long)", () => {
   const c = cOf("local v = 1.5\nlocal n = 3\n" + LOOP);
   assert.match(c, /^long lcl_v = 98304L;/m);
   assert.match(c, /^int lcl_n = 3;$/m);
+});
+
+test("decimal -32768 is accepted only through unary minus", () => {
+  const c = cOf('local minimum=-32768\nfunction _draw() print(minimum,4,4,7) end\n');
+  assert.match(c, /int lcl_minimum = -32768;/);
+  assert.ok(errorsOf('local too_high=32768\nfunction _draw() end\n')
+    .some((m) => /outside the 16\.16 range/.test(m)));
 });
 
 test("kind inference widens through assignment", () => {
