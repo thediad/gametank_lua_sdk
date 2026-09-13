@@ -178,6 +178,10 @@ redraw-tinted path.
 | bitwise `& \| ^^ << >>` … | ✅ | as operators (band/bor/bxor/bnot/shl/shr/lshr names → ops) |
 | `x^n` | 🟡 | **constant** integer power 1..8 → `x*x*…`; no float `pow` |
 
+Pure constant forms of `flr`, `ceil`, `sgn`, `min`, `max`, and `mid` can also
+initialize top-level locals and array capacities. Runtime-dependent arguments
+still belong in `_init()`.
+
 ## Tables & entities
 
 | Call | | Notes |

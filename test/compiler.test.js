@@ -353,6 +353,21 @@ test("static numeric intrinsics work in constant initializers", () => {
   }
 });
 
+test("pure math builtins work in constant initializers", () => {
+  const c = cOf('local floor=flr(-3.25)\nlocal ceiling=ceil(-3.25)\nlocal sign=sgn(0)\nlocal low=min(-2.5,3)\nlocal default_max=max(-4)\nlocal middle=mid(9,4,7)\nlocal bytes=array8(flr(4.9))\nfunction _draw() end\n');
+  assert.match(c, /int lcl_floor = -4;/);
+  assert.match(c, /int lcl_ceiling = -3;/);
+  assert.match(c, /int lcl_sign = 1;/);
+  assert.match(c, /long lcl_low = -163840L/);
+  assert.match(c, /int lcl_default_max = 0;/);
+  assert.match(c, /int lcl_middle = 7;/);
+  assert.match(c, /unsigned char lcl_bytes\[4\];/);
+  for (const expr of ['flr(x)', 'ceil()', 'sgn(1,2)', 'min()', 'max(1,2,3)', 'mid(1,2)']) {
+    assert.ok(errorsOf(`local x=1\nlocal n=${expr}\nfunction _draw() end\n`)
+      .some((m) => /constant expression/.test(m)), expr);
+  }
+});
+
 test("array length converts to fixed point in fractional arithmetic", () => {
   const c = cOf('local a=array(3)\nlocal n=0.5\nfunction _update60() n=#a+0.5 end\nfunction _draw() print(n,4,4,7) end\n');
   assert.match(c, /lcl_n = .*3.*<< 16.*32768L/);
