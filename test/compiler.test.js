@@ -326,6 +326,16 @@ test("literal string lengths initialize globals and array capacities", () => {
     .some((m) => /constant capacity between 1/.test(m)));
 });
 
+test("joined literal lengths work in constant initializers", () => {
+  const c = cOf('local n=#("game".."tank")\nlocal f=#("a"..("b".."c"))+0.5\nlocal z=#("".."")\nlocal a=array8(#("ab".."cd"))\nfunction _draw() end\n');
+  assert.match(c, /int lcl_n = 8;/);
+  assert.match(c, /long lcl_f = 229376L/);
+  assert.match(c, /int lcl_z = 0;/);
+  assert.match(c, /unsigned char lcl_a\[4\];/);
+  assert.ok(errorsOf('local x=1\nlocal n=#("a"..x)\nfunction _draw() end\n')
+    .some((m) => /constant expression/.test(m)));
+});
+
 test("array length converts to fixed point in fractional arithmetic", () => {
   const c = cOf('local a=array(3)\nlocal n=0.5\nfunction _update60() n=#a+0.5 end\nfunction _draw() print(n,4,4,7) end\n');
   assert.match(c, /lcl_n = .*3.*<< 16.*32768L/);
