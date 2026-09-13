@@ -9,6 +9,7 @@ int lcl_width = 8;
 long lcl_fraction = 229376L; /* 3.5 */
 int lcl_empty = 0;
 unsigned char lcl_bytes[4];
+int lcl_numeric = 10;
 
 static void lcl__init(void)
 {
@@ -27,6 +28,7 @@ static void lcl__draw(void)
     gt_print_int(lcl_empty, 44, 56, 31);
     gt_print_int(4, 44, 74, 190);
     gt_print_int(lcl_bytes[3], 44, 92, 62);
+    gt_print_int(lcl_numeric, 44, 110, 91);
 }
 
 void main(void)

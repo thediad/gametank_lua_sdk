@@ -326,14 +326,19 @@ test("literal string lengths initialize globals and array capacities", () => {
     .some((m) => /constant capacity between 1/.test(m)));
 });
 
-test("joined literal lengths work in constant initializers", () => {
-  const c = cOf('local n=#("game".."tank")\nlocal f=#("a"..("b".."c"))+0.5\nlocal z=#("".."")\nlocal a=array8(#("ab".."cd"))\nfunction _draw() end\n');
+test("static string lengths work in constant initializers", () => {
+  const c = cOf('local n=#("game".."tank")\nlocal f=#("a"..("b".."c"))+0.5\nlocal z=#tostr()\nlocal a=array8(#sub(chr(97,98,99,100,101),2,5))\nlocal numeric=#("score "..12.5)\nfunction _draw() end\n');
   assert.match(c, /int lcl_n = 8;/);
   assert.match(c, /long lcl_f = 229376L/);
   assert.match(c, /int lcl_z = 0;/);
   assert.match(c, /unsigned char lcl_a\[4\];/);
+  assert.match(c, /int lcl_numeric = 10;/);
   assert.ok(errorsOf('local x=1\nlocal n=#("a"..x)\nfunction _draw() end\n')
     .some((m) => /constant expression/.test(m)));
+  for (const expr of ['#chr(256)', '#sub("a",2)', '#tostr(x)']) {
+    assert.ok(errorsOf(`local x=1\nlocal n=${expr}\nfunction _draw() end\n`)
+      .some((m) => /constant expression/.test(m)), expr);
+  }
 });
 
 test("array length converts to fixed point in fractional arithmetic", () => {
