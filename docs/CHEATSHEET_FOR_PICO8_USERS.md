@@ -228,10 +228,10 @@ Zero-authoring built-ins: `sfx(0)`=jump, 1=pickup, 2=shoot, 3=explode, 4=blip,
 | `s = "hello"` | ✅ | string literals (short and `[[ long ]]`) |
 | `#s` | 🟡 | compile-time length of a static string expression; literals, constant numbers, `..`, `chr`, `sub`, and `tostr` work in top-level constants and array capacities |
 | `s .. s2` | 🟡 | static strings and constant numbers only; runtime concat remains unsupported |
-| `ord("literal",[constant_index])` | 🟡 | one byte result; literal string and in-range constant index only |
+| `ord("literal",[constant_index])` | 🟡 | one byte result; static string and in-range constant index; usable in top-level constant initializers |
 | `chr(constant_bytes...)` | 🟡 | compile-time string, directly usable by `print` |
 | `sub("literal",pos0,[pos1])` | 🟡 | compile-time positions; literal boolean `pos1` selects one character |
-| `tonum(decimal_or_constant_number)` | 🟡 | static decimal strings (including composed expressions) or constant numbers; no format flags |
+| `tonum(decimal_or_constant_number)` | 🟡 | static decimal strings (including composed expressions) or constant numbers; usable in top-level constant initializers; no format flags |
 | `tostr([constant_number])` | 🟡 | compile-time string; omitted value produces `""` |
 | `type(value)` | 🟡 | compile-time result; evaluate runtime calls into a variable first |
 | `split("numeric,literal",[separator],[true])` | 🟡 | top-level static numeric array; literal string or positive integer separator |

@@ -341,6 +341,18 @@ test("static string lengths work in constant initializers", () => {
   }
 });
 
+test("static numeric intrinsics work in constant initializers", () => {
+  const c = cOf('local code=ord(chr(64,65),2)\nlocal decimal=tonum("12"..".5")\nlocal nested=tonum(tostr(-3.5))\nlocal bytes=array8(tonum("4"))\nfunction _draw() end\n');
+  assert.match(c, /int lcl_code = 65;/);
+  assert.match(c, /long lcl_decimal = 819200L/);
+  assert.match(c, /long lcl_nested = -229376L/);
+  assert.match(c, /unsigned char lcl_bytes\[4\];/);
+  for (const expr of ['ord("",1)', 'ord("a",2)', 'tonum("bad")', 'tonum(tostr(x))']) {
+    assert.ok(errorsOf(`local x=1\nlocal n=${expr}\nfunction _draw() end\n`)
+      .some((m) => /constant expression/.test(m)), expr);
+  }
+});
+
 test("array length converts to fixed point in fractional arithmetic", () => {
   const c = cOf('local a=array(3)\nlocal n=0.5\nfunction _update60() n=#a+0.5 end\nfunction _draw() print(n,4,4,7) end\n');
   assert.match(c, /lcl_n = .*3.*<< 16.*32768L/);
