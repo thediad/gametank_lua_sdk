@@ -10,6 +10,8 @@
 //           optional -> -1 sentinel (keep current draw color)
 // Ret kinds: fixed | int | bool | void | same (polymorphic with args)
 
+import { fixedSqrt } from "./constant-math.js";
+
 export const BUILTINS = {
   // ---- graphics -------------------------------------------------------------
   cls:      { params: [["color", true]], ret: "void", c: "lc_cls" },
@@ -103,7 +105,7 @@ export const BUILTINS = {
   min:   { params: [["num", false], ["num", true]], ret: "same", c: null, special: "min" },
   max:   { params: [["num", false], ["num", true]], ret: "same", c: null, special: "max" },
   mid:   { params: [["num", false], ["num", false], ["num", false]], ret: "same", c: null, special: "mid" },
-  sqrt:  { params: [["num", false]], ret: "fixed", c: "lc_fsqrt" },
+  sqrt:  { params: [["num", false]], ret: "fixed", c: "lc_fsqrt", constEval: fixedSqrt },
   sin:   { params: [["num", false]], ret: "fixed", c: "lc_fsin" },
   cos:   { params: [["num", false]], ret: "fixed", c: "lc_fcos" },
   atan2: { params: [["num", false], ["num", false]], ret: "fixed", c: "lc_fatan2" },
