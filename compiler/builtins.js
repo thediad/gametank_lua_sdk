@@ -18,7 +18,17 @@ export const BUILTINS = {
   color:    { params: [["color", false]], ret: "void", c: "lc_color" },
   // GameTank hardware supports only its native color-0 colorkey. palt() resets
   // it; palt(0,false) makes zero opaque. Other colors are rejected by emit.
-  palt:     { params: [["int", true], ["flip", true]], ret: "void", special: "palt" },
+  palt: {
+    params: [["int", true], ["flip", true]], ret: "void", special: "palt",
+    // Keep special for the installed vendor; canonical uses this SDK hook.
+    emit(call, { argAt, cName }) {
+      if (call.args.length === 0) return `${cName("lc_palt")}(1)`;
+      if (call.args[0].kind !== "number" || call.args[0].value !== 0) {
+        throw new Error("palt only supports color 0 on GameTank; re-author nonzero transparent colors in the sprite sheet");
+      }
+      return `${cName("lc_palt")}(${argAt(call, 1, "flip", "1")})`;
+    },
+  },
   pset:     { params: [["coord", false], ["coord", false], ["color", true]], ret: "void", c: "lc_pset" },
   rect:     { params: [["coord", false], ["coord", false], ["coord", false], ["coord", false], ["color", true]], ret: "void", c: "lc_rect" },
   rectfill: { params: [["coord", false], ["coord", false], ["coord", false], ["coord", false], ["color", true]], ret: "void", c: "lc_rectfill" },
