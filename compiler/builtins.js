@@ -37,7 +37,7 @@ export const BUILTINS = {
   // same as PICO-8 (neither machine has tilemap hardware). The optional seventh
   // argument is a sprite-flag mask: any requested bit may match.
   map:      { params: [["int", true], ["int", true], ["coord", true], ["coord", true], ["int", true], ["int", true], ["int", true]], ret: "void", special: "map" },
-  mget:     { params: [["int", false], ["int", false]], ret: "int", special: "mget" },
+  mget:     { params: [["int", false], ["int", false]], ret: "int", special: "mget", c: "lc_mget" },
   mset:     { params: [["int", false], ["int", false], ["int", false]], ret: "void", special: "mset" },
 
   // PICO-8 sprite flags.
