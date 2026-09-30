@@ -38,6 +38,8 @@ export const BUILTINS = {
   circfill: { params: [["coord", false], ["coord", false], ["coord", false], ["color", true]], ret: "void", c: "lc_circfill" },
   line:     { params: [["coord", false], ["coord", false], ["coord", false], ["coord", false], ["color", true]], ret: "void", c: "lc_line" },
   sset:     { params: [["coord", false], ["coord", false], ["color", true]], ret: "void", c: "lc_sset" },
+  // PICO-8 sget(x,y): read a sprite-sheet pixel (raw GameTank color byte).
+  sget:     { params: [["coord", false], ["coord", false]], ret: "int", c: "lc_sget" },
   spr:      { params: [["int", false], ["coord", false], ["coord", false], ["int", true], ["int", true], ["flip", true], ["flip", true]], ret: "void", c: "lc_spr" },
   // native frame-table sprite: sprf(frame, x, y, [flipx], [flipy]) draws frame
   // `frame` from a .gsi table (arbitrary size/offset, any 256x256 quadrant).

@@ -759,6 +759,31 @@ void gt_sset_z(void) {
 }
 #endif
 
+/* PICO-8 sget: read from the 128x128 sprite sheet (GRAM quadrant 0). Colors
+ * are raw GameTank bytes, matching pget() and the SDK's runtime color model.
+ * Off-sheet reads return 0. */
+#ifdef GT_BANKED
+#pragma code-name ("B0CODE")
+static int gt_sget_impl(int x, int y) {
+#else
+int gt_sget(int x, int y) {
+#endif
+    if (x < 0 || x > 127 || y < 0 || y > 127) return 0;
+    enter_gram_mode();
+    return vram[((unsigned int)y << 7) | (unsigned int)x];
+}
+#ifdef GT_BANKED
+#pragma code-name ("CODE")
+int gt_sget(int x, int y) {
+    unsigned char saved_bank = gt_cur_bank;
+    int value;
+    gt_bank(0);
+    value = gt_sget_impl(x, y);
+    gt_bank(saved_bank);
+    return value;
+}
+#endif
+
 
 /* 16-cell-wide/tall sprites are 128px spans - past the 7-bit blit counter
  * (the hardware wraps the width to 0). The asm fast path punts here; split

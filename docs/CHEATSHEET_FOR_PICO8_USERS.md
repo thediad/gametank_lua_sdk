@@ -136,7 +136,7 @@ free (Lexaloffle designed it for exactly this class of machine).
 | `circfill / circ(x,y,r,c)` | ✅ | blitter row-run fills |
 | `line(x0,y0,x1,y1,c)` | ✅ | CPU Bresenham |
 | `pset / pget(x,y,[c])` | ✅ | |
-| `sset(x,y,c)` | ✅ | write a sheet pixel (bake sprites) |
+| `sset(x,y,c)` / `sget(x,y)` | ✅ | write/read a sheet pixel; reads return raw GameTank color bytes |
 | `camera([x,y])` | ✅ | sticky draw offset |
 | `color(c)` | ✅ | |
 | `sspr(sx,sy,sw,sh,dx,dy,[dw,dh],[fx,fy])` | 🟡 | unscaled = 1:1 rect blit; scaled = **software integer nearest-neighbor** (rounds to one factor 1..4), not arbitrary scale; clipped/flipped scaling uses a slower correctness path |

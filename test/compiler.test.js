@@ -418,6 +418,11 @@ test("sspr() emits gt_sspr with dw/dh defaulting to 0 (= source size)", () => {
   assert.match(c, /gt_sspr\(0, 0, 8, 8, 100, 100, 0, 0,/);   // unscaled (dw/dh 0)
 });
 
+test("sget() reads a sprite-sheet pixel as a raw color byte", () => {
+  const c = cOf("local c=0\nfunction _init()\n sset(3,4,8)\n c=sget(3,4)\nend\nfunction _draw() end\n");
+  assert.match(c, /gt_sget\(3, 4\)/);
+});
+
 test("palt supports the GameTank color-0 transparency toggle", () => {
   const c = cOf("function _update60()\nend\nfunction _draw()\n" +
                 "  palt()\n  palt(0)\n  palt(0,false)\nend\n");

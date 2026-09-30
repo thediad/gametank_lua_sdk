@@ -86,6 +86,7 @@ void gt_spr_z(void);
 void gt_spr_clipped(void); /* C fallback when arbitrary clip is active */
 void gt_spr_wide(void);  /* 128px-span splitter (asm punts here) */        /* a0=n a1=x a2=y a3=w a4=h */
 void gt_sset_z(void);       /* a0=x a1=y a2=c */
+int gt_sget(int x, int y);
 void gt_parallax_init(int n, int cfar, int cmid, int cnear); /* seed n stars; colors -1 = classic tiers */
 void gt_parallax_move(int mode);   /* scroll: 0=drift 1=1x 2=2x */
 void gt_parallax_draw(void);
