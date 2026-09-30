@@ -272,7 +272,6 @@ same as PICO-8. **For fast scrolling worlds, gt also has it a different way:**
 The GameTank SAVE bank hardware backs this directly. Using any save API
 automatically promotes the build to a 2 MiB FLASH2M+RAM cartridge. The emulator
 writes a sibling `.sav` file; real hardware requires a save-RAM cartridge.
-planned, not yet wired.
 
 ## Memory / low-level - n/a by design
 
