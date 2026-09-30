@@ -390,6 +390,17 @@ test("abs saturates the minimum fixed value", () => {
   assert.match(n8, /lcl_runtime = gt_absi\(lcl_runtime\)/);
 });
 
+test("sqrt constants match the fixed-point runtime algorithms", () => {
+  const c = cOf('local root=sqrt(2)\nlocal negative=sqrt(-1)\nlocal runtime=2\nfunction _init() runtime=sqrt(runtime) end\nfunction _draw() end\n');
+  assert.match(c, /long lcl_root = 92681L/);
+  assert.match(c, /int lcl_negative = 0;/);
+  assert.match(c, /lcl_runtime = gt_fsqrt\(/);
+
+  const n8 = cOf('local root=sqrt(2)\nlocal runtime=2\nfunction _init() runtime=sqrt(runtime) end\nfunction _draw() end\n', { num8: true });
+  assert.match(n8, /int lcl_root = 362/);
+  assert.match(n8, /lcl_runtime = gt_fsqrt\(/);
+});
+
 test("array length converts to fixed point in fractional arithmetic", () => {
   const c = cOf('local a=array(3)\nlocal n=0.5\nfunction _update60() n=#a+0.5 end\nfunction _draw() print(n,4,4,7) end\n');
   assert.match(c, /lcl_n = .*3.*<< 16.*32768L/);
