@@ -193,6 +193,7 @@ still belong in `_init()`.
 | `add(ps,{x=1,y=2})` | ✅ | traps past capacity in debug builds |
 | `del(ps,e)` | ✅ | delete-while-iterating ok |
 | `for e in all(ps) do` | ✅ | insertion order |
+| `foreach(ps, fn)` | ❌ | function values are outside the compiled subset; use an explicit `for e in all(ps)` loop |
 | `count(ps)` / `#ps` | ✅ | live pool count; fixed arrays report their capacity |
 | `array(n)` / `array8(n)` | 🟡➕ | fixed / byte-wide arrays |
 | `{x=1, y=2}` (struct) | ✅ | tables are structs: fixed **named** fields |

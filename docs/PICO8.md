@@ -98,7 +98,8 @@ for e in all(enemies) do
   e.y += e.spd
   if (e.y > 127) del(enemies, e)      -- delete-while-iterating: supported
 end
-foreach(enemies, draw_enemy)
+-- foreach(enemies, draw_enemy) is intentionally not supported: function
+-- values are outside the compiled subset. Use the explicit all() loop above.
 ```
 
 gtlua compiles this as a fixed-capacity array of structs + a live count:
@@ -129,7 +130,7 @@ research tiers:
 | `rectfill(x0,y0,x1,y1,[c])` / `rect(...)` | corner coords, inclusive (the P8 gotcha, kept) - fill = 1 blit; outline = 4 | exact |
 | `print(str,[x,y],[c])` | v0.4 with strings; literal-only strings can land earlier for HUDs; returns right-edge x | near-exact (4×6 font) |
 | `sfx(n,[ch])` / `music(n,[loop])` | **shipped.** n indexes a BUILT-IN effect (0–7: jump/pickup/shoot/explode/blip/powerup/hurt/select) or tune (0–1) played on the ACP's 4-op FM voices - zero authoring, a kid writes `sfx(0)`. `ch` omitted = auto channel; `music(-1)` stops. Per-frame sequencer ported from the upstream tracker. (Custom P8-tracker-byte import is a later asset-pipeline task.) | same shape, built-in bank not P8 SFX bytes |
-| `rnd`, `flr`, `add/del/all/foreach` | as above | exact |
+| `rnd`, `flr`, `add/del/all` | as above | exact |
 
 ### Tier 1 (v0.3–v0.4) - any game with a world
 
@@ -200,7 +201,7 @@ wrong - the documented dynamic-color caveat).
   library (`flr ceil abs sgn sqrt min max mid sin cos atan2 rnd srand t`),
   multiple assignment, `camera`, `rect/rectfill`, `pset`, `circfill`, `line`.
 - **v0.3 - the world release:** structs + capacity tables +
-  `add/del/deli/all/foreach/count`, `spr/sspr(unscaled)` + GRAM sheets +
+  `add/del/deli/all/count`, `spr/sspr(unscaled)` + GRAM sheets +
   sprite asset pipeline, `pal/palt` (as scoped above), `fget/fset`.
 - **v0.4 - map + sound:** `map/mget/mset`, `sfx/music` on the ACP +
   converter, `cartdata/dget/dset`.

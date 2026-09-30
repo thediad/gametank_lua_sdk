@@ -112,7 +112,7 @@ statement, block structure preserved.
 
 ## Roadmap (see PICO8.md §4)
 
-v0.3 tables + `add/del/all/foreach` + `spr`/`sspr` sprites on GRAM sheets ·
+v0.3 tables + `add/del/all` + `spr`/`sspr` sprites on GRAM sheets ·
 v0.4 `map/mget/fget` + `sfx/music` on the audio coprocessor + `cartdata` ·
 v0.5 strings + `print` + `?` · later: `require`, 2 MB multi-bank carts,
 hand-tuned asm for `gt_fmul`/`gt_fdiv`.
