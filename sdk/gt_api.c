@@ -97,6 +97,7 @@ unsigned char resolve_color(int c) {
 #define MODE_CPU  2
 #define MODE_GRAM 3
 char gt_draw_mode;
+static unsigned char gt_gram_quad;
 
 /* dma_flags bytes carried in queue entries */
 #define QF_RECT (DMA_NMI | DMA_ENABLE | DMA_IRQ | DMA_COLORFILL_ENABLE | DMA_OPAQUE)
@@ -172,6 +173,7 @@ void GT_ENTER_GRAM(unsigned char quad) {
     flags_mirror = DMA_NMI | frameflip;  /* DMA off, CPU_TO_VRAM off -> GRAM writes */
     *dma_flags = flags_mirror;
     gt_draw_mode = MODE_GRAM;
+    gt_gram_quad = quad & 3;
 }
 #ifdef GT_BANKED
 #pragma code-name ("CODE")
@@ -187,7 +189,7 @@ void enter_gram_mode_q(unsigned char quad) {
 /* quadrant-0 GRAM entry with the sset fast-path (thousands of boot-time sset
  * calls skip the re-latch + bank switch once we're already in GRAM mode). */
 static void enter_gram_mode(void) {
-    if (gt_draw_mode == MODE_GRAM) return;
+    if (gt_draw_mode == MODE_GRAM && gt_gram_quad == 0) return;
     enter_gram_mode_q(0);
 }
 
