@@ -1,0 +1,14 @@
+# Opt-in: loaded only by gtedit/gtdev. Global Nano settings remain untouched.
+set minibar
+set nohelp
+set constantshow
+set tabsize 2
+set tabstospaces
+set autoindent
+set smarthome
+set positionlog
+unset breaklonglines
+unset softwrap
+unset linenumbers
+unset mouse
+include "/home/pico/.config/gtdev/gtlua.nanorc"

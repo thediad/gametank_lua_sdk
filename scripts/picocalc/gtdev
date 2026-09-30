@@ -1,0 +1,161 @@
+#!/bin/bash
+set -u
+
+SDK=/home/pico/dev/gametank/gametank_lua_sdk
+EMU=${GTDEV_EMULATOR:-/home/pico/dev/gametank/emulator-picocalc/bin/GameTankEmulator}
+WORKSPACE=/home/pico/dev/gametank/workspace
+LOG=/home/pico/.gtbuild-last.log
+GTDEV_EDITOR=${GTDEV_EDITOR:-nano}
+GTDEV_NANORC=${GTDEV_NANORC:-$HOME/.config/gtdev/nanorc}
+
+fail() {
+    printf 'gtdev: %s\n' "$*" >&2
+    exit 1
+}
+
+usage() {
+    cat <<'EOF'
+GameTank Lua shortcuts:
+  gtnew NAME       create a project under ~/dev/gametank/workspace
+  gtedit PROJECT   edit main.lua with Nano
+  gtbuild PROJECT  build game.gtr
+  gtplay PROJECT   open the existing game.gtr
+  gtrun PROJECT    build and open game.gtr
+  gtdev PROJECT    edit, then build and open game.gtr
+  gtlog            view the last build log
+
+PROJECT may be a workspace name, project directory, main.lua, or game.gtr.
+Builds automatically use gfx.gtg, gfx.gff, level.map, and gfx.gsi when present.
+Extra gtlua build options may follow PROJECT.
+PICOCALC_SCALE defaults to 2; override it for a different supported scale.
+EOF
+}
+
+command_name=${0##*/}
+case "$command_name" in
+    gtnew|gtedit|gtbuild|gtplay|gtrun|gtlog) action=${command_name#gt} ;;
+    gtdev)
+        case "${1:-}" in
+            --help|-h|help) action=help; shift ;;
+            *) action=dev ;;
+        esac ;;
+    *) action=${1:-help}; [ "$#" -gt 0 ] && shift ;;
+esac
+
+if [ "$action" = help ] || [ "$action" = --help ] || [ "$action" = -h ]; then
+    usage
+    exit 0
+fi
+
+if [ "$action" = log ]; then
+    [ -s "$LOG" ] || fail "no build log exists yet"
+    if command -v less >/dev/null 2>&1; then
+        exec less "$LOG"
+    fi
+    exec cat "$LOG"
+fi
+
+if [ "$action" = new ]; then
+    [ "$#" -eq 1 ] || fail 'usage: gtnew NAME'
+    name=$1
+    case "$name" in
+        ''|[!a-z0-9]*|*[!a-z0-9_-]*)
+            fail 'use a lowercase name starting with a letter or digit; allowed: a-z, 0-9, _ and -' ;;
+    esac
+    mkdir -p "$WORKSPACE"
+    project=$WORKSPACE/$name
+    mkdir "$project" || fail "project already exists or cannot be created: $project"
+    cat > "$project/main.lua" <<'LUA'
+local x=64
+local y=64
+
+function _update()
+  if btn(0) then x=max(4,x-1) end
+  if btn(1) then x=min(123,x+1) end
+  if btn(2) then y=max(4,y-1) end
+  if btn(3) then y=min(123,y+1) end
+end
+
+function _draw()
+  cls(1)
+  print("my gametank game",30,16,7)
+  circfill(x,y,4,10)
+end
+LUA
+    printf 'Created %s\n' "$project"
+    printf 'Start with: gtdev %s\n' "$name"
+    exit 0
+fi
+
+[ "$#" -ge 1 ] || { usage >&2; exit 2; }
+target=$1
+shift
+
+if [ -e "$target" ]; then
+    resolved=$target
+elif [ -e "$WORKSPACE/$target" ]; then
+    resolved=$WORKSPACE/$target
+else
+    fail "project not found: $target"
+fi
+
+if [ -d "$resolved" ]; then
+    project=$(cd "$resolved" && pwd -P)
+    source=$project/main.lua
+    rom=$project/game.gtr
+else
+    project=$(cd "$(dirname "$resolved")" && pwd -P)
+    file=$project/$(basename "$resolved")
+    case "$file" in
+        *.lua) source=$file; rom=${file%.lua}.gtr ;;
+        *.gtr) source=$project/main.lua; rom=$file ;;
+        *) fail 'expected a project directory, .lua source, or .gtr ROM' ;;
+    esac
+fi
+
+[ -f "$source" ] || fail "Lua source not found: $source"
+[ -f "$SDK/bin/gtlua.js" ] || fail "SDK not found: $SDK"
+[ -x "$EMU" ] || fail "emulator not found: $EMU"
+
+edit() {
+    [ -r "$GTDEV_NANORC" ] || fail "Nano configuration not found: $GTDEV_NANORC"
+    "$GTDEV_EDITOR" --rcfile "$GTDEV_NANORC" "$source"
+}
+
+build() {
+    local args=()
+    [ -f "$project/gfx.gtg" ] && args+=(--sheet "$project/gfx.gtg")
+    [ -f "$project/gfx.gff" ] && args+=(--gff "$project/gfx.gff")
+    [ -f "$project/level.map" ] && args+=(--map "$project/level.map")
+    [ -f "$project/gfx.gsi" ] && args+=(--frames "$project/gfx.gsi")
+
+    printf 'Building %s\n' "$source"
+    GTLUA_TOOLCHAIN=wasm node "$SDK/bin/gtlua.js" build "$source" \
+        -o "$rom" "${args[@]}" "$@" 2>&1 | tee "$LOG"
+    local rc=${PIPESTATUS[0]}
+    if [ "$rc" -ne 0 ]; then
+        printf '\nBuild failed. Review with: gtlog\n' >&2
+        return "$rc"
+    fi
+    printf 'ROM: %s\n' "$rom"
+}
+
+play() {
+    [ -f "$rom" ] || fail "ROM not found: $rom (run gtbuild first)"
+    PICOCALC_SCALE="${PICOCALC_SCALE:-2}" "$EMU" "$rom"
+}
+
+case "$action" in
+    edit)
+        edit ;;
+    build)
+        build "$@" ;;
+    play)
+        play ;;
+    run)
+        build "$@" && play ;;
+    dev)
+        edit && build "$@" && play ;;
+    *)
+        fail "unknown action: $action" ;;
+esac

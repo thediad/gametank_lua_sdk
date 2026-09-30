@@ -1,0 +1,28 @@
+#!/bin/sh
+set -eu
+
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+source_dir=$script_dir/picocalc
+bin_dir=${GTDEV_BIN_DIR:-$HOME/bin}
+config_dir=${GTDEV_CONFIG_DIR:-$HOME/.config/gtdev}
+
+install -d "$bin_dir" "$config_dir"
+install -m 0755 "$source_dir/gtdev" "$bin_dir/gtdev"
+install -m 0644 "$source_dir/nanorc" "$config_dir/nanorc"
+install -m 0644 "$source_dir/gtlua.nanorc" "$config_dir/gtlua.nanorc"
+
+for name in gtnew gtedit gtbuild gtplay gtrun gtlog; do
+    target=$bin_dir/$name
+    if [ -e "$target" ] && [ ! -L "$target" ]; then
+        echo "refusing to replace non-symlink shortcut: $target" >&2
+        exit 1
+    fi
+    if [ -L "$target" ] && [ "$(readlink "$target")" != gtdev ]; then
+        echo "refusing to replace unrelated symlink: $target" >&2
+        exit 1
+    fi
+    ln -sfn gtdev "$target"
+done
+
+echo "Installed GameTank Lua shortcuts in $bin_dir"
+echo "Installed dedicated Nano configuration in $config_dir"

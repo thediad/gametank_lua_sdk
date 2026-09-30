@@ -1,0 +1,25 @@
+# GameTank Lua highlighting. Named lua for future isolated linter integration.
+# API names mirror compiler/builtins.js; this is a reading aid, not a parser.
+syntax lua "\.lua$"
+comment "--"
+
+color white "."
+color brightwhite "[(){}=,+*/<>:#%~-]"
+
+color brightmagenta "\<(and|break|do|else|elseif|end|for|function|if|in|local|not|or|repeat|return|then|until|while)\>"
+color brightmagenta "\<(true|false|nil)\>"
+color brightblue "\<[0-9]+(\.[0-9]*)?\>" "\<0[xX][[:xdigit:]]+(\.[[:xdigit:]]*)?\>" "\<0[bB][01]+(\.[01]*)?\>"
+
+# Supported PICO-8-shaped globals and GTLua collection/string helpers.
+color brightgreen "\<(abs|add|all|array|array8|atan2|band|bnot|bor|btn|btnp|bxor|camera|cartdata|ceil|chr|circ|circfill|clip|cls|color|cos|count|del|deli|dget|dset|fget|flr|fset|hexdata|line|lshr|map|max|mget|mid|min|mset|music|music_bank|ord|palt|pget|pool|print|pset|rect|rectfill|reset|rnd|run|sfx|sfx_bank|sget|sgn|shl|shr|sin|song|song_stop|split|spr|sprf|sqrt|srand|sset|sspr|sub|t|time|tonum|tostr|type)\>"
+
+# Implemented GameTank-specific namespace members.
+color brightgreen "\<gt\.(autocls|bg_clear|bg_coln|bg_compose|bg_draw|bg_tile|border|canvas_top|canvas_view|chain_step_draw|chunks_draw|dbar|dbar_style|drift_draw|drift_draw_range|drift_draw_range_cpu|drift_init|drift_mode|drift_set|gflush|gspr|hit_scan|mark|note|noteoff|parallax_draw|parallax_init|parallax_move|parts_step|phys_bounds|phys_drag|phys_draw|phys_sprite|phys_step|pool_anim|pool_decay|pool_edraw|pool_move|pool_sprs|print_buf|rgb|ticks|tiles_draw|track_col|track_compose|track_dims|track_grid|track_props|track_row2|track_view)\>"
+
+color white "\<(_init|_update|_update60|_draw)\>"
+
+# Apply strings and comments last so API names inside them are not accented.
+color brightblue "\"([^\"\\]|\\.)*\"|'([^'\\]|\\.)*'"
+color brightblue start="\[\[" end="\]\]"
+color magenta "--.*" "//.*"
+color magenta start="--\[\[" end="\]\]"
