@@ -210,12 +210,6 @@ static unsigned char *const vram_row[128] = {
  * RESOLVED byte; a 9th color falls back to the CPU path.
  * The upload runs the same latch dance as the bg canvas (dummy blit selects
  * the quadrant for CPU GRAM writes) and preserves frameflip. */
-#define FONT_GROUP 2
-#define FONT_SLOTS 8
-#ifndef GT_NO_BLITFONT
-static unsigned char font_cols[FONT_SLOTS];
-static unsigned char font_nslots = 0;
-
 /* back to the queue-owned draw state (mirrors gt_bg.c's restore) */
 static void bg_pipeline_restore(void) {
     flags_mirror = DMA_NMI | DMA_ENABLE | DMA_IRQ | DMA_OPAQUE | DMA_GCARRY | frameflip;
@@ -225,6 +219,12 @@ static void bg_pipeline_restore(void) {
     gt_qbank = bankflip | BANK_CLIP_X | BANK_CLIP_Y;
     gt_draw_mode = MODE_NONE;
 }
+
+#define FONT_GROUP 2
+#define FONT_SLOTS 8
+#ifndef GT_NO_BLITFONT
+static unsigned char font_cols[FONT_SLOTS];
+static unsigned char font_nslots = 0;
 
 /* FLASH2M: the upload body is cold (once per text color) - it rides in
  * bank 0 WITH the glyph table it reads; a fixed-bank stub banks + restores. */

@@ -11,6 +11,7 @@ import { spawnSync } from "node:child_process";
 import path from "node:path";
 import os from "node:os";
 import { fileURLToPath } from "node:url";
+import { runTool } from "../compiler/wasm_toolchain.js";
 
 const SDK = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const GTLUA = path.join(SDK, "bin", "gtlua.js");
@@ -43,4 +44,18 @@ test("wasm and native cc65 produce byte-identical .gtr", { skip: !(nativeAvail &
   const w = readFileSync(wGtr);
   assert.equal(w.length, n.length, `size mismatch: native ${n.length} vs wasm ${w.length}`);
   assert.ok(w.equals(n), "wasm .gtr differs from native .gtr (toolchain divergence)");
+});
+
+test("no-blit-font builds retain the scaled-sprite pipeline restore", {
+  skip: !wasmAvail && "needs the bundled wasm toolchain",
+}, async () => {
+  const dir = mkdtempSync(path.join(os.tmpdir(), "gtlua-nofont-"));
+  const out = path.join(dir, "gt_api.s");
+  const result = await runTool("cc65", [
+    "-t", "none", "-Osr", "--cpu", "65c02", "--codesize", "500", "-g",
+    "-I", path.join(SDK, "sdk"), "-DGT_BANKED", "-DGT_NO_BLITFONT",
+    "-DGT_SSPR", "-DGT_GSHEET", "-o", out, path.join(SDK, "sdk", "gt_api.c"),
+  ]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.ok(existsSync(out), "cc65 did not produce gt_api.s");
 });
