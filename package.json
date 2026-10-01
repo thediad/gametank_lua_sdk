@@ -3,7 +3,8 @@
   "version": "0.5.0",
   "type": "module",
   "bin": {
-    "gtlua": "bin/gtlua.js"
+    "gtlua": "bin/gtlua.js",
+    "gtapi": "bin/gtapi.js"
   },
   "exports": {
     ".": "./compiler/index.js",
@@ -23,7 +24,9 @@
     "romdev-toolchain-cc65": "0.1.3"
   },
   "scripts": {
-    "test": "node --test test/api_units.test.js test/compiler.test.js test/constant-math.test.js test/fixed_asm.test.js test/gfx.test.js test/gtm2.test.js test/toolchain_parity.test.js",
+    "test": "node --test test/api_units.test.js test/api_browser.test.js test/compiler.test.js test/constant-math.test.js test/fixed_asm.test.js test/gfx.test.js test/gtm2.test.js test/toolchain_parity.test.js",
+    "api:generate": "node tools/generate-api.mjs",
+    "api:check": "node tools/generate-api.mjs --check",
     "bench": "node bench/run.mjs"
   },
   "description": "Write GameTank games in a PICO-8-flavored Lua that ahead-of-time compiles to native 65C02. Bundled cc65 WASM toolchain + emulator, .gtr cartridges, no native tools.",

@@ -275,6 +275,7 @@ cc65 startup/linker files) · `bin/gtlua.js` CLI · `tools/` cc65 (built by
 | doc | what |
 |---|---|
 | [docs/CHEATSHEET.md](docs/CHEATSHEET.md) | the full gt-lua API reference |
+| [docs/API_HELP.md](docs/API_HELP.md) | searchable offline `gtapi` help, including the PicoCalc workflow |
 | [docs/CHEATSHEET_FOR_PICO8_USERS.md](docs/CHEATSHEET_FOR_PICO8_USERS.md) | per-function PICO-8 compatibility map |
 | [docs/PORTING.md](docs/PORTING.md) | bringing a PICO-8 cart over, step by step |
 | [docs/GRAPHICS.md](docs/GRAPHICS.md) | the `.gtg` sprite-sheet format + `gtlua gfx` converter |

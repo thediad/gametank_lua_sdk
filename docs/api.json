@@ -1,0 +1,3865 @@
+{
+  "schema": 1,
+  "generatedFrom": {
+    "compiler/builtins.js": "2b2a51fa6295677ce0291d78f4daba95b4a0a1c6a095e73eb990a7eea35ab0dc",
+    "docs/CHEATSHEET.md": "2bed429510379ffe2b20fa2c1bd26a0413ee649870021c36c03e135f6fe086a3"
+  },
+  "counts": {
+    "entries": 128
+  },
+  "entries": [
+    {
+      "name": "_draw",
+      "category": "lifecycle",
+      "signature": "_draw()",
+      "params": [],
+      "returns": "void",
+      "summary": "Define this callback to draw one frame.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "_draw",
+        "callback",
+        "lifecycle"
+      ]
+    },
+    {
+      "name": "_init",
+      "category": "lifecycle",
+      "signature": "_init()",
+      "params": [],
+      "returns": "void",
+      "summary": "Define this callback to initialize the game once after startup.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "_init",
+        "callback",
+        "lifecycle"
+      ]
+    },
+    {
+      "name": "_update",
+      "category": "lifecycle",
+      "signature": "_update()",
+      "params": [],
+      "returns": "void",
+      "summary": "Define this callback for game logic at the normal 30 Hz update rate.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "_update",
+        "callback",
+        "lifecycle"
+      ]
+    },
+    {
+      "name": "_update60",
+      "category": "lifecycle",
+      "signature": "_update60()",
+      "params": [],
+      "returns": "void",
+      "summary": "Define this callback instead of _update for 60 Hz game logic.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "_update60",
+        "callback",
+        "lifecycle"
+      ]
+    },
+    {
+      "name": "abs",
+      "category": "math",
+      "signature": "abs(value)",
+      "params": [
+        {
+          "name": "value",
+          "kind": "num",
+          "optional": false
+        }
+      ],
+      "returns": "fixed",
+      "summary": "Always fixed: abs(the minimum integer) saturates to the largest fractional value, which cannot be represented by the narrow integer optimization.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "abs",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "add",
+      "category": "data",
+      "signature": "add()",
+      "params": [],
+      "returns": "void",
+      "summary": "Add a value or entity to a supported collection.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "add",
+        "data",
+        "array",
+        "collection",
+        "save"
+      ]
+    },
+    {
+      "name": "all",
+      "category": "data",
+      "signature": "all(pool)",
+      "params": [],
+      "returns": "iterator",
+      "summary": "Iterate over every live element in a pool.",
+      "source": "compiler syntax",
+      "keywords": [
+        "all",
+        "data",
+        "syntax"
+      ]
+    },
+    {
+      "name": "array",
+      "category": "data",
+      "signature": "array(capacity, [initial])",
+      "params": [
+        {
+          "name": "capacity",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "initial",
+          "kind": "num",
+          "optional": true
+        }
+      ],
+      "returns": "array",
+      "summary": "Create a fixed-capacity numeric array.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "array",
+        "data",
+        "array",
+        "collection",
+        "save"
+      ]
+    },
+    {
+      "name": "array8",
+      "category": "data",
+      "signature": "array8(capacity, [initial])",
+      "params": [
+        {
+          "name": "capacity",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "initial",
+          "kind": "num",
+          "optional": true
+        }
+      ],
+      "returns": "array",
+      "summary": "Create a compact fixed-capacity byte array.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "array8",
+        "data",
+        "array",
+        "collection",
+        "save"
+      ]
+    },
+    {
+      "name": "atan2",
+      "category": "math",
+      "signature": "atan2(dx, dy)",
+      "params": [
+        {
+          "name": "dx",
+          "kind": "num",
+          "optional": false
+        },
+        {
+          "name": "dy",
+          "kind": "num",
+          "optional": false
+        }
+      ],
+      "returns": "fixed",
+      "summary": "Compiler-supported atan2 function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "atan2",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "band",
+      "category": "math",
+      "signature": "band(a, b)",
+      "params": [
+        {
+          "name": "a",
+          "kind": "num",
+          "optional": false
+        },
+        {
+          "name": "b",
+          "kind": "num",
+          "optional": false
+        }
+      ],
+      "returns": "same",
+      "summary": "PICO-8 bitwise FUNCTION forms - exact aliases of the operators gtlua already has (a & b, a | b, ...). Carts use both spellings interchangeably. Emitted as the operator, so zero runtime cost. band/bor/bxor/bnot on the raw bits; shl/shr shift (shr = arithmetic >>, lshr = logical >>>).",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "band",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "bnot",
+      "category": "math",
+      "signature": "bnot(value)",
+      "params": [
+        {
+          "name": "value",
+          "kind": "num",
+          "optional": false
+        }
+      ],
+      "returns": "same",
+      "summary": "Compiler-supported bnot function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "bnot",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "bor",
+      "category": "math",
+      "signature": "bor(a, b)",
+      "params": [
+        {
+          "name": "a",
+          "kind": "num",
+          "optional": false
+        },
+        {
+          "name": "b",
+          "kind": "num",
+          "optional": false
+        }
+      ],
+      "returns": "same",
+      "summary": "Compiler-supported bor function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "bor",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "btn",
+      "category": "input",
+      "signature": "btn(button, [player])",
+      "params": [
+        {
+          "name": "button",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "player",
+          "kind": "int",
+          "optional": true
+        }
+      ],
+      "returns": "bool",
+      "summary": "Test whether a controller button is held.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "btn",
+        "input",
+        "controller",
+        "button",
+        "keyboard"
+      ]
+    },
+    {
+      "name": "btnp",
+      "category": "input",
+      "signature": "btnp(button, [player])",
+      "params": [
+        {
+          "name": "button",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "player",
+          "kind": "int",
+          "optional": true
+        }
+      ],
+      "returns": "bool",
+      "summary": "Test whether a controller button was just pressed, including repeat.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "btnp",
+        "input",
+        "controller",
+        "button",
+        "keyboard"
+      ]
+    },
+    {
+      "name": "bxor",
+      "category": "math",
+      "signature": "bxor(a, b)",
+      "params": [
+        {
+          "name": "a",
+          "kind": "num",
+          "optional": false
+        },
+        {
+          "name": "b",
+          "kind": "num",
+          "optional": false
+        }
+      ],
+      "returns": "same",
+      "summary": "Compiler-supported bxor function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "bxor",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "camera",
+      "category": "graphics",
+      "signature": "camera([x], [y])",
+      "params": [
+        {
+          "name": "x",
+          "kind": "coord",
+          "optional": true
+        },
+        {
+          "name": "y",
+          "kind": "coord",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "sticky draw offset added to everything (no args = reset)",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "camera",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "cartdata",
+      "category": "data",
+      "signature": "cartdata(id)",
+      "params": [
+        {
+          "name": "id",
+          "kind": "str",
+          "optional": false
+        }
+      ],
+      "returns": "bool",
+      "summary": "Select the persistent save-data namespace.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "cartdata",
+        "data",
+        "array",
+        "collection",
+        "save"
+      ]
+    },
+    {
+      "name": "ceil",
+      "category": "math",
+      "signature": "ceil(value)",
+      "params": [
+        {
+          "name": "value",
+          "kind": "num",
+          "optional": false
+        }
+      ],
+      "returns": "int",
+      "summary": "Compiler-supported ceil function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "ceil",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "chr",
+      "category": "data",
+      "signature": "chr()",
+      "params": [],
+      "returns": "str",
+      "summary": "Allocation-free static form: every byte must be a compile-time constant.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "chr",
+        "data",
+        "array",
+        "collection",
+        "save"
+      ]
+    },
+    {
+      "name": "circ",
+      "category": "graphics",
+      "signature": "circ(x, y, radius, [color])",
+      "params": [
+        {
+          "name": "x",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "radius",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "color",
+          "kind": "color",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "circle outline / filled",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "circ",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "circfill",
+      "category": "graphics",
+      "signature": "circfill(x, y, radius, [color])",
+      "params": [
+        {
+          "name": "x",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "radius",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "color",
+          "kind": "color",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "circle outline / filled",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "circfill",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "clip",
+      "category": "graphics",
+      "signature": "clip([x], [y], [width], [height], [previous])",
+      "params": [
+        {
+          "name": "x",
+          "kind": "coord",
+          "optional": true
+        },
+        {
+          "name": "y",
+          "kind": "coord",
+          "optional": true
+        },
+        {
+          "name": "width",
+          "kind": "coord",
+          "optional": true
+        },
+        {
+          "name": "height",
+          "kind": "coord",
+          "optional": true
+        },
+        {
+          "name": "previous",
+          "kind": "flip",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "Compiler-supported clip function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "clip",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "cls",
+      "category": "graphics",
+      "signature": "cls([color])",
+      "params": [
+        {
+          "name": "color",
+          "kind": "color",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "Clear the screen with an optional color.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "cls",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "color",
+      "category": "graphics",
+      "signature": "color(color)",
+      "params": [
+        {
+          "name": "color",
+          "kind": "color",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "set the default pen color",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "color",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "cos",
+      "category": "math",
+      "signature": "cos(turns)",
+      "params": [
+        {
+          "name": "turns",
+          "kind": "num",
+          "optional": false
+        }
+      ],
+      "returns": "fixed",
+      "summary": "Compiler-supported cos function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "cos",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "count",
+      "category": "data",
+      "signature": "count()",
+      "params": [],
+      "returns": "int",
+      "summary": "PICO-8 count(t): pools report their live element count; fixed arrays report their capacity (all slots are always present in gtlua's static model).",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "count",
+        "data",
+        "array",
+        "collection",
+        "save"
+      ]
+    },
+    {
+      "name": "del",
+      "category": "data",
+      "signature": "del()",
+      "params": [],
+      "returns": "void",
+      "summary": "Remove a matching value or entity from a supported collection.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "del",
+        "data",
+        "array",
+        "collection",
+        "save"
+      ]
+    },
+    {
+      "name": "deli",
+      "category": "data",
+      "signature": "deli()",
+      "params": [],
+      "returns": "void",
+      "summary": "Remove an item by numeric index.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "deli",
+        "data",
+        "array",
+        "collection",
+        "save"
+      ]
+    },
+    {
+      "name": "dget",
+      "category": "data",
+      "signature": "dget(index)",
+      "params": [
+        {
+          "name": "index",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "fixed",
+      "summary": "Read a persistent numeric save slot.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "dget",
+        "data",
+        "array",
+        "collection",
+        "save"
+      ]
+    },
+    {
+      "name": "dset",
+      "category": "data",
+      "signature": "dset(index, value)",
+      "params": [
+        {
+          "name": "index",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "value",
+          "kind": "num",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "Write a persistent numeric save slot.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "dset",
+        "data",
+        "array",
+        "collection",
+        "save"
+      ]
+    },
+    {
+      "name": "fget",
+      "category": "graphics",
+      "signature": "fget(sprite, [flag])",
+      "params": [
+        {
+          "name": "sprite",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "flag",
+          "kind": "int",
+          "optional": true
+        }
+      ],
+      "returns": "int",
+      "summary": "PICO-8 sprite flags. fget(n) -> all 8 flag bits fget(n, f) -> 0/1 for flag f fset(n, v) -> replace all 8 bits fset(n, f, v) -> set/clear flag f",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "fget",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "flr",
+      "category": "math",
+      "signature": "flr(value)",
+      "params": [
+        {
+          "name": "value",
+          "kind": "num",
+          "optional": false
+        }
+      ],
+      "returns": "int",
+      "summary": "---- math ------------------------------------------------------------------",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "flr",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "fset",
+      "category": "graphics",
+      "signature": "fset(sprite, flag, [value])",
+      "params": [
+        {
+          "name": "sprite",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "flag",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "value",
+          "kind": "flip",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "Compiler-supported fset function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "fset",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "gt.autocls",
+      "category": "gametank",
+      "signature": "gt.autocls(color)",
+      "params": [
+        {
+          "name": "color",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "clear to color c automatically each frame (free - happens while the screen is between frames)",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.autocls",
+        "autocls",
+        "gametank",
+        "gametank",
+        "hardware",
+        "advanced"
+      ]
+    },
+    {
+      "name": "gt.bg_clear",
+      "category": "engines",
+      "signature": "gt.bg_clear()",
+      "params": [],
+      "returns": "void",
+      "summary": "clear the offscreen 256×256 canvas",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.bg_clear",
+        "bg clear",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.bg_coln",
+      "category": "engines",
+      "signature": "gt.bg_coln(cells, px, py, n)",
+      "params": [
+        {
+          "name": "cells",
+          "kind": "array8",
+          "optional": false
+        },
+        {
+          "name": "px",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "py",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "n",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "paint one tile column into the canvas",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.bg_coln",
+        "bg coln",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.bg_compose",
+      "category": "engines",
+      "signature": "gt.bg_compose(map, cols, cx, cy, cw, ch)",
+      "params": [
+        {
+          "name": "map",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "cols",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "cx",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "cy",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "cw",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "ch",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "CPU-paint a tilemap into the canvas",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.bg_compose",
+        "bg compose",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.bg_draw",
+      "category": "engines",
+      "signature": "gt.bg_draw([x], [y])",
+      "params": [
+        {
+          "name": "x",
+          "kind": "coord",
+          "optional": true
+        },
+        {
+          "name": "y",
+          "kind": "coord",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "blit the (scrolled) canvas → screen, 1 blit/frame",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.bg_draw",
+        "bg draw",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.bg_tile",
+      "category": "engines",
+      "signature": "gt.bg_tile(sprite, x, y)",
+      "params": [
+        {
+          "name": "sprite",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "x",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "stamp one sheet tile into the canvas",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.bg_tile",
+        "bg tile",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.border",
+      "category": "gametank",
+      "signature": "gt.border(color)",
+      "params": [
+        {
+          "name": "color",
+          "kind": "color",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "overscan border color",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.border",
+        "border",
+        "gametank",
+        "gametank",
+        "hardware",
+        "advanced"
+      ]
+    },
+    {
+      "name": "gt.canvas_top",
+      "category": "engines",
+      "signature": "gt.canvas_top(page)",
+      "params": [
+        {
+          "name": "page",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "GameTank-specific gt.canvas_top function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.canvas_top",
+        "canvas top",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.canvas_view",
+      "category": "engines",
+      "signature": "gt.canvas_view(x, y, [width], [height])",
+      "params": [
+        {
+          "name": "x",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "width",
+          "kind": "int",
+          "optional": true
+        },
+        {
+          "name": "height",
+          "kind": "int",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "window blit from the composed canvas",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.canvas_view",
+        "canvas view",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.chain_step_draw",
+      "category": "engines",
+      "signature": "gt.chain_step_draw(x, y, color)",
+      "params": [
+        {
+          "name": "x",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "color",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "GameTank-specific gt.chain_step_draw function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.chain_step_draw",
+        "chain step draw",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.chunks_draw",
+      "category": "engines",
+      "signature": "gt.chunks_draw(grid, lut, lut2, props, stride, cx0, cy0, cx1, cy1)",
+      "params": [
+        {
+          "name": "grid",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "lut",
+          "kind": "array8",
+          "optional": false
+        },
+        {
+          "name": "lut2",
+          "kind": "array8",
+          "optional": false
+        },
+        {
+          "name": "props",
+          "kind": "array8",
+          "optional": false
+        },
+        {
+          "name": "stride",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "cx0",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "cy0",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "cx1",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "cy1",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "24×24-chunk world renderer",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.chunks_draw",
+        "chunks draw",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.dbar",
+      "category": "gametank",
+      "signature": "gt.dbar(x, y, value, maximum, color, highlight, background)",
+      "params": [
+        {
+          "name": "x",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "value",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "maximum",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "color",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "highlight",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "background",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "fast segmented bar (HUD meters); v of max m, bg >= 16 skips the strip",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.dbar",
+        "dbar",
+        "gametank",
+        "gametank",
+        "hardware",
+        "advanced"
+      ]
+    },
+    {
+      "name": "gt.dbar_style",
+      "category": "gametank",
+      "signature": "gt.dbar_style(background, fill, highlight, deficit)",
+      "params": [
+        {
+          "name": "background",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "fill",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "highlight",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "deficit",
+          "kind": "color",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "bar look: px-per-unit scale (/256), strip width, height, deficit color",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.dbar_style",
+        "dbar style",
+        "gametank",
+        "gametank",
+        "hardware",
+        "advanced"
+      ]
+    },
+    {
+      "name": "gt.drift_draw",
+      "category": "engines",
+      "signature": "gt.drift_draw(camera_x, camera_y)",
+      "params": [
+        {
+          "name": "camera_x",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "camera_y",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "drifting flakes/snow",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.drift_draw",
+        "drift draw",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.drift_draw_range",
+      "category": "engines",
+      "signature": "gt.drift_draw_range(first, count, camera_x8, camera_y8)",
+      "params": [
+        {
+          "name": "first",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "count",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "camera_x8",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "camera_y8",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "layered range draw: (first, count, camdx8, camdy8) - clouds behind the map and snow in front share one engine",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.drift_draw_range",
+        "drift draw range",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.drift_draw_range_cpu",
+      "category": "engines",
+      "signature": "gt.drift_draw_range_cpu(first, count, camera_x8, camera_y8)",
+      "params": [
+        {
+          "name": "first",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "count",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "camera_x8",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "camera_y8",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "the 4-piece 128x128 canvas window blit (scrolling composed maps) flakes draw through CPU pokes (1x1 fields, frame-tail only)",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.drift_draw_range_cpu",
+        "drift draw range cpu",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.drift_init",
+      "category": "engines",
+      "signature": "gt.drift_init(count)",
+      "params": [
+        {
+          "name": "count",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "drifting flakes/snow",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.drift_init",
+        "drift init",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.drift_mode",
+      "category": "engines",
+      "signature": "gt.drift_mode(mode, value)",
+      "params": [
+        {
+          "name": "mode",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "value",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "follower chain (hair/tails): eases 5 segments toward (x,y), draws p8 round dots r=2,2,1,1,1 in the given color - all in asm (gt_flakes.s)",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.drift_mode",
+        "drift mode",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.drift_set",
+      "category": "engines",
+      "signature": "gt.drift_set(index, x, y, width, height, speed8, color)",
+      "params": [
+        {
+          "name": "index",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "x",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "width",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "height",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "speed8",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "color",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "drifting flakes/snow",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.drift_set",
+        "drift set",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.gflush",
+      "category": "engines",
+      "signature": "gt.gflush()",
+      "params": [],
+      "returns": "void",
+      "summary": "GameTank-specific gt.gflush function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.gflush",
+        "gflush",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.gspr",
+      "category": "engines",
+      "signature": "gt.gspr(source_x, source_y, width, height, x, y)",
+      "params": [
+        {
+          "name": "source_x",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "source_y",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "width",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "height",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "x",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "kind": "coord",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "blit a rect from the canvas (a \"cut\" sprite)",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.gspr",
+        "gspr",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.hit_scan",
+      "category": "entities",
+      "signature": "gt.hit_scan(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)",
+      "params": [
+        {
+          "name": "arg1",
+          "kind": "pool",
+          "optional": false
+        },
+        {
+          "name": "arg2",
+          "kind": "str",
+          "optional": false
+        },
+        {
+          "name": "arg3",
+          "kind": "str",
+          "optional": false
+        },
+        {
+          "name": "arg4",
+          "kind": "pool",
+          "optional": false
+        },
+        {
+          "name": "arg5",
+          "kind": "str",
+          "optional": false
+        },
+        {
+          "name": "arg6",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg7",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg8",
+          "kind": "array8",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "broad-phase collision → contact pairs",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.hit_scan",
+        "hit scan",
+        "entities",
+        "gametank",
+        "pool",
+        "collision",
+        "physics",
+        "advanced"
+      ]
+    },
+    {
+      "name": "gt.mark",
+      "category": "gametank",
+      "signature": "gt.mark(value)",
+      "params": [
+        {
+          "name": "value",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "benchmark/test cycle marker: writes GT_MARK_ADDR so the GT_PROFILE core build can bracket measured regions. No effect on normal carts.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.mark",
+        "mark",
+        "gametank",
+        "gametank",
+        "hardware",
+        "advanced"
+      ]
+    },
+    {
+      "name": "gt.note",
+      "category": "audio",
+      "signature": "gt.note(channel, pitch, [instrument])",
+      "params": [
+        {
+          "name": "channel",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "pitch",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "instrument",
+          "kind": "int",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "GameTank-specific gt.note function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.note",
+        "note",
+        "audio",
+        "gametank",
+        "sound",
+        "music"
+      ]
+    },
+    {
+      "name": "gt.noteoff",
+      "category": "audio",
+      "signature": "gt.noteoff(channel)",
+      "params": [
+        {
+          "name": "channel",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "GameTank-specific gt.noteoff function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.noteoff",
+        "noteoff",
+        "audio",
+        "gametank",
+        "sound",
+        "music"
+      ]
+    },
+    {
+      "name": "gt.parallax_draw",
+      "category": "engines",
+      "signature": "gt.parallax_draw()",
+      "params": [],
+      "returns": "void",
+      "summary": "parallax starfield",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.parallax_draw",
+        "parallax draw",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.parallax_init",
+      "category": "engines",
+      "signature": "gt.parallax_init(count, [color1], [color2], [color3])",
+      "params": [
+        {
+          "name": "count",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "color1",
+          "kind": "color",
+          "optional": true
+        },
+        {
+          "name": "color2",
+          "kind": "color",
+          "optional": true
+        },
+        {
+          "name": "color3",
+          "kind": "color",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "parallax starfield",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.parallax_init",
+        "parallax init",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.parallax_move",
+      "category": "engines",
+      "signature": "gt.parallax_move(speed)",
+      "params": [
+        {
+          "name": "speed",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "parallax starfield",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.parallax_move",
+        "parallax move",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.parts_step",
+      "category": "gametank",
+      "signature": "gt.parts_step(entities)",
+      "params": [
+        {
+          "name": "entities",
+          "kind": "pool",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "step a particle pool",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.parts_step",
+        "parts step",
+        "gametank",
+        "gametank",
+        "hardware",
+        "advanced"
+      ]
+    },
+    {
+      "name": "gt.phys_bounds",
+      "category": "entities",
+      "signature": "gt.phys_bounds(left, top, right, bottom, bounce)",
+      "params": [
+        {
+          "name": "left",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "top",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "right",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "bottom",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "bounce",
+          "kind": "num",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "set the walls balls bounce in (default: the whole screen); vymin = how fast a falling ball must move to bounce off the floor (0 = always)",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.phys_bounds",
+        "phys bounds",
+        "entities",
+        "gametank",
+        "pool",
+        "collision",
+        "physics",
+        "advanced"
+      ]
+    },
+    {
+      "name": "gt.phys_drag",
+      "category": "entities",
+      "signature": "gt.phys_drag(vx, vy, act, n)",
+      "params": [
+        {
+          "name": "vx",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "vy",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "act",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "n",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "apply drag",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.phys_drag",
+        "phys drag",
+        "entities",
+        "gametank",
+        "pool",
+        "collision",
+        "physics",
+        "advanced"
+      ]
+    },
+    {
+      "name": "gt.phys_draw",
+      "category": "entities",
+      "signature": "gt.phys_draw(x, y, cells, n)",
+      "params": [
+        {
+          "name": "x",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "cells",
+          "kind": "array8",
+          "optional": false
+        },
+        {
+          "name": "n",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "draw the body table (bulk asm blits; size from physsprite)",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.phys_draw",
+        "phys draw",
+        "entities",
+        "gametank",
+        "pool",
+        "collision",
+        "physics",
+        "advanced"
+      ]
+    },
+    {
+      "name": "gt.phys_sprite",
+      "category": "entities",
+      "signature": "gt.phys_sprite(sprite, width, height)",
+      "params": [
+        {
+          "name": "sprite",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "width",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "height",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "body sprite size + center anchor (default 16, 8, 7)",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.phys_sprite",
+        "phys sprite",
+        "entities",
+        "gametank",
+        "pool",
+        "collision",
+        "physics",
+        "advanced"
+      ]
+    },
+    {
+      "name": "gt.phys_step",
+      "category": "entities",
+      "signature": "gt.phys_step(x, y, vx, vy, act, flags, pairs, n)",
+      "params": [
+        {
+          "name": "x",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "vx",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "vy",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "act",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "flags",
+          "kind": "array8",
+          "optional": false
+        },
+        {
+          "name": "pairs",
+          "kind": "array8",
+          "optional": false
+        },
+        {
+          "name": "n",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "integrate + wall-bounce + collision pairs",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.phys_step",
+        "phys step",
+        "entities",
+        "gametank",
+        "pool",
+        "collision",
+        "physics",
+        "advanced"
+      ]
+    },
+    {
+      "name": "gt.pool_anim",
+      "category": "entities",
+      "signature": "gt.pool_anim(entities, frame_field, speed_field, max_field, [reset])",
+      "params": [
+        {
+          "name": "entities",
+          "kind": "pool",
+          "optional": false
+        },
+        {
+          "name": "frame_field",
+          "kind": "str",
+          "optional": false
+        },
+        {
+          "name": "speed_field",
+          "kind": "str",
+          "optional": false
+        },
+        {
+          "name": "max_field",
+          "kind": "str",
+          "optional": false
+        },
+        {
+          "name": "reset",
+          "kind": "int",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "advance animation frames (16ths; past maxf snaps to reset, default 16 = first frame)",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.pool_anim",
+        "pool anim",
+        "entities",
+        "gametank",
+        "pool",
+        "collision",
+        "physics",
+        "advanced"
+      ]
+    },
+    {
+      "name": "gt.pool_decay",
+      "category": "entities",
+      "signature": "gt.pool_decay(act, lm, table, n, step)",
+      "params": [
+        {
+          "name": "act",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "lm",
+          "kind": "array8",
+          "optional": false
+        },
+        {
+          "name": "table",
+          "kind": "array8",
+          "optional": false
+        },
+        {
+          "name": "n",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "step",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "int",
+      "summary": "per-slot sum += table[act-1]; lm[i] -= step (floor 0); returns the sum",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.pool_decay",
+        "pool decay",
+        "entities",
+        "gametank",
+        "pool",
+        "collision",
+        "physics",
+        "advanced"
+      ]
+    },
+    {
+      "name": "gt.pool_edraw",
+      "category": "entities",
+      "signature": "gt.pool_edraw(arg1, arg2, arg3, arg4, arg5, arg6, arg7)",
+      "params": [
+        {
+          "name": "arg1",
+          "kind": "pool",
+          "optional": false
+        },
+        {
+          "name": "arg2",
+          "kind": "str",
+          "optional": false
+        },
+        {
+          "name": "arg3",
+          "kind": "str",
+          "optional": false
+        },
+        {
+          "name": "arg4",
+          "kind": "str",
+          "optional": false
+        },
+        {
+          "name": "arg5",
+          "kind": "str",
+          "optional": false
+        },
+        {
+          "name": "arg6",
+          "kind": "array8",
+          "optional": false
+        },
+        {
+          "name": "arg7",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "rich pool draw (flash/shake)",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.pool_edraw",
+        "pool edraw",
+        "entities",
+        "gametank",
+        "pool",
+        "collision",
+        "physics",
+        "advanced"
+      ]
+    },
+    {
+      "name": "gt.pool_move",
+      "category": "entities",
+      "signature": "gt.pool_move(entities, mode)",
+      "params": [
+        {
+          "name": "entities",
+          "kind": "pool",
+          "optional": false
+        },
+        {
+          "name": "mode",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "integrate positions for the pool",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.pool_move",
+        "pool move",
+        "entities",
+        "gametank",
+        "pool",
+        "collision",
+        "physics",
+        "advanced"
+      ]
+    },
+    {
+      "name": "gt.pool_sprs",
+      "category": "entities",
+      "signature": "gt.pool_sprs(ps, cells, [ox], [oy])",
+      "params": [
+        {
+          "name": "ps",
+          "kind": "pool",
+          "optional": false
+        },
+        {
+          "name": "cells",
+          "kind": "str",
+          "optional": false
+        },
+        {
+          "name": "ox",
+          "kind": "int",
+          "optional": true
+        },
+        {
+          "name": "oy",
+          "kind": "int",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "draw the pool as sprites",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.pool_sprs",
+        "pool sprs",
+        "entities",
+        "gametank",
+        "pool",
+        "collision",
+        "physics",
+        "advanced"
+      ]
+    },
+    {
+      "name": "gt.print_buf",
+      "category": "text",
+      "signature": "gt.print_buf(buf, off, x, y, c)",
+      "params": [
+        {
+          "name": "buf",
+          "kind": "array8",
+          "optional": false
+        },
+        {
+          "name": "off",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "x",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "c",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "int",
+      "summary": "fast HUD text from a byte buffer",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.print_buf",
+        "print buf",
+        "text",
+        "gametank",
+        "font",
+        "words"
+      ]
+    },
+    {
+      "name": "gt.rgb",
+      "category": "gametank",
+      "signature": "gt.rgb(red_or_byte)",
+      "params": [
+        {
+          "name": "red_or_byte",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "int",
+      "summary": "pick any color the GameTank can show",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.rgb",
+        "rgb",
+        "gametank",
+        "gametank",
+        "hardware",
+        "advanced"
+      ]
+    },
+    {
+      "name": "gt.ticks",
+      "category": "gametank",
+      "signature": "gt.ticks()",
+      "params": [],
+      "returns": "int",
+      "summary": "frame counter",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.ticks",
+        "ticks",
+        "gametank",
+        "gametank",
+        "hardware",
+        "advanced"
+      ]
+    },
+    {
+      "name": "gt.tiles_draw",
+      "category": "engines",
+      "signature": "gt.tiles_draw(map, flags, w, i0, i1, j0, j1)",
+      "params": [
+        {
+          "name": "map",
+          "kind": "array8",
+          "optional": false
+        },
+        {
+          "name": "flags",
+          "kind": "array8",
+          "optional": false
+        },
+        {
+          "name": "w",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "i0",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "i1",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "j0",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "j1",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "asm tile-window scan → blits",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.tiles_draw",
+        "tiles draw",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.track_col",
+      "category": "engines",
+      "signature": "gt.track_col(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)",
+      "params": [
+        {
+          "name": "arg1",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "arg2",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "arg3",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "arg4",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg5",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg6",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg7",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg8",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "GameTank-specific gt.track_col function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.track_col",
+        "track col",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.track_compose",
+      "category": "engines",
+      "signature": "gt.track_compose(arg1, arg2, arg3, arg4, arg5, arg6)",
+      "params": [
+        {
+          "name": "arg1",
+          "kind": "array8",
+          "optional": false
+        },
+        {
+          "name": "arg2",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg3",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg4",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg5",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg6",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "GameTank-specific gt.track_compose function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.track_compose",
+        "track compose",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.track_dims",
+      "category": "engines",
+      "signature": "gt.track_dims(size)",
+      "params": [
+        {
+          "name": "size",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "track world size in tiles per side (default 90 = 30x30 chunks)",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.track_dims",
+        "track dims",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.track_grid",
+      "category": "engines",
+      "signature": "gt.track_grid(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)",
+      "params": [
+        {
+          "name": "arg1",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "arg2",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "arg3",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "arg4",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg5",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg6",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg7",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg8",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "GameTank-specific gt.track_grid function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.track_grid",
+        "track grid",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.track_props",
+      "category": "engines",
+      "signature": "gt.track_props(arg1, arg2, arg3, arg4, arg5, arg6, arg7)",
+      "params": [
+        {
+          "name": "arg1",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "arg2",
+          "kind": "array8",
+          "optional": false
+        },
+        {
+          "name": "arg3",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg4",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg5",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg6",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg7",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "GameTank-specific gt.track_props function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.track_props",
+        "track props",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.track_row2",
+      "category": "engines",
+      "signature": "gt.track_row2(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)",
+      "params": [
+        {
+          "name": "arg1",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "arg2",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "arg3",
+          "kind": "array",
+          "optional": false
+        },
+        {
+          "name": "arg4",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg5",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg6",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg7",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "arg8",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "GameTank-specific gt.track_row2 function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.track_row2",
+        "track row2",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "gt.track_view",
+      "category": "engines",
+      "signature": "gt.track_view(x, y)",
+      "params": [
+        {
+          "name": "x",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "GameTank-specific gt.track_view function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "gt.track_view",
+        "track view",
+        "engines",
+        "gametank",
+        "background",
+        "advanced",
+        "drawing"
+      ]
+    },
+    {
+      "name": "hexdata",
+      "category": "data",
+      "signature": "hexdata(text)",
+      "params": [],
+      "returns": "array8",
+      "summary": "Create a compile-time byte array from hexadecimal text.",
+      "source": "compiler syntax",
+      "keywords": [
+        "hexdata",
+        "data",
+        "syntax"
+      ]
+    },
+    {
+      "name": "line",
+      "category": "graphics",
+      "signature": "line(x0, y0, x1, y1, [color])",
+      "params": [
+        {
+          "name": "x0",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "y0",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "x1",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "y1",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "color",
+          "kind": "color",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "line (CPU Bresenham)",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "line",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "lshr",
+      "category": "math",
+      "signature": "lshr(value, bits)",
+      "params": [
+        {
+          "name": "value",
+          "kind": "num",
+          "optional": false
+        },
+        {
+          "name": "bits",
+          "kind": "num",
+          "optional": false
+        }
+      ],
+      "returns": "same",
+      "summary": "Compiler-supported lshr function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "lshr",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "map",
+      "category": "graphics",
+      "signature": "map([cell_x], [cell_y], [screen_x], [screen_y], [cell_w], [cell_h], [flag])",
+      "params": [
+        {
+          "name": "cell_x",
+          "kind": "int",
+          "optional": true
+        },
+        {
+          "name": "cell_y",
+          "kind": "int",
+          "optional": true
+        },
+        {
+          "name": "screen_x",
+          "kind": "coord",
+          "optional": true
+        },
+        {
+          "name": "screen_y",
+          "kind": "coord",
+          "optional": true
+        },
+        {
+          "name": "cell_w",
+          "kind": "int",
+          "optional": true
+        },
+        {
+          "name": "cell_h",
+          "kind": "int",
+          "optional": true
+        },
+        {
+          "name": "flag",
+          "kind": "int",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "Draw a rectangular region of the tile map.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "map",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "max",
+      "category": "math",
+      "signature": "max(a, [b])",
+      "params": [
+        {
+          "name": "a",
+          "kind": "num",
+          "optional": false
+        },
+        {
+          "name": "b",
+          "kind": "num",
+          "optional": true
+        }
+      ],
+      "returns": "same",
+      "summary": "Compiler-supported max function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "max",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "mget",
+      "category": "graphics",
+      "signature": "mget(cell_x, cell_y)",
+      "params": [
+        {
+          "name": "cell_x",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "cell_y",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "int",
+      "summary": "the tile index at map cell (cx, cy)",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "mget",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "mid",
+      "category": "math",
+      "signature": "mid(a, b, c)",
+      "params": [
+        {
+          "name": "a",
+          "kind": "num",
+          "optional": false
+        },
+        {
+          "name": "b",
+          "kind": "num",
+          "optional": false
+        },
+        {
+          "name": "c",
+          "kind": "num",
+          "optional": false
+        }
+      ],
+      "returns": "same",
+      "summary": "Compiler-supported mid function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "mid",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "min",
+      "category": "math",
+      "signature": "min(a, [b])",
+      "params": [
+        {
+          "name": "a",
+          "kind": "num",
+          "optional": false
+        },
+        {
+          "name": "b",
+          "kind": "num",
+          "optional": true
+        }
+      ],
+      "returns": "same",
+      "summary": "Compiler-supported min function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "min",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "mset",
+      "category": "graphics",
+      "signature": "mset(cell_x, cell_y, sprite)",
+      "params": [
+        {
+          "name": "cell_x",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "cell_y",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "sprite",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "Compiler-supported mset function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "mset",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "music",
+      "category": "audio",
+      "signature": "music(track, [loop])",
+      "params": [
+        {
+          "name": "track",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "loop",
+          "kind": "flip",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "`loop` is a truthy flag (default on): music(0) loops, music(0,false) plays once.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "music",
+        "audio",
+        "sound",
+        "music"
+      ]
+    },
+    {
+      "name": "music_bank",
+      "category": "audio",
+      "signature": "music_bank(data)",
+      "params": [
+        {
+          "name": "data",
+          "kind": "array8",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "Compiler-supported music_bank function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "music_bank",
+        "audio",
+        "sound",
+        "music"
+      ]
+    },
+    {
+      "name": "ord",
+      "category": "data",
+      "signature": "ord()",
+      "params": [],
+      "returns": "int",
+      "summary": "Static-string subset: literal input and optional literal 1-based index. Dynamic strings / multi-result ord remain part of the later string runtime.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "ord",
+        "data",
+        "array",
+        "collection",
+        "save"
+      ]
+    },
+    {
+      "name": "palt",
+      "category": "graphics",
+      "signature": "palt([color], [transparent])",
+      "params": [
+        {
+          "name": "color",
+          "kind": "int",
+          "optional": true
+        },
+        {
+          "name": "transparent",
+          "kind": "flip",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "GameTank hardware supports only its native color-0 colorkey. palt() resets it; palt(0,false) makes zero opaque. Other colors are rejected by emit.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "palt",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "pget",
+      "category": "graphics",
+      "signature": "pget(x, y)",
+      "params": [
+        {
+          "name": "x",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "kind": "coord",
+          "optional": false
+        }
+      ],
+      "returns": "int",
+      "summary": "one pixel",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "pget",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "pool",
+      "category": "data",
+      "signature": "pool(capacity)",
+      "params": [
+        {
+          "name": "capacity",
+          "kind": "int",
+          "optional": false
+        }
+      ],
+      "returns": "pool",
+      "summary": "Create a fixed-capacity entity pool.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "pool",
+        "data",
+        "array",
+        "collection",
+        "save"
+      ]
+    },
+    {
+      "name": "print",
+      "category": "text",
+      "signature": "print()",
+      "params": [],
+      "returns": "int",
+      "summary": "Draw text and return the final horizontal position.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "print",
+        "text",
+        "font",
+        "words"
+      ]
+    },
+    {
+      "name": "pset",
+      "category": "graphics",
+      "signature": "pset(x, y, [color])",
+      "params": [
+        {
+          "name": "x",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "color",
+          "kind": "color",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "one pixel",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "pset",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "rect",
+      "category": "graphics",
+      "signature": "rect(x0, y0, x1, y1, [color])",
+      "params": [
+        {
+          "name": "x0",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "y0",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "x1",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "y1",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "color",
+          "kind": "color",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "box outline / filled - corners inclusive",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "rect",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "rectfill",
+      "category": "graphics",
+      "signature": "rectfill(x0, y0, x1, y1, [color])",
+      "params": [
+        {
+          "name": "x0",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "y0",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "x1",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "y1",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "color",
+          "kind": "color",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "box outline / filled - corners inclusive",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "rectfill",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "reset",
+      "category": "lifecycle",
+      "signature": "reset()",
+      "params": [],
+      "returns": "void",
+      "summary": "Alias of run; restart the cartridge from power-on state.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "reset",
+        "lifecycle",
+        "callback",
+        "game loop"
+      ]
+    },
+    {
+      "name": "rnd",
+      "category": "math",
+      "signature": "rnd([limit])",
+      "params": [
+        {
+          "name": "limit",
+          "kind": "num",
+          "optional": true
+        }
+      ],
+      "returns": "fixed",
+      "summary": "Compiler-supported rnd function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "rnd",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "run",
+      "category": "lifecycle",
+      "signature": "run()",
+      "params": [],
+      "returns": "void",
+      "summary": "Restart the cartridge from power-on state.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "run",
+        "lifecycle",
+        "callback",
+        "game loop"
+      ]
+    },
+    {
+      "name": "sfx",
+      "category": "audio",
+      "signature": "sfx(effect, [channel])",
+      "params": [
+        {
+          "name": "effect",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "channel",
+          "kind": "int",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "---- sound (gt_music.c) -------------------------------------------------- sfx(n, [ch]) - fire built-in effect n (0-7); ch omitted = auto channel. music(n, [loop]) - start built-in tune n; music(-1) stops (PICO-8). `audio` pulls in gt_audio_init()+gt_music.o at build time.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "sfx",
+        "audio",
+        "sound",
+        "music"
+      ]
+    },
+    {
+      "name": "sfx_bank",
+      "category": "audio",
+      "signature": "sfx_bank(data)",
+      "params": [
+        {
+          "name": "data",
+          "kind": "array8",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "Compiler-supported sfx_bank function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "sfx_bank",
+        "audio",
+        "sound",
+        "music"
+      ]
+    },
+    {
+      "name": "sget",
+      "category": "graphics",
+      "signature": "sget(x, y)",
+      "params": [
+        {
+          "name": "x",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "kind": "coord",
+          "optional": false
+        }
+      ],
+      "returns": "int",
+      "summary": "PICO-8 sget(x,y): read a sprite-sheet pixel (raw GameTank color byte).",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "sget",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "sgn",
+      "category": "math",
+      "signature": "sgn(value)",
+      "params": [
+        {
+          "name": "value",
+          "kind": "num",
+          "optional": false
+        }
+      ],
+      "returns": "int",
+      "summary": "Compiler-supported sgn function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "sgn",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "shl",
+      "category": "math",
+      "signature": "shl(value, bits)",
+      "params": [
+        {
+          "name": "value",
+          "kind": "num",
+          "optional": false
+        },
+        {
+          "name": "bits",
+          "kind": "num",
+          "optional": false
+        }
+      ],
+      "returns": "same",
+      "summary": "Compiler-supported shl function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "shl",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "shr",
+      "category": "math",
+      "signature": "shr(value, bits)",
+      "params": [
+        {
+          "name": "value",
+          "kind": "num",
+          "optional": false
+        },
+        {
+          "name": "bits",
+          "kind": "num",
+          "optional": false
+        }
+      ],
+      "returns": "same",
+      "summary": "Compiler-supported shr function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "shr",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "sin",
+      "category": "math",
+      "signature": "sin(turns)",
+      "params": [
+        {
+          "name": "turns",
+          "kind": "num",
+          "optional": false
+        }
+      ],
+      "returns": "fixed",
+      "summary": "Compiler-supported sin function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "sin",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "song",
+      "category": "audio",
+      "signature": "song(data, [loop])",
+      "params": [
+        {
+          "name": "data",
+          "kind": "array8",
+          "optional": false
+        },
+        {
+          "name": "loop",
+          "kind": "flip",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "song(data, [loop]) - play a native .gtm2 FM song (Clyde's format); data is a hexdata() blob. loop defaults on. gt.song_stop() halts it. See docs/MUSIC.md.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "song",
+        "audio",
+        "sound",
+        "music"
+      ]
+    },
+    {
+      "name": "song_stop",
+      "category": "audio",
+      "signature": "song_stop()",
+      "params": [],
+      "returns": "void",
+      "summary": "Compiler-supported song_stop function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "song_stop",
+        "audio",
+        "sound",
+        "music"
+      ]
+    },
+    {
+      "name": "split",
+      "category": "data",
+      "signature": "split()",
+      "params": [],
+      "returns": "array",
+      "summary": "Compiler-supported split function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "split",
+        "data",
+        "array",
+        "collection",
+        "save"
+      ]
+    },
+    {
+      "name": "spr",
+      "category": "graphics",
+      "signature": "spr(sprite, x, y, [width], [height], [flip_x], [flip_y])",
+      "params": [
+        {
+          "name": "sprite",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "x",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "width",
+          "kind": "int",
+          "optional": true
+        },
+        {
+          "name": "height",
+          "kind": "int",
+          "optional": true
+        },
+        {
+          "name": "flip_x",
+          "kind": "flip",
+          "optional": true
+        },
+        {
+          "name": "flip_y",
+          "kind": "flip",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "Draw one or more 8x8 sprite-sheet cells.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "spr",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "sprf",
+      "category": "graphics",
+      "signature": "sprf(frame, x, y, [flip_x], [flip_y])",
+      "params": [
+        {
+          "name": "frame",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "x",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "flip_x",
+          "kind": "flip",
+          "optional": true
+        },
+        {
+          "name": "flip_y",
+          "kind": "flip",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "Draw a named frame from the project's frame table.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "sprf",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "sqrt",
+      "category": "math",
+      "signature": "sqrt(value)",
+      "params": [
+        {
+          "name": "value",
+          "kind": "num",
+          "optional": false
+        }
+      ],
+      "returns": "fixed",
+      "summary": "Compiler-supported sqrt function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "sqrt",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "srand",
+      "category": "math",
+      "signature": "srand(seed)",
+      "params": [
+        {
+          "name": "seed",
+          "kind": "num",
+          "optional": false
+        }
+      ],
+      "returns": "void",
+      "summary": "Compiler-supported srand function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "srand",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "sset",
+      "category": "graphics",
+      "signature": "sset(x, y, [color])",
+      "params": [
+        {
+          "name": "x",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "color",
+          "kind": "color",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "write a pixel into the sprite sheet (bake sprites at runtime)",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "sset",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "sspr",
+      "category": "graphics",
+      "signature": "sspr(sx, sy, sw, sh, dx, dy, [dw], [dh], [flip_x], [flip_y])",
+      "params": [
+        {
+          "name": "sx",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "sy",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "sw",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "sh",
+          "kind": "int",
+          "optional": false
+        },
+        {
+          "name": "dx",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "dy",
+          "kind": "coord",
+          "optional": false
+        },
+        {
+          "name": "dw",
+          "kind": "int",
+          "optional": true
+        },
+        {
+          "name": "dh",
+          "kind": "int",
+          "optional": true
+        },
+        {
+          "name": "flip_x",
+          "kind": "flip",
+          "optional": true
+        },
+        {
+          "name": "flip_y",
+          "kind": "flip",
+          "optional": true
+        }
+      ],
+      "returns": "void",
+      "summary": "Draw and optionally scale a rectangle from the sprite sheet.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "sspr",
+        "graphics",
+        "draw",
+        "screen",
+        "sprite",
+        "pixel"
+      ]
+    },
+    {
+      "name": "sub",
+      "category": "data",
+      "signature": "sub()",
+      "params": [],
+      "returns": "str",
+      "summary": "Compiler-supported sub function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "sub",
+        "data",
+        "array",
+        "collection",
+        "save"
+      ]
+    },
+    {
+      "name": "t",
+      "category": "math",
+      "signature": "t()",
+      "params": [],
+      "returns": "fixed",
+      "summary": "Compiler-supported t function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "t",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "time",
+      "category": "math",
+      "signature": "time()",
+      "params": [],
+      "returns": "fixed",
+      "summary": "Compiler-supported time function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "time",
+        "math",
+        "number",
+        "calculate"
+      ]
+    },
+    {
+      "name": "tonum",
+      "category": "data",
+      "signature": "tonum()",
+      "params": [],
+      "returns": "same",
+      "summary": "Compiler-supported tonum function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "tonum",
+        "data",
+        "array",
+        "collection",
+        "save"
+      ]
+    },
+    {
+      "name": "tostr",
+      "category": "data",
+      "signature": "tostr()",
+      "params": [],
+      "returns": "str",
+      "summary": "Compiler-supported tostr function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "tostr",
+        "data",
+        "array",
+        "collection",
+        "save"
+      ]
+    },
+    {
+      "name": "type",
+      "category": "data",
+      "signature": "type()",
+      "params": [],
+      "returns": "str",
+      "summary": "Compiler-supported type function.",
+      "source": "compiler/builtins.js",
+      "keywords": [
+        "type",
+        "data",
+        "array",
+        "collection",
+        "save"
+      ]
+    }
+  ]
+}

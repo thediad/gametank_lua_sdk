@@ -23,6 +23,8 @@ GameTank Lua shortcuts:
   gtrun PROJECT    build and open game.gtr
   gtdev PROJECT    edit, then build and open game.gtr
   gtlog            view the last build log
+  gtapi [WORDS]    browse or search offline API help
+  gthelp [WORDS]   alias for gtapi
 
 PROJECT may be a workspace name, project directory, main.lua, or game.gtr.
 Builds automatically use gfx.gtg, gfx.gff, level.map, and gfx.gsi when present.
