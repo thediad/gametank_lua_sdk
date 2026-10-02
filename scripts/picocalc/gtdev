@@ -107,8 +107,24 @@ fi
 
 edit() {
     [ -r "$GTDEV_NANORC" ] || fail "Nano configuration not found: $GTDEV_NANORC"
-    (cd "$project" && GTEDIT_PROJECT="$project" GTEDIT_SOURCE="$source" GTEDIT_ROM="$rom" \
-        "$GTDEV_EDITOR" --rcfile "$GTDEV_NANORC" "$source")
+    local reopen
+    local location=
+    local args
+    reopen=$(mktemp /tmp/gtedit-reopen.XXXXXX) || fail 'cannot create editor state file'
+    rm -f "$reopen"
+    while true; do
+        args=(--rcfile "$GTDEV_NANORC")
+        case "$location" in
+            [0-9]*,[0-9]*) args+=("+$location") ;;
+        esac
+        args+=("$source")
+        (cd "$project" && GTEDIT_PROJECT="$project" GTEDIT_SOURCE="$source" GTEDIT_ROM="$rom" \
+            GTEDIT_REOPEN="$reopen" "$GTDEV_EDITOR" "${args[@]}")
+        [ -f "$reopen" ] || break
+        location=$(cat "$reopen")
+        rm -f "$reopen"
+    done
+    rm -f "$reopen"
 }
 
 build() {

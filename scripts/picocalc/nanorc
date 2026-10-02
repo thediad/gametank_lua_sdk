@@ -18,5 +18,5 @@ include "/home/pico/.config/gtdev/gtlua.nanorc"
 # names such as _draw and gt.bg_draw. The helper preserves that selection.
 bind F5 "{savefile}{execute}/home/pico/bin/gtedit-run{enter}{refresh}" main
 bind F6 "{savefile}{nextword}{mark}{prevword}{execute}| /home/pico/bin/gtedit-help{enter}{undo}{refresh}" main
-bind F7 "{savefile}{execute}/home/pico/bin/gtedit-check{enter}{refresh}" main
+bind F7 "{savefile}{execute}/home/pico/bin/gtedit-check{enter}{exit}" main
 bind F8 suspend main

@@ -3,6 +3,7 @@ set -u
 
 SDK=${GTLUA_SDK:-/home/pico/dev/gametank/gametank_lua_sdk}
 LOG=${GTDEV_BUILD_LOG:-$HOME/.gtbuild-last.log}
+REOPEN=${GTEDIT_REOPEN:-}
 
 wait_and_drain() {
     local deadline=$((SECONDS + $1))
@@ -22,14 +23,27 @@ else
     rc=1
 fi
 
+location=$(sed -n 's/^[^:]*:\([0-9][0-9]*\):\([0-9][0-9]*\): error:.*/\1,\2/p' "$LOG" | head -n 1)
+if [ -n "$REOPEN" ]; then
+    if [ -n "$location" ]; then printf '%s\n' "$location" > "$REOPEN"
+    else printf '%s\n' reopen > "$REOPEN"
+    fi
+fi
+
 if [ -c /dev/tty ] && ( : > /dev/tty ) 2>/dev/null; then
     printf '\033[2J\033[H' > /dev/tty
     while IFS= read -r line || [ -n "$line" ]; do
         printf '%s\r\n' "$line"
     done < "$LOG" > /dev/tty
-    printf '\r\nReturning in 6 seconds; keys are ignored...' > /dev/tty
+    if [ -n "$location" ]; then
+        printf '\r\nOpening error at %s in 6 seconds; keys are ignored...' "$location" > /dev/tty
+    else
+        printf '\r\nReturning in 6 seconds; keys are ignored...' > /dev/tty
+    fi
     wait_and_drain 6
 else
     cat "$LOG" >&2
 fi
-exit "$rc"
+# The diagnostic status is preserved in the log. Return success so Nano can
+# finish the binding and exit into gtdev's controlled reopen loop.
+exit 0
