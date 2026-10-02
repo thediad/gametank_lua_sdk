@@ -12,7 +12,7 @@ install -m 0755 "$script_dir/../bin/gtapi.js" "$bin_dir/gtapi"
 install -m 0644 "$source_dir/nanorc" "$config_dir/nanorc"
 install -m 0644 "$source_dir/gtlua.nanorc" "$config_dir/gtlua.nanorc"
 
-for name in gtnew gtedit gtbuild gtplay gtrun gtlog; do
+for name in gtstudio gtnew gtedit gtcheck gtbuild gtplay gtrun gtlog; do
     target=$bin_dir/$name
     if [ -e "$target" ] && [ ! -L "$target" ]; then
         echo "refusing to replace non-symlink shortcut: $target" >&2

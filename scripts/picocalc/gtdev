@@ -16,8 +16,10 @@ fail() {
 usage() {
     cat <<'EOF'
 GameTank Lua shortcuts:
+  gtstudio PROJECT interactive edit/check/build/run/help suite
   gtnew NAME       create a project under ~/dev/gametank/workspace
   gtedit PROJECT   edit main.lua with Nano
+  gtcheck PROJECT  validate Lua and declared project assets
   gtbuild PROJECT  build game.gtr
   gtplay PROJECT   open the existing game.gtr
   gtrun PROJECT    build and open game.gtr
@@ -35,7 +37,8 @@ EOF
 
 command_name=${0##*/}
 case "$command_name" in
-    gtnew|gtedit|gtbuild|gtplay|gtrun|gtlog) action=${command_name#gt} ;;
+    gtstudio) action=studio ;;
+    gtnew|gtedit|gtcheck|gtbuild|gtplay|gtrun|gtlog) action=${command_name#gt} ;;
     gtdev)
         case "${1:-}" in
             --help|-h|help) action=help; shift ;;
@@ -64,27 +67,10 @@ if [ "$action" = new ]; then
         ''|[!a-z0-9]*|*[!a-z0-9_-]*)
             fail 'use a lowercase name starting with a letter or digit; allowed: a-z, 0-9, _ and -' ;;
     esac
+    [ -f "$SDK/bin/gtlua.js" ] || fail "SDK not found: $SDK"
     mkdir -p "$WORKSPACE"
     project=$WORKSPACE/$name
-    mkdir "$project" || fail "project already exists or cannot be created: $project"
-    cat > "$project/main.lua" <<'LUA'
-local x=64
-local y=64
-
-function _update()
-  if btn(0) then x=max(4,x-1) end
-  if btn(1) then x=min(123,x+1) end
-  if btn(2) then y=max(4,y-1) end
-  if btn(3) then y=min(123,y+1) end
-end
-
-function _draw()
-  cls(1)
-  print("my gametank game",30,16,7)
-  circfill(x,y,4,10)
-end
-LUA
-    printf 'Created %s\n' "$project"
+    node "$SDK/bin/gtlua.js" init "$project" || exit $?
     printf 'Start with: gtdev %s\n' "$name"
     exit 0
 fi
@@ -125,6 +111,19 @@ edit() {
 }
 
 build() {
+    if [ -f "$project/gtlua.json" ]; then
+        printf 'Building project %s\n' "$project"
+        (cd "$project" && GTLUA_TOOLCHAIN=wasm node "$SDK/bin/gtlua.js" build "$@") \
+            2>&1 | tee "$LOG"
+        local rc=${PIPESTATUS[0]}
+        if [ "$rc" -ne 0 ]; then
+            printf '\nBuild failed. Review with: gtlog\n' >&2
+            return "$rc"
+        fi
+        printf 'ROM: %s\n' "$rom"
+        return 0
+    fi
+
     local args=()
     [ -f "$project/gfx.gtg" ] && args+=(--sheet "$project/gfx.gtg")
     [ -f "$project/gfx.gff" ] && args+=(--gff "$project/gfx.gff")
@@ -142,20 +141,78 @@ build() {
     printf 'ROM: %s\n' "$rom"
 }
 
+check() {
+    if [ -f "$project/gtlua.json" ]; then
+        (cd "$project" && node "$SDK/bin/gtlua.js" check "$@") 2>&1 | tee "$LOG"
+    else
+        node "$SDK/bin/gtlua.js" check "$source" "$@" 2>&1 | tee "$LOG"
+    fi
+    local rc=${PIPESTATUS[0]}
+    if [ "$rc" -ne 0 ]; then
+        printf '\nCheck failed. Review with: gtlog\n' >&2
+    fi
+    return "$rc"
+}
+
 play() {
     [ -f "$rom" ] || fail "ROM not found: $rom (run gtbuild first)"
     PICOCALC_SCALE="${PICOCALC_SCALE:-2}" "$EMU" "$rom"
 }
 
+pause_for_key() {
+    printf '\nPress Enter to return to GTStudio...'
+    IFS= read -r _unused
+}
+
+studio() {
+    while true; do
+        clear
+        printf '%s\n' 'GameTank Lua Studio'
+        printf '%s\n' '-------------------'
+        printf 'Project: %s\n\n' "${project##*/}"
+        printf '%s\n' \
+            '1  Edit code' \
+            '2  Check project' \
+            '3  Build ROM' \
+            '4  Build and run' \
+            '5  API help' \
+            '6  Last build log' \
+            'Q  Quit'
+        printf '\nChoice: '
+        IFS= read -r choice
+        case "$choice" in
+            1|e|E) edit ;;
+            2|c|C) check "$@"; pause_for_key ;;
+            3|b|B) build "$@"; pause_for_key ;;
+            4|r|R) if build "$@"; then play; else pause_for_key; fi ;;
+            5|h|H)
+                if command -v gtapi >/dev/null 2>&1; then gtapi; else node "$SDK/bin/gtapi.js"; fi ;;
+            6|l|L)
+                if [ -s "$LOG" ]; then
+                    if command -v less >/dev/null 2>&1; then less "$LOG"; else cat "$LOG"; pause_for_key; fi
+                else
+                    printf '\nNo build log exists yet.\n'
+                    pause_for_key
+                fi ;;
+            q|Q|0) return 0 ;;
+            *) printf '\nUnknown choice.\n'; pause_for_key ;;
+        esac
+    done
+}
+
 case "$action" in
     edit)
         edit ;;
+    check)
+        check "$@" ;;
     build)
         build "$@" ;;
     play)
         play ;;
     run)
         build "$@" && play ;;
+    studio)
+        studio "$@" ;;
     dev)
         edit && build "$@" && play ;;
     *)

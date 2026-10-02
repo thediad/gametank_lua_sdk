@@ -21,6 +21,7 @@ import { fileURLToPath } from "node:url";
 
 import { compile, formatDiagnostics } from "../compiler/index.js";
 import { build } from "../compiler/build.js";
+import { PROJECT_FILE, createProject, loadProject, resolveProject, validateProjectFiles } from "../compiler/project.js";
 
 const REPO = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SDK = path.join(REPO, "sdk");
@@ -224,69 +225,96 @@ async function runBuild(entry, opts) {
   }
 }
 
+const BUILD_VALUE_FLAGS = new Map([
+  ["-o", "outPath"], ["--sheet", "sheetPath"], ["--frames", "framesPath"],
+  ["--songs", "songsPaths"], ["--sheetext", "sheetExtPath"],
+  ["--gff", "gffPath"], ["--map", "mapPath"],
+]);
+
+function parseBuildArgs(args) {
+  const options = {};
+  const positional = [];
+  for (let index = 0; index < args.length; index++) {
+    const arg = args[index];
+    if (arg === "--num8") {
+      options.num8 = true;
+      continue;
+    }
+    const field = BUILD_VALUE_FLAGS.get(arg);
+    if (field) {
+      const value = args[++index];
+      if (!value || value.startsWith("--")) fail(`${arg} requires a value`);
+      options[field] = field === "songsPaths" ? value.split(",").filter(Boolean) : value;
+      continue;
+    }
+    if (arg.startsWith("-")) fail(`unknown build option: ${arg}`);
+    positional.push(arg);
+  }
+  if (positional.length > 1) fail(`unexpected argument: ${positional[1]}`);
+  return { target: positional[0], options };
+}
+
+function projectForTarget(target) {
+  try {
+    if (!target) return validateProjectFiles(resolveProject());
+    const absolute = path.resolve(target);
+    if (existsSync(absolute) && statSync(absolute).isDirectory()) return validateProjectFiles(resolveProject(absolute));
+    if (path.basename(absolute) === PROJECT_FILE) return validateProjectFiles(loadProject(absolute));
+    return null;
+  } catch (error) {
+    fail(error?.message ?? String(error));
+  }
+}
+
+function resolveBuildRequest(args) {
+  const parsed = parseBuildArgs(args);
+  const project = projectForTarget(parsed.target);
+  if (!project) {
+    if (!parsed.target) fail(`no source given and no ${PROJECT_FILE} found`);
+    return { entry: parsed.target, options: parsed.options, project: null };
+  }
+  return {
+    entry: project.entry,
+    project,
+    options: {
+      outPath: project.outPath,
+      sheetPath: project.sheetPath,
+      framesPath: project.framesPath,
+      songsPaths: project.songsPaths,
+      sheetExtPath: project.sheetExtPath,
+      gffPath: project.gffPath,
+      mapPath: project.mapPath,
+      num8: project.num8,
+      ...parsed.options,
+    },
+  };
+}
+
+function checkSource(entry, options = {}) {
+  if (!existsSync(entry)) fail(`no such file: ${entry}`);
+  compileLuaCli(path.resolve(entry), { num8: !!options.num8 });
+  console.log(`OK: ${path.resolve(entry)}`);
+}
+
 // ---- main -------------------------------------------------------------------
 
 const [, , cmd, ...rest] = process.argv;
 if (cmd === "build") {
-  const oIdx = rest.indexOf("-o");
-  const outPath = oIdx !== -1 ? rest[oIdx + 1] : undefined;
-  const sIdx = rest.indexOf("--sheet");
-  const sheetPath = sIdx !== -1 ? rest[sIdx + 1] : undefined;
-  const fIdx = rest.indexOf("--frames");
-  const framesPath = fIdx !== -1 ? rest[fIdx + 1] : undefined;
-  const gIdx = rest.indexOf("--songs");
-  const songsPaths = gIdx !== -1 ? rest[gIdx + 1].split(",").filter(Boolean) : [];
-  const xIdx = rest.indexOf("--sheetext");
-  const sheetExtPath = xIdx !== -1 ? rest[xIdx + 1] : undefined;
-  const ffIdx = rest.indexOf("--gff");
-  const gffPath = ffIdx !== -1 ? rest[ffIdx + 1] : undefined;
-  const mIdx = rest.indexOf("--map");
-  const mapPath = mIdx !== -1 ? rest[mIdx + 1] : undefined;
-  const nIdx = rest.indexOf("--num8");
-  const valueOf = (i) => (i === -1 ? -2 : i + 1);   // index of a flag's value arg
-  const entry = rest.filter((a, i) =>
-    i !== oIdx && i !== valueOf(oIdx) &&
-    i !== sIdx && i !== valueOf(sIdx) &&
-    i !== fIdx && i !== valueOf(fIdx) &&
-    i !== gIdx && i !== valueOf(gIdx) &&
-    i !== xIdx && i !== valueOf(xIdx) &&
-    i !== ffIdx && i !== valueOf(ffIdx) &&
-    i !== mIdx && i !== valueOf(mIdx) &&
-    i !== nIdx)[0];
-  if (!entry) fail("usage: gtlua build <main.lua> [--sheet foo.gtg] [--gff foo.gff] [--map foo.map] [--frames foo.gsi] [--songs a.gtm2,b.gtm2] [--sheetext ext.bin] [--num8] [-o game.gtr]");
-  await runBuild(entry, { outPath, sheetPath, gffPath, mapPath, num8: nIdx !== -1, framesPath, songsPaths, sheetExtPath });
+  const request = resolveBuildRequest(rest);
+  await runBuild(request.entry, request.options);
   if (_closeWorker) _closeWorker();
 } else if (cmd === "run") {
   // build then play in a window (bundled core), no external emulator needed.
-  const oIdx = rest.indexOf("-o");
-  const sIdx = rest.indexOf("--sheet");
-  const fIdx = rest.indexOf("--frames");
-  const ffIdx = rest.indexOf("--gff");
-  const mIdx = rest.indexOf("--map");
-  const nIdx = rest.indexOf("--num8");
-  const valueOf = (i) => (i === -1 ? -2 : i + 1);
-  const entry = rest.filter((a, i) =>
-    i !== oIdx && i !== valueOf(oIdx) &&
-    i !== sIdx && i !== valueOf(sIdx) &&
-    i !== fIdx && i !== valueOf(fIdx) &&
-    i !== ffIdx && i !== valueOf(ffIdx) &&
-    i !== mIdx && i !== valueOf(mIdx) &&
-    i !== nIdx)[0];
-  if (!entry) fail("usage: gtlua run <main.lua> [--sheet foo.gtg] [--gff foo.gff] [--map foo.map] [--frames foo.gsi] [--num8]");
+  const directRom = rest.length === 1 && rest[0].endsWith(".gtr") ? rest[0] : null;
+  const request = directRom ? null : resolveBuildRequest(rest);
+  const entry = directRom ?? request.entry;
   // if given a prebuilt .gtr, run it directly; else build to a temp .gtr first.
   let gtr;
   if (entry.endsWith(".gtr")) {
     gtr = entry;
   } else {
-    gtr = path.join(path.dirname(path.resolve(entry)), path.basename(entry, path.extname(entry)) + ".gtr");
-    await runBuild(entry, {
-      outPath: gtr,
-      sheetPath: sIdx !== -1 ? rest[sIdx + 1] : undefined,
-      gffPath: ffIdx !== -1 ? rest[ffIdx + 1] : undefined,
-      mapPath: mIdx !== -1 ? rest[mIdx + 1] : undefined,
-      num8: nIdx !== -1,
-      framesPath: fIdx !== -1 ? rest[fIdx + 1] : undefined,
-    });
+    gtr = request.options.outPath ?? path.join(path.dirname(path.resolve(entry)), path.basename(entry, path.extname(entry)) + ".gtr");
+    await runBuild(entry, { ...request.options, outPath: gtr });
     if (_closeWorker) _closeWorker();
   }
   try {
@@ -309,6 +337,18 @@ if (cmd === "build") {
       fail(`gtlua run: ${e?.message ?? e}`);
     }
   }
+} else if (cmd === "check") {
+  const parsed = parseBuildArgs(rest);
+  const project = projectForTarget(parsed.target);
+  if (project) checkSource(project.entry, { num8: project.num8, ...parsed.options });
+  else if (parsed.target) checkSource(parsed.target, parsed.options);
+  else fail(`no source given and no ${PROJECT_FILE} found`);
+} else if (cmd === "init") {
+  if (rest.length > 1) fail("usage: gtlua init [directory]");
+  const directory = path.resolve(rest[0] ?? ".");
+  const project = createProject(directory);
+  console.log(`Created ${project.name} in ${project.root}`);
+  console.log(`Next: cd ${path.relative(process.cwd(), project.root) || "."} && gtlua run`);
 } else if (cmd === "c") {
   if (!rest[0]) fail("usage: gtlua c <main.lua>");
   process.stdout.write(compileLuaCli(rest[0]).c);
@@ -316,9 +356,11 @@ if (cmd === "build") {
   const { gfxCli } = await import("./gtlua-gfx.mjs");
   gfxCli(rest);
 } else {
-  fail("usage: gtlua build <main.lua> [--sheet foo.gtg] [--gff foo.gff] [--map foo.map] [--frames foo.gsi] [--num8] [-o game.gtr]\n" +
-       "       gtlua run   <main.lua|game.gtr> [--sheet ...] [--gff ...] [--map ...] [--num8]   build + play in a window\n" +
+  fail("usage: gtlua init  [directory]                                      create a project\n" +
+       "       gtlua check [main.lua|project-dir] [--num8]                   validate without building\n" +
+       "       gtlua build [main.lua|project-dir] [--sheet ...] [-o ...]     build a project or source\n" +
+       "       gtlua run   [main.lua|project-dir|game.gtr] [--sheet ...]     build + play\n" +
     "       gtlua gfx import <in.png|in.p8|in.gtg> [-o out.gtg]\n" +
     "       gtlua gfx export <in.gtg> [-o out.png]\n" +
-    "       gtlua c <main.lua>");
+    `       gtlua c <main.lua>\n\nWith no source, check/build/run discover ${PROJECT_FILE} in the current or parent directory.`);
 }

@@ -24,7 +24,7 @@
     "romdev-toolchain-cc65": "0.1.3"
   },
   "scripts": {
-    "test": "node --test test/api_units.test.js test/api_browser.test.js test/compiler.test.js test/constant-math.test.js test/fixed_asm.test.js test/gfx.test.js test/gtm2.test.js test/toolchain_parity.test.js",
+    "test": "node --test test/api_units.test.js test/api_browser.test.js test/compiler.test.js test/constant-math.test.js test/fixed_asm.test.js test/gfx.test.js test/gtm2.test.js test/project.test.js test/toolchain_parity.test.js",
     "api:generate": "node tools/generate-api.mjs",
     "api:check": "node tools/generate-api.mjs --check",
     "bench": "node bench/run.mjs"

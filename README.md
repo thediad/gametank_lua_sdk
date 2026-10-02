@@ -59,6 +59,50 @@ That's the whole loop: write `main.lua`, `run` it, ship the `.gtr`. Colors are
 PICO-8-style indices `0-15` (`0` black, `1` dark-blue, `10` yellow, `14` pink);
 `gt.rgb()` reaches the full 256-color GameTank palette when you want more.
 
+### Project workflow (`gtstudio` foundation)
+
+For a project that remembers its source, output, assets, and number format, use:
+
+```sh
+gtlua init mygame
+cd mygame
+gtlua check
+gtlua build
+gtlua run
+```
+
+These commands discover `gtlua.json` in the current directory or any parent
+directory. Explicit commands such as `gtlua build main.lua --sheet gfx.gtg`
+remain supported. A project file currently has this dependency-free JSON form:
+
+```json
+{
+  "version": 1,
+  "name": "mygame",
+  "source": "main.lua",
+  "output": "game.gtr",
+  "assets": {
+    "sheet": "gfx.gtg",
+    "flags": "gfx.gff",
+    "map": "level.map",
+    "frames": "gfx.gsi",
+    "songs": ["title.gtm2"]
+  },
+  "build": { "num8": false }
+}
+```
+
+Only declare assets that exist. Paths are relative to the project and cannot
+escape it. `gtlua check` validates the manifest and declared files, then runs
+the Lua compiler without invoking cc65 or creating a ROM. This project model is
+the stable interface intended for the future integrated `gtstudio` editor.
+
+On PicoCalc, `scripts/install_picocalc_dev.sh` also installs `gtstudio`. Run
+`gtstudio PROJECT` for one compact menu that returns to the same place after
+editing, checking, building, running, browsing API help, or reading the last
+build log. The menu is deliberately a lightweight front end over the same CLI;
+it does not duplicate compiler or project behavior.
+
 ## Requirements
 
 - [Node.js](https://nodejs.org/) **24+** (the bundled cc65 + emulator WASM need
