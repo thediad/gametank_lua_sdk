@@ -233,7 +233,8 @@ asset_menu() {
             '3  Set tile map (.map)' \
             '4  Set frame table (.gsi)' \
             '5  Add song (.gtm2)' \
-            '6  Unregister an asset' \
+            '6  Import graphics or PICO-8 cart' \
+            '7  Unregister an asset' \
             'B  Back'
         printf '\nChoice: '
         IFS= read -r choice
@@ -244,6 +245,15 @@ asset_menu() {
             4) kind=frames ;;
             5) kind=song ;;
             6)
+                printf 'Source image/cart path: '
+                IFS= read -r asset_file
+                printf 'Output name [gfx.gtg]: '
+                IFS= read -r output_file
+                output_file=${output_file:-gfx.gtg}
+                (cd "$project" && node "$SDK/bin/gtlua.js" asset import "$asset_file" -o "$output_file")
+                pause_for_key
+                continue ;;
+            7)
                 printf 'Kind to unregister (sheet/flags/map/frames): '
                 IFS= read -r kind
                 (cd "$project" && node "$SDK/bin/gtlua.js" asset unset "$kind")

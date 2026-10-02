@@ -146,3 +146,16 @@ test("asset registration rejects missing and outside-project files", t => {
   assert.throws(() => setProjectAsset(project, "sheet", outside), /must stay inside/);
   assert.throws(() => setProjectAsset(project, "sheet", project.entry), /must use the \.gtg extension/);
 });
+
+test("asset import converts and registers art without implicit overwrite", t => {
+  const root = temporaryProject(t);
+  const project = createProject(path.join(root, "demo"), "demo");
+  const source = path.join(project.root, "source.gtg");
+  fs.writeFileSync(source, Buffer.alloc(128 * 128, 7));
+  const cli = path.resolve("bin/gtlua.js");
+  execFileSync(process.execPath, [cli, "asset", "import", "source.gtg"], { cwd: project.root });
+  assert.equal(projectInfo(loadProject(project.manifest)).assets.sheet, "gfx.gtg");
+  assert.equal(fs.statSync(path.join(project.root, "gfx.gtg")).size, 128 * 128);
+  assert.throws(() => execFileSync(process.execPath, [cli, "asset", "import", "source.gtg"], { cwd: project.root, stdio: "pipe" }), /Command failed/);
+  assert.deepEqual(fs.readFileSync(path.join(project.root, "gfx.gtg")), Buffer.alloc(128 * 128, 7));
+});

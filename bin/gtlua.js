@@ -317,6 +317,36 @@ function printProject(project, json = false) {
   console.log(`  songs:    ${info.assets.songs.length ? info.assets.songs.join(", ") : "-"}`);
 }
 
+async function importProjectGraphics(project, args) {
+  const force = args.includes("--force");
+  const filtered = args.filter(arg => arg !== "--force");
+  const oIdx = filtered.indexOf("-o");
+  const outputArg = oIdx === -1 ? "gfx.gtg" : filtered[oIdx + 1];
+  const input = filtered.filter((arg, index) => oIdx === -1 || (index !== oIdx && index !== oIdx + 1))[0];
+  if (!input || !outputArg || filtered.length !== (oIdx === -1 ? 1 : 3)) {
+    fail("usage: gtlua asset import <image.png|cart.p8|sheet.gtg> [-o project.gtg] [--force]");
+  }
+  const inputPath = path.resolve(input);
+  if (!existsSync(inputPath)) fail(`asset import source does not exist: ${input}`);
+  const outputPath = path.resolve(project.root, outputArg);
+  const rel = path.relative(project.root, outputPath);
+  if (rel === ".." || rel.startsWith(`..${path.sep}`) || path.isAbsolute(rel)) fail("asset import output must stay inside the project directory");
+  if (path.extname(outputPath).toLowerCase() !== ".gtg") fail("asset import output must use the .gtg extension");
+  const stem = outputPath.slice(0, -4);
+  const possible = [outputPath, `${stem}_1.gtg`, `${stem}_2.gtg`, `${stem}_3.gtg`, `${stem}.gff`, `${stem}.map`];
+  const existing = possible.filter(file => existsSync(file));
+  if (existing.length && !force) {
+    fail(`asset import refuses to overwrite: ${existing.map(file => path.relative(project.root, file)).join(", ")}\nUse --force only after reviewing those files.`);
+  }
+  const { gfxCli } = await import("./gtlua-gfx.mjs");
+  gfxCli(["import", inputPath, "-o", outputPath]);
+  let updated = setProjectAsset(project, "sheet", outputPath);
+  if (existsSync(`${stem}.gff`)) updated = setProjectAsset(updated, "flags", `${stem}.gff`);
+  if (existsSync(`${stem}.map`)) updated = setProjectAsset(updated, "map", `${stem}.map`);
+  console.log("Updated gtlua.json:");
+  printProject(updated);
+}
+
 // ---- main -------------------------------------------------------------------
 
 const [, , cmd, ...rest] = process.argv;
@@ -368,7 +398,9 @@ if (cmd === "build") {
 } else if (cmd === "asset") {
   const [action, kind, file, ...extra] = rest;
   const project = projectForTarget();
-  if (action === "set" && kind && file && extra.length === 0) {
+  if (action === "import") {
+    await importProjectGraphics(project, rest.slice(1));
+  } else if (action === "set" && kind && file && extra.length === 0) {
     const updated = setProjectAsset(project, kind, file);
     console.log(`Registered ${kind}: ${projectInfo(updated).assets[kind]}`);
   } else if (action === "add-song" && kind && !file && extra.length === 0) {
@@ -380,7 +412,8 @@ if (cmd === "build") {
   } else {
     fail("usage: gtlua asset set <sheet|sheetext|flags|map|frames> <project-file>\n" +
          "       gtlua asset add-song <project-file>\n" +
-         "       gtlua asset unset <sheet|sheetext|flags|map|frames>");
+         "       gtlua asset unset <sheet|sheetext|flags|map|frames>\n" +
+         "       gtlua asset import <image.png|cart.p8|sheet.gtg> [-o project.gtg] [--force]");
   }
 } else if (cmd === "check") {
   const parsed = parseBuildArgs(rest);
@@ -404,6 +437,7 @@ if (cmd === "build") {
   fail("usage: gtlua init  [directory]                                      create a project\n" +
        "       gtlua project [directory] [--json]                            show project and assets\n" +
        "       gtlua asset set|add-song|unset ...                            update declared assets\n" +
+       "       gtlua asset import <image|cart> [-o gfx.gtg] [--force]         convert and register art\n" +
        "       gtlua check [main.lua|project-dir] [--num8]                   validate without building\n" +
        "       gtlua build [main.lua|project-dir] [--sheet ...] [-o ...]     build a project or source\n" +
        "       gtlua run   [main.lua|project-dir|game.gtr] [--sheet ...]     build + play\n" +
