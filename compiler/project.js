@@ -101,6 +101,26 @@ export function validateProjectFiles(project) {
   return project;
 }
 
+export function projectInfo(project) {
+  const relative = file => file ? path.relative(project.root, file).replaceAll(path.sep, "/") : null;
+  return {
+    name: project.name,
+    root: project.root,
+    manifest: relative(project.manifest),
+    source: relative(project.entry),
+    output: relative(project.outPath),
+    numberFormat: project.num8 ? "8.8" : "16.16",
+    assets: {
+      sheet: relative(project.sheetPath),
+      sheetext: relative(project.sheetExtPath),
+      flags: relative(project.gffPath),
+      map: relative(project.mapPath),
+      frames: relative(project.framesPath),
+      songs: project.songsPaths.map(relative),
+    },
+  };
+}
+
 export function createProject(directory, name = path.basename(path.resolve(directory))) {
   const root = path.resolve(directory);
   const manifest = path.join(root, PROJECT_FILE);

@@ -194,6 +194,7 @@ studio() {
             '4  Build and run' \
             '5  API help' \
             '6  Last build log' \
+            '7  Project and assets' \
             'Q  Quit'
         printf '\nChoice: '
         IFS= read -r choice
@@ -211,6 +212,9 @@ studio() {
                     printf '\nNo build log exists yet.\n'
                     pause_for_key
                 fi ;;
+            7|p|P)
+                (cd "$project" && node "$SDK/bin/gtlua.js" project) 2>&1
+                pause_for_key ;;
             q|Q|0) return 0 ;;
             *) printf '\nUnknown choice.\n'; pause_for_key ;;
         esac

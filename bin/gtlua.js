@@ -21,7 +21,7 @@ import { fileURLToPath } from "node:url";
 
 import { compile, formatDiagnostics } from "../compiler/index.js";
 import { build } from "../compiler/build.js";
-import { PROJECT_FILE, createProject, loadProject, resolveProject, validateProjectFiles } from "../compiler/project.js";
+import { PROJECT_FILE, createProject, loadProject, projectInfo, resolveProject, validateProjectFiles } from "../compiler/project.js";
 
 const REPO = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SDK = path.join(REPO, "sdk");
@@ -296,6 +296,27 @@ function checkSource(entry, options = {}) {
   console.log(`OK: ${path.resolve(entry)}`);
 }
 
+function printProject(project, json = false) {
+  const info = projectInfo(project);
+  if (json) {
+    console.log(JSON.stringify(info, null, 2));
+    return;
+  }
+  const value = item => item ?? "-";
+  console.log(`GameTank Lua project: ${info.name}`);
+  console.log(`root:    ${info.root}`);
+  console.log(`source:  ${info.source}`);
+  console.log(`ROM:     ${info.output}`);
+  console.log(`numbers: ${info.numberFormat}`);
+  console.log("assets:");
+  console.log(`  sheet:    ${value(info.assets.sheet)}`);
+  console.log(`  sheetext: ${value(info.assets.sheetext)}`);
+  console.log(`  flags:    ${value(info.assets.flags)}`);
+  console.log(`  map:      ${value(info.assets.map)}`);
+  console.log(`  frames:   ${value(info.assets.frames)}`);
+  console.log(`  songs:    ${info.assets.songs.length ? info.assets.songs.join(", ") : "-"}`);
+}
+
 // ---- main -------------------------------------------------------------------
 
 const [, , cmd, ...rest] = process.argv;
@@ -337,6 +358,13 @@ if (cmd === "build") {
       fail(`gtlua run: ${e?.message ?? e}`);
     }
   }
+} else if (cmd === "project") {
+  const json = rest.includes("--json");
+  const targets = rest.filter(arg => arg !== "--json");
+  if (targets.length > 1) fail("usage: gtlua project [directory|gtlua.json] [--json]");
+  const project = projectForTarget(targets[0]);
+  if (!project) fail(`no ${PROJECT_FILE} found for ${targets[0]}`);
+  printProject(project, json);
 } else if (cmd === "check") {
   const parsed = parseBuildArgs(rest);
   const project = projectForTarget(parsed.target);
@@ -357,6 +385,7 @@ if (cmd === "build") {
   gfxCli(rest);
 } else {
   fail("usage: gtlua init  [directory]                                      create a project\n" +
+       "       gtlua project [directory] [--json]                            show project and assets\n" +
        "       gtlua check [main.lua|project-dir] [--num8]                   validate without building\n" +
        "       gtlua build [main.lua|project-dir] [--sheet ...] [-o ...]     build a project or source\n" +
        "       gtlua run   [main.lua|project-dir|game.gtr] [--sheet ...]     build + play\n" +

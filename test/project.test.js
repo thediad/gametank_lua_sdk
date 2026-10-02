@@ -4,7 +4,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { createProject, findProject, loadProject, validateProjectFiles } from "../compiler/project.js";
+import { createProject, findProject, loadProject, projectInfo, validateProjectFiles } from "../compiler/project.js";
 
 function temporaryProject(t) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "gtlua-project-"));
@@ -37,6 +37,15 @@ test("loadProject resolves declared assets relative to the manifest", t => {
   assert.equal(project.sheetPath, path.join(root, "gfx.gtg"));
   assert.equal(project.outPath, path.join(root, "build", "assets.gtr"));
   assert.equal(project.num8, true);
+  assert.deepEqual(projectInfo(project), {
+    name: "assets",
+    root,
+    manifest: "gtlua.json",
+    source: "main.lua",
+    output: "build/assets.gtr",
+    numberFormat: "8.8",
+    assets: { sheet: "gfx.gtg", sheetext: null, flags: null, map: null, frames: null, songs: [] },
+  });
 });
 
 test("project paths cannot escape the project directory", t => {
@@ -61,6 +70,7 @@ test("PicoCalc shortcuts use the shared project workflow", () => {
   assert.match(launcher, /\[ -f "\$project\/gtlua\.json" \]/);
   assert.match(launcher, /GameTank Lua Studio/);
   assert.match(launcher, /4  Build and run/);
+  assert.match(launcher, /7  Project and assets/);
   const nanorc = fs.readFileSync(path.resolve("scripts/picocalc/nanorc"), "utf8");
   assert.match(nanorc, /set wordchars "_\."/);
   assert.match(nanorc, /bind F5 .*gtedit-run/);
@@ -90,6 +100,18 @@ test("gtlua check discovers a parent project without invoking the toolchain", t 
   });
   assert.match(output, /^OK: .*main\.lua/m);
   assert.equal(fs.existsSync(project.outPath), false);
+});
+
+test("gtlua project prints human and JSON project summaries", t => {
+  const root = temporaryProject(t);
+  const project = createProject(path.join(root, "demo"), "demo");
+  const cli = path.resolve("bin/gtlua.js");
+  const human = execFileSync(process.execPath, [cli, "project"], { cwd: project.root, encoding: "utf8" });
+  assert.match(human, /GameTank Lua project: demo/);
+  assert.match(human, /sheet:\s+-/);
+  const json = JSON.parse(execFileSync(process.execPath, [cli, "project", "--json"], { cwd: project.root, encoding: "utf8" }));
+  assert.equal(json.source, "main.lua");
+  assert.equal(json.assets.map, null);
 });
 
 test("context-help cache includes unambiguous Nano word aliases", t => {
