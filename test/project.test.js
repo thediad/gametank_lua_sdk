@@ -63,6 +63,7 @@ test("PicoCalc shortcuts use the shared project workflow", () => {
   assert.match(launcher, /4  Build and run/);
   const nanorc = fs.readFileSync(path.resolve("scripts/picocalc/nanorc"), "utf8");
   assert.match(nanorc, /set wordchars "_\."/);
+  assert.match(nanorc, /bind F5 .*gtedit-run/);
   assert.match(nanorc, /bind F6 .*\{nextword\}\{mark\}\{prevword\}.*gtedit-help/);
   assert.match(nanorc, /bind F7 .*gtedit-check/);
   assert.match(installer, /build-context-help\.mjs/);
@@ -70,6 +71,9 @@ test("PicoCalc shortcuts use the shared project workflow", () => {
   const check = fs.readFileSync(path.resolve("scripts/picocalc/gtedit-check"), "utf8");
   assert.match(help, /read -rsn1 -t 0\.2/);
   assert.match(check, /read -rsn1 -t 0\.2/);
+  const run = fs.readFileSync(path.resolve("scripts/picocalc/gtedit-run"), "utf8");
+  assert.match(run, /exec <\/dev\/tty >\/dev\/tty 2>&1/);
+  assert.match(run, /"\$RUNNER" "\$PROJECT"/);
 });
 
 test("gtlua check discovers a parent project without invoking the toolchain", t => {

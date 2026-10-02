@@ -1,0 +1,31 @@
+#!/bin/bash
+set -u
+
+PROJECT=${GTEDIT_PROJECT:-$PWD}
+RUNNER=${GTDEV_RUNNER:-/home/pico/bin/gtrun}
+
+if [ ! -x "$RUNNER" ]; then
+    printf 'gtedit-run: runner not found: %s\n' "$RUNNER" > /dev/tty
+    sleep 3
+    exit 1
+fi
+
+# Nano waits for this helper. Give the build and emulator the real terminal;
+# neither command may emit text into the source buffer through stdout.
+exec </dev/tty >/dev/tty 2>&1
+printf '\033[2J\033[H'
+printf 'GTStudio: building and running %s\r\n\r\n' "${PROJECT##*/}"
+
+"$RUNNER" "$PROJECT"
+rc=$?
+
+if [ "$rc" -eq 0 ]; then
+    printf '\033[2J\033[HReturning to Nano...\r\n'
+    sleep 1
+else
+    printf '\r\nBuild or run failed (status %s).\r\n' "$rc"
+    printf 'The output is saved for gtlog.\r\n'
+    printf 'Press Enter to return to Nano...'
+    IFS= read -r _unused
+fi
+exit "$rc"
