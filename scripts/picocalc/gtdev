@@ -195,6 +195,7 @@ studio() {
             '5  API help' \
             '6  Last build log' \
             '7  Project and assets' \
+            '8  Register assets' \
             'Q  Quit'
         printf '\nChoice: '
         IFS= read -r choice
@@ -215,9 +216,50 @@ studio() {
             7|p|P)
                 (cd "$project" && node "$SDK/bin/gtlua.js" project) 2>&1
                 pause_for_key ;;
+            8|a|A) asset_menu ;;
             q|Q|0) return 0 ;;
             *) printf '\nUnknown choice.\n'; pause_for_key ;;
         esac
+    done
+}
+
+asset_menu() {
+    while true; do
+        clear
+        printf '%s\n' 'GTStudio Asset Registration' '---------------------------'
+        printf '%s\n' \
+            '1  Set sprite sheet (.gtg)' \
+            '2  Set sprite flags (.gff)' \
+            '3  Set tile map (.map)' \
+            '4  Set frame table (.gsi)' \
+            '5  Add song (.gtm2)' \
+            '6  Unregister an asset' \
+            'B  Back'
+        printf '\nChoice: '
+        IFS= read -r choice
+        case "$choice" in
+            1) kind=sheet ;;
+            2) kind=flags ;;
+            3) kind=map ;;
+            4) kind=frames ;;
+            5) kind=song ;;
+            6)
+                printf 'Kind to unregister (sheet/flags/map/frames): '
+                IFS= read -r kind
+                (cd "$project" && node "$SDK/bin/gtlua.js" asset unset "$kind")
+                pause_for_key
+                continue ;;
+            b|B|q|Q) return 0 ;;
+            *) printf '\nUnknown choice.\n'; pause_for_key; continue ;;
+        esac
+        printf 'Existing project-relative file: '
+        IFS= read -r asset_file
+        if [ "$kind" = song ]; then
+            (cd "$project" && node "$SDK/bin/gtlua.js" asset add-song "$asset_file")
+        else
+            (cd "$project" && node "$SDK/bin/gtlua.js" asset set "$kind" "$asset_file")
+        fi
+        pause_for_key
     done
 }
 

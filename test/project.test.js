@@ -4,7 +4,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { createProject, findProject, loadProject, projectInfo, validateProjectFiles } from "../compiler/project.js";
+import { createProject, findProject, loadProject, projectInfo, setProjectAsset, unsetProjectAsset, validateProjectFiles } from "../compiler/project.js";
 
 function temporaryProject(t) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "gtlua-project-"));
@@ -71,6 +71,7 @@ test("PicoCalc shortcuts use the shared project workflow", () => {
   assert.match(launcher, /GameTank Lua Studio/);
   assert.match(launcher, /4  Build and run/);
   assert.match(launcher, /7  Project and assets/);
+  assert.match(launcher, /8  Register assets/);
   const nanorc = fs.readFileSync(path.resolve("scripts/picocalc/nanorc"), "utf8");
   assert.match(nanorc, /set wordchars "_\."/);
   assert.match(nanorc, /bind F5 .*gtedit-run/);
@@ -121,4 +122,27 @@ test("context-help cache includes unambiguous Nano word aliases", t => {
   assert.match(fs.readFileSync(path.join(cache, "draw.txt"), "utf8"), /^_draw\(\)/);
   assert.match(fs.readFileSync(path.join(cache, "bg_draw.txt"), "utf8"), /^gt\.bg_draw/);
   assert.equal(fs.readFileSync(path.join(cache, ".entry-count"), "utf8"), "128\n");
+});
+
+test("asset registration updates the manifest atomically without moving files", t => {
+  const root = temporaryProject(t);
+  let project = createProject(path.join(root, "demo"), "demo");
+  const sheet = path.join(project.root, "gfx.gtg");
+  fs.writeFileSync(sheet, "sheet");
+  project = setProjectAsset(project, "sheet", sheet);
+  assert.equal(projectInfo(project).assets.sheet, "gfx.gtg");
+  assert.equal(fs.readFileSync(sheet, "utf8"), "sheet");
+  project = unsetProjectAsset(project, "sheet");
+  assert.equal(projectInfo(project).assets.sheet, null);
+  assert.equal(fs.readFileSync(sheet, "utf8"), "sheet");
+});
+
+test("asset registration rejects missing and outside-project files", t => {
+  const root = temporaryProject(t);
+  const project = createProject(path.join(root, "demo"), "demo");
+  const outside = path.join(root, "outside.gtg");
+  fs.writeFileSync(outside, "outside");
+  assert.throws(() => setProjectAsset(project, "sheet", "missing.gtg"), /does not exist/);
+  assert.throws(() => setProjectAsset(project, "sheet", outside), /must stay inside/);
+  assert.throws(() => setProjectAsset(project, "sheet", project.entry), /must use the \.gtg extension/);
 });

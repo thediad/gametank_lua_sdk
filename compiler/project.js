@@ -2,6 +2,14 @@ import fs from "node:fs";
 import path from "node:path";
 
 export const PROJECT_FILE = "gtlua.json";
+const ASSET_FIELDS = new Map([
+  ["sheet", "sheet"], ["sheetext", "sheetext"], ["flags", "flags"],
+  ["map", "map"], ["frames", "frames"],
+]);
+const ASSET_EXTENSIONS = new Map([
+  ["sheet", ".gtg"], ["sheetext", ".bin"], ["flags", ".gff"],
+  ["map", ".map"], ["frames", ".gsi"], ["song", ".gtm2"],
+]);
 
 function projectError(message) {
   throw new Error(`project: ${message}`);
@@ -119,6 +127,50 @@ export function projectInfo(project) {
       songs: project.songsPaths.map(relative),
     },
   };
+}
+
+function storedProjectPath(project, file, label) {
+  const absolute = path.resolve(project.root, file);
+  const rel = path.relative(project.root, absolute);
+  if (rel === ".." || rel.startsWith(`..${path.sep}`) || path.isAbsolute(rel)) projectError(`${label} must stay inside the project directory`);
+  if (!fs.existsSync(absolute) || !fs.statSync(absolute).isFile()) projectError(`${label} does not exist: ${file}`);
+  return rel.replaceAll(path.sep, "/");
+}
+
+function writeManifest(project, raw) {
+  const temporary = `${project.manifest}.tmp-${process.pid}`;
+  try {
+    fs.writeFileSync(temporary, `${JSON.stringify(raw, null, 2)}\n`, { flag: "wx" });
+    fs.renameSync(temporary, project.manifest);
+  } finally {
+    if (fs.existsSync(temporary)) fs.rmSync(temporary);
+  }
+  return validateProjectFiles(loadProject(project.manifest));
+}
+
+export function setProjectAsset(project, kind, file) {
+  const raw = JSON.parse(fs.readFileSync(project.manifest, "utf8"));
+  raw.assets ??= {};
+  const extension = ASSET_EXTENSIONS.get(kind);
+  if (!extension) projectError(`unknown asset kind '${kind}'`);
+  if (path.extname(file).toLowerCase() !== extension) projectError(`${kind} must use the ${extension} extension`);
+  if (kind === "song") {
+    const stored = storedProjectPath(project, file, "song");
+    raw.assets.songs ??= [];
+    if (!raw.assets.songs.includes(stored)) raw.assets.songs.push(stored);
+  } else {
+    const field = ASSET_FIELDS.get(kind);
+    raw.assets[field] = storedProjectPath(project, file, kind);
+  }
+  return writeManifest(project, raw);
+}
+
+export function unsetProjectAsset(project, kind) {
+  const field = ASSET_FIELDS.get(kind);
+  if (!field) projectError(`unknown removable asset kind '${kind}'`);
+  const raw = JSON.parse(fs.readFileSync(project.manifest, "utf8"));
+  if (raw.assets) delete raw.assets[field];
+  return writeManifest(project, raw);
 }
 
 export function createProject(directory, name = path.basename(path.resolve(directory))) {

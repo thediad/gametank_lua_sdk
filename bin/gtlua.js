@@ -21,7 +21,7 @@ import { fileURLToPath } from "node:url";
 
 import { compile, formatDiagnostics } from "../compiler/index.js";
 import { build } from "../compiler/build.js";
-import { PROJECT_FILE, createProject, loadProject, projectInfo, resolveProject, validateProjectFiles } from "../compiler/project.js";
+import { PROJECT_FILE, createProject, loadProject, projectInfo, resolveProject, setProjectAsset, unsetProjectAsset, validateProjectFiles } from "../compiler/project.js";
 
 const REPO = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SDK = path.join(REPO, "sdk");
@@ -365,6 +365,23 @@ if (cmd === "build") {
   const project = projectForTarget(targets[0]);
   if (!project) fail(`no ${PROJECT_FILE} found for ${targets[0]}`);
   printProject(project, json);
+} else if (cmd === "asset") {
+  const [action, kind, file, ...extra] = rest;
+  const project = projectForTarget();
+  if (action === "set" && kind && file && extra.length === 0) {
+    const updated = setProjectAsset(project, kind, file);
+    console.log(`Registered ${kind}: ${projectInfo(updated).assets[kind]}`);
+  } else if (action === "add-song" && kind && !file && extra.length === 0) {
+    const updated = setProjectAsset(project, "song", kind);
+    console.log(`Registered song: ${projectInfo(updated).assets.songs.at(-1)}`);
+  } else if (action === "unset" && kind && !file && extra.length === 0) {
+    unsetProjectAsset(project, kind);
+    console.log(`Unregistered ${kind}; no asset file was deleted.`);
+  } else {
+    fail("usage: gtlua asset set <sheet|sheetext|flags|map|frames> <project-file>\n" +
+         "       gtlua asset add-song <project-file>\n" +
+         "       gtlua asset unset <sheet|sheetext|flags|map|frames>");
+  }
 } else if (cmd === "check") {
   const parsed = parseBuildArgs(rest);
   const project = projectForTarget(parsed.target);
@@ -386,6 +403,7 @@ if (cmd === "build") {
 } else {
   fail("usage: gtlua init  [directory]                                      create a project\n" +
        "       gtlua project [directory] [--json]                            show project and assets\n" +
+       "       gtlua asset set|add-song|unset ...                            update declared assets\n" +
        "       gtlua check [main.lua|project-dir] [--num8]                   validate without building\n" +
        "       gtlua build [main.lua|project-dir] [--sheet ...] [-o ...]     build a project or source\n" +
        "       gtlua run   [main.lua|project-dir|game.gtr] [--sheet ...]     build + play\n" +
