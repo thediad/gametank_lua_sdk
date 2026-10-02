@@ -347,6 +347,24 @@ async function importProjectGraphics(project, args) {
   printProject(updated);
 }
 
+function createProjectAsset(project, kind, requested) {
+  const specs = {
+    sheet: { name: "gfx.gtg", size: 128 * 128 },
+    flags: { name: "gfx.gff", size: 256 },
+    map: { name: "level.map", size: 128 * 64 },
+  };
+  const spec = specs[kind];
+  if (!spec) fail("asset create kind must be sheet, flags, or map");
+  const output = path.resolve(project.root, requested ?? spec.name);
+  const rel = path.relative(project.root, output);
+  if (rel === ".." || rel.startsWith(`..${path.sep}`) || path.isAbsolute(rel)) fail("asset create output must stay inside the project directory");
+  if (existsSync(output)) fail(`asset create refuses to overwrite: ${rel}`);
+  mkdirSync(path.dirname(output), { recursive: true });
+  writeFileSync(output, Buffer.alloc(spec.size), { flag: "wx" });
+  const updated = setProjectAsset(project, kind, output);
+  console.log(`Created and registered ${kind}: ${projectInfo(updated).assets[kind]} (${spec.size} bytes)`);
+}
+
 // ---- main -------------------------------------------------------------------
 
 const [, , cmd, ...rest] = process.argv;
@@ -400,6 +418,8 @@ if (cmd === "build") {
   const project = projectForTarget();
   if (action === "import") {
     await importProjectGraphics(project, rest.slice(1));
+  } else if (action === "create" && kind && extra.length === 0) {
+    createProjectAsset(project, kind, file);
   } else if (action === "set" && kind && file && extra.length === 0) {
     const updated = setProjectAsset(project, kind, file);
     console.log(`Registered ${kind}: ${projectInfo(updated).assets[kind]}`);
@@ -411,6 +431,7 @@ if (cmd === "build") {
     console.log(`Unregistered ${kind}; no asset file was deleted.`);
   } else {
     fail("usage: gtlua asset set <sheet|sheetext|flags|map|frames> <project-file>\n" +
+         "       gtlua asset create <sheet|flags|map> [project-file]\n" +
          "       gtlua asset add-song <project-file>\n" +
          "       gtlua asset unset <sheet|sheetext|flags|map|frames>\n" +
          "       gtlua asset import <image.png|cart.p8|sheet.gtg> [-o project.gtg] [--force]");
@@ -437,6 +458,7 @@ if (cmd === "build") {
   fail("usage: gtlua init  [directory]                                      create a project\n" +
        "       gtlua project [directory] [--json]                            show project and assets\n" +
        "       gtlua asset set|add-song|unset ...                            update declared assets\n" +
+       "       gtlua asset create <sheet|flags|map> [file]                   create a blank asset\n" +
        "       gtlua asset import <image|cart> [-o gfx.gtg] [--force]         convert and register art\n" +
        "       gtlua check [main.lua|project-dir] [--num8]                   validate without building\n" +
        "       gtlua build [main.lua|project-dir] [--sheet ...] [-o ...]     build a project or source\n" +

@@ -159,3 +159,14 @@ test("asset import converts and registers art without implicit overwrite", t => 
   assert.throws(() => execFileSync(process.execPath, [cli, "asset", "import", "source.gtg"], { cwd: project.root, stdio: "pipe" }), /Command failed/);
   assert.deepEqual(fs.readFileSync(path.join(project.root, "gfx.gtg")), Buffer.alloc(128 * 128, 7));
 });
+
+test("asset create writes correctly sized blank files and refuses overwrite", t => {
+  const root = temporaryProject(t);
+  const project = createProject(path.join(root, "demo"), "demo");
+  const cli = path.resolve("bin/gtlua.js");
+  execFileSync(process.execPath, [cli, "asset", "create", "flags"], { cwd: project.root });
+  assert.equal(fs.statSync(path.join(project.root, "gfx.gff")).size, 256);
+  assert.equal(projectInfo(loadProject(project.manifest)).assets.flags, "gfx.gff");
+  assert.throws(() => execFileSync(process.execPath, [cli, "asset", "create", "flags"], { cwd: project.root, stdio: "pipe" }), /Command failed/);
+  assert.equal(fs.statSync(path.join(project.root, "gfx.gff")).size, 256);
+});

@@ -234,7 +234,8 @@ asset_menu() {
             '4  Set frame table (.gsi)' \
             '5  Add song (.gtm2)' \
             '6  Import graphics or PICO-8 cart' \
-            '7  Unregister an asset' \
+            '7  Create a blank native asset' \
+            '8  Unregister an asset' \
             'B  Back'
         printf '\nChoice: '
         IFS= read -r choice
@@ -254,6 +255,18 @@ asset_menu() {
                 pause_for_key
                 continue ;;
             7)
+                printf 'Kind to create (sheet/flags/map): '
+                IFS= read -r kind
+                printf 'Output name [default]: '
+                IFS= read -r output_file
+                if [ -n "$output_file" ]; then
+                    (cd "$project" && node "$SDK/bin/gtlua.js" asset create "$kind" "$output_file")
+                else
+                    (cd "$project" && node "$SDK/bin/gtlua.js" asset create "$kind")
+                fi
+                pause_for_key
+                continue ;;
+            8)
                 printf 'Kind to unregister (sheet/flags/map/frames): '
                 IFS= read -r kind
                 (cd "$project" && node "$SDK/bin/gtlua.js" asset unset "$kind")
