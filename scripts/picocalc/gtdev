@@ -107,7 +107,7 @@ fi
 
 edit() {
     [ -r "$GTDEV_NANORC" ] || fail "Nano configuration not found: $GTDEV_NANORC"
-    "$GTDEV_EDITOR" --rcfile "$GTDEV_NANORC" "$source"
+    (cd "$project" && GTEDIT_SOURCE="$source" "$GTDEV_EDITOR" --rcfile "$GTDEV_NANORC" "$source")
 }
 
 build() {

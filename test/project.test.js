@@ -61,6 +61,15 @@ test("PicoCalc shortcuts use the shared project workflow", () => {
   assert.match(launcher, /\[ -f "\$project\/gtlua\.json" \]/);
   assert.match(launcher, /GameTank Lua Studio/);
   assert.match(launcher, /4  Build and run/);
+  const nanorc = fs.readFileSync(path.resolve("scripts/picocalc/nanorc"), "utf8");
+  assert.match(nanorc, /set wordchars "_\."/);
+  assert.match(nanorc, /bind F6 .*\{nextword\}\{mark\}\{prevword\}.*gtedit-help/);
+  assert.match(nanorc, /bind F7 .*gtedit-check/);
+  assert.match(installer, /build-context-help\.mjs/);
+  const help = fs.readFileSync(path.resolve("scripts/picocalc/gtedit-help"), "utf8");
+  const check = fs.readFileSync(path.resolve("scripts/picocalc/gtedit-check"), "utf8");
+  assert.match(help, /read -rsn1 -t 0\.2/);
+  assert.match(check, /read -rsn1 -t 0\.2/);
 });
 
 test("gtlua check discovers a parent project without invoking the toolchain", t => {
@@ -74,4 +83,13 @@ test("gtlua check discovers a parent project without invoking the toolchain", t 
   });
   assert.match(output, /^OK: .*main\.lua/m);
   assert.equal(fs.existsSync(project.outPath), false);
+});
+
+test("context-help cache includes unambiguous Nano word aliases", t => {
+  const root = temporaryProject(t);
+  const cache = path.join(root, "cache");
+  execFileSync(process.execPath, [path.resolve("tools/build-context-help.mjs"), cache]);
+  assert.match(fs.readFileSync(path.join(cache, "draw.txt"), "utf8"), /^_draw\(\)/);
+  assert.match(fs.readFileSync(path.join(cache, "bg_draw.txt"), "utf8"), /^gt\.bg_draw/);
+  assert.equal(fs.readFileSync(path.join(cache, ".entry-count"), "utf8"), "128\n");
 });

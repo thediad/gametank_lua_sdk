@@ -6,9 +6,16 @@ set tabsize 2
 set tabstospaces
 set autoindent
 set smarthome
+set wordchars "_."
 set positionlog
 unset breaklonglines
 unset softwrap
 unset linenumbers
 unset mouse
 include "/home/pico/.config/gtdev/gtlua.nanorc"
+
+# Treat _ and . as identifier characters so contextual help selects complete
+# names such as _draw and gt.bg_draw. The helper preserves that selection.
+bind F6 "{savefile}{nextword}{mark}{prevword}{execute}| /home/pico/bin/gtedit-help{enter}{undo}{refresh}" main
+bind F7 "{savefile}{execute}/home/pico/bin/gtedit-check{enter}{refresh}" main
+bind F8 suspend main

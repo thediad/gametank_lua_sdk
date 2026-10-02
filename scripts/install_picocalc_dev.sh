@@ -8,9 +8,12 @@ config_dir=${GTDEV_CONFIG_DIR:-$HOME/.config/gtdev}
 
 install -d "$bin_dir" "$config_dir"
 install -m 0755 "$source_dir/gtdev" "$bin_dir/gtdev"
+install -m 0755 "$source_dir/gtedit-help" "$bin_dir/gtedit-help"
+install -m 0755 "$source_dir/gtedit-check" "$bin_dir/gtedit-check"
 install -m 0755 "$script_dir/../bin/gtapi.js" "$bin_dir/gtapi"
 install -m 0644 "$source_dir/nanorc" "$config_dir/nanorc"
 install -m 0644 "$source_dir/gtlua.nanorc" "$config_dir/gtlua.nanorc"
+node "$script_dir/../tools/build-context-help.mjs" "$config_dir/api-help-cache"
 
 for name in gtstudio gtnew gtedit gtcheck gtbuild gtplay gtrun gtlog; do
     target=$bin_dir/$name
