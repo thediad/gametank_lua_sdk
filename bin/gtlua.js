@@ -15,7 +15,7 @@
 
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, statSync, unlinkSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -365,6 +365,29 @@ function createProjectAsset(project, kind, requested) {
   console.log(`Created and registered ${kind}: ${projectInfo(updated).assets[kind]} (${spec.size} bytes)`);
 }
 
+async function buildSheetPreview(project) {
+  if (!project.sheetPath) fail("asset preview requires a registered sprite sheet");
+  const source = path.join(project.root, ".gtstudio-sheet-preview.lua");
+  const output = path.join(project.root, "build", "gtstudio-sheet-preview.gtr");
+  if (existsSync(source)) fail(`asset preview refuses to replace temporary source: ${source}`);
+  const program = `-- Generated temporarily by: gtlua asset preview\nfunction _draw()\n  cls(0)\n  for sprite=0,255 do\n    spr(sprite,(sprite%16)*8,flr(sprite/16)*8)\n  end\nend\n`;
+  writeFileSync(source, program, { flag: "wx" });
+  try {
+    await runBuild(source, {
+      outPath: output,
+      sheetPath: project.sheetPath,
+      sheetExtPath: project.sheetExtPath,
+      framesPath: project.framesPath,
+      gffPath: project.gffPath,
+      mapPath: project.mapPath,
+      num8: project.num8,
+    });
+  } finally {
+    if (existsSync(source)) unlinkSync(source);
+  }
+  console.log(`Preview ROM: ${output}`);
+}
+
 // ---- main -------------------------------------------------------------------
 
 const [, , cmd, ...rest] = process.argv;
@@ -418,6 +441,9 @@ if (cmd === "build") {
   const project = projectForTarget();
   if (action === "import") {
     await importProjectGraphics(project, rest.slice(1));
+  } else if (action === "preview" && !kind) {
+    await buildSheetPreview(project);
+    if (_closeWorker) _closeWorker();
   } else if (action === "create" && kind && extra.length === 0) {
     createProjectAsset(project, kind, file);
   } else if (action === "set" && kind && file && extra.length === 0) {
@@ -434,6 +460,7 @@ if (cmd === "build") {
          "       gtlua asset create <sheet|flags|map> [project-file]\n" +
          "       gtlua asset add-song <project-file>\n" +
          "       gtlua asset unset <sheet|sheetext|flags|map|frames>\n" +
+         "       gtlua asset preview\n" +
          "       gtlua asset import <image.png|cart.p8|sheet.gtg> [-o project.gtg] [--force]");
   }
 } else if (cmd === "check") {
@@ -459,6 +486,7 @@ if (cmd === "build") {
        "       gtlua project [directory] [--json]                            show project and assets\n" +
        "       gtlua asset set|add-song|unset ...                            update declared assets\n" +
        "       gtlua asset create <sheet|flags|map> [file]                   create a blank asset\n" +
+       "       gtlua asset preview                                           build a sheet preview ROM\n" +
        "       gtlua asset import <image|cart> [-o gfx.gtg] [--force]         convert and register art\n" +
        "       gtlua check [main.lua|project-dir] [--num8]                   validate without building\n" +
        "       gtlua build [main.lua|project-dir] [--sheet ...] [-o ...]     build a project or source\n" +

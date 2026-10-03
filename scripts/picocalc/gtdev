@@ -236,6 +236,7 @@ asset_menu() {
             '6  Import graphics or PICO-8 cart' \
             '7  Create a blank native asset' \
             '8  Unregister an asset' \
+            '9  Preview registered sprite sheet' \
             'B  Back'
         printf '\nChoice: '
         IFS= read -r choice
@@ -271,6 +272,13 @@ asset_menu() {
                 IFS= read -r kind
                 (cd "$project" && node "$SDK/bin/gtlua.js" asset unset "$kind")
                 pause_for_key
+                continue ;;
+            9)
+                if (cd "$project" && GTLUA_TOOLCHAIN=wasm node "$SDK/bin/gtlua.js" asset preview); then
+                    PICOCALC_SCALE="${PICOCALC_SCALE:-2}" "$EMU" "$project/build/gtstudio-sheet-preview.gtr"
+                else
+                    pause_for_key
+                fi
                 continue ;;
             b|B|q|Q) return 0 ;;
             *) printf '\nUnknown choice.\n'; pause_for_key; continue ;;
