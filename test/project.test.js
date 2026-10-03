@@ -73,7 +73,9 @@ test("PicoCalc shortcuts use the shared project workflow", () => {
   assert.match(launcher, /7  Project and assets/);
   assert.match(launcher, /8  Register assets/);
   assert.match(launcher, /9  Preview registered sprite sheet/);
-  assert.match(launcher, /asset preview/);
+  assert.match(launcher, /10 Preview registered tile map/);
+  assert.match(launcher, /asset preview sheet/);
+  assert.match(launcher, /asset preview map/);
   const nanorc = fs.readFileSync(path.resolve("scripts/picocalc/nanorc"), "utf8");
   assert.match(nanorc, /set wordchars "_\."/);
   assert.match(nanorc, /bind F5 .*gtedit-run/);

@@ -237,6 +237,7 @@ asset_menu() {
             '7  Create a blank native asset' \
             '8  Unregister an asset' \
             '9  Preview registered sprite sheet' \
+            '10 Preview registered tile map' \
             'B  Back'
         printf '\nChoice: '
         IFS= read -r choice
@@ -274,8 +275,15 @@ asset_menu() {
                 pause_for_key
                 continue ;;
             9)
-                if (cd "$project" && GTLUA_TOOLCHAIN=wasm node "$SDK/bin/gtlua.js" asset preview); then
+                if (cd "$project" && GTLUA_TOOLCHAIN=wasm node "$SDK/bin/gtlua.js" asset preview sheet); then
                     PICOCALC_SCALE="${PICOCALC_SCALE:-2}" "$EMU" "$project/build/gtstudio-sheet-preview.gtr"
+                else
+                    pause_for_key
+                fi
+                continue ;;
+            10)
+                if (cd "$project" && GTLUA_TOOLCHAIN=wasm node "$SDK/bin/gtlua.js" asset preview map); then
+                    PICOCALC_SCALE="${PICOCALC_SCALE:-2}" "$EMU" "$project/build/gtstudio-map-preview.gtr"
                 else
                     pause_for_key
                 fi
