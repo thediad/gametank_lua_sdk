@@ -237,7 +237,7 @@ asset_menu() {
             '7  Create a blank native asset' \
             '8  Unregister an asset' \
             '9  Inspect registered sprite sheet' \
-            '10 Preview registered tile map' \
+            '10 Inspect registered tile map' \
             'B  Back'
         printf '\nChoice: '
         IFS= read -r choice
