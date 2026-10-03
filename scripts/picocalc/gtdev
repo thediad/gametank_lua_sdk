@@ -236,7 +236,7 @@ asset_menu() {
             '6  Import graphics or PICO-8 cart' \
             '7  Create a blank native asset' \
             '8  Unregister an asset' \
-            '9  Preview registered sprite sheet' \
+            '9  Inspect registered sprite sheet' \
             '10 Preview registered tile map' \
             'B  Back'
         printf '\nChoice: '

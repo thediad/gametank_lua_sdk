@@ -373,7 +373,7 @@ async function buildAssetPreview(project, kind = "sheet") {
   const output = path.join(project.root, "build", `gtstudio-${kind}-preview.gtr`);
   if (existsSync(source)) fail(`asset preview refuses to replace temporary source: ${source}`);
   const programs = {
-    sheet: `-- Generated temporarily by: gtlua asset preview sheet\nfunction _draw()\n  cls(0)\n  for sprite=0,255 do\n    spr(sprite,(sprite%16)*8,flr(sprite/16)*8)\n  end\nend\n`,
+    sheet: `-- Generated temporarily by: gtlua asset preview sheet\nlocal selected=0\nlocal show_info=0\nfunction _update60()\n  if btnp(0) and selected%16>0 then selected-=1 end\n  if btnp(1) and selected%16<15 then selected+=1 end\n  if btnp(2) and selected>15 then selected-=16 end\n  if btnp(3) and selected<240 then selected+=16 end\n  if btnp(4) then show_info=1-show_info end\nend\nfunction _draw()\n  cls(0)\n  for sprite=0,255 do\n    spr(sprite,(sprite%16)*8,flr(sprite/16)*8)\n  end\n  local sx=(selected%16)*8\n  local sy=flr(selected/16)*8\n  rect(sx,sy,sx+7,sy+7,7)\n  if show_info==1 then\n    rectfill(0,0,63,7,0)\n    print("s",1,1,7)\n    print(selected,7,1,7)\n    print("f",31,1,7)\n    print(fget(selected),37,1,7)\n  end\nend\n`,
     map: `-- Generated temporarily by: gtlua asset preview map\nlocal map_x=0\nlocal map_y=0\nfunction _update60()\n  if btnp(0) and map_x>0 then map_x-=1 end\n  if btnp(1) and map_x<112 then map_x+=1 end\n  if btnp(2) and map_y>0 then map_y-=1 end\n  if btnp(3) and map_y<48 then map_y+=1 end\nend\nfunction _draw()\n  cls(0)\n  map(map_x,map_y,0,0,16,16)\nend\n`,
   };
   const program = programs[kind];

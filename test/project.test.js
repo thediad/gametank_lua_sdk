@@ -72,7 +72,7 @@ test("PicoCalc shortcuts use the shared project workflow", () => {
   assert.match(launcher, /4  Build and run/);
   assert.match(launcher, /7  Project and assets/);
   assert.match(launcher, /8  Register assets/);
-  assert.match(launcher, /9  Preview registered sprite sheet/);
+  assert.match(launcher, /9  Inspect registered sprite sheet/);
   assert.match(launcher, /10 Preview registered tile map/);
   assert.match(launcher, /asset preview sheet/);
   assert.match(launcher, /asset preview map/);
@@ -173,4 +173,18 @@ test("asset create writes correctly sized blank files and refuses overwrite", t 
   assert.equal(projectInfo(loadProject(project.manifest)).assets.flags, "gfx.gff");
   assert.throws(() => execFileSync(process.execPath, [cli, "asset", "create", "flags"], { cwd: project.root, stdio: "pipe" }), /Command failed/);
   assert.equal(fs.statSync(path.join(project.root, "gfx.gff")).size, 256);
+});
+
+test("sprite inspector builds a ROM without leaving generated Lua behind", t => {
+  const root = temporaryProject(t);
+  const project = createProject(path.join(root, "demo"), "demo");
+  const cli = path.resolve("bin/gtlua.js");
+  execFileSync(process.execPath, [cli, "asset", "create", "sheet"], { cwd: project.root });
+  execFileSync(process.execPath, [cli, "asset", "create", "flags"], { cwd: project.root });
+  execFileSync(process.execPath, [cli, "asset", "preview", "sheet"], {
+    cwd: project.root,
+    env: { ...process.env, GTLUA_TOOLCHAIN: "wasm" },
+  });
+  assert.equal(fs.statSync(path.join(project.root, "build", "gtstudio-sheet-preview.gtr")).size, 32768);
+  assert.equal(fs.existsSync(path.join(project.root, ".gtstudio-sheet-preview.lua")), false);
 });
